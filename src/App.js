@@ -1,25 +1,44 @@
-import logo from './logo.svg';
-import './App.css';
+import { Outlet, Route, Routes } from "react-router-dom"
+import React, {useState, createContext, useEffect} from 'react'
+import SideBar from "./components/SideBar"
+import Cart from "./components/Cart"
+import Homepage from "./components/Homepage"
+import Shop from "./components/Shop"
+import Product from "./components/Product"
+import RemoveItemModal from "./modals/removeItemModal"
+export const StateSharingContext = createContext()
 
-function App() {
+export default function App() {
+  const [cartItems, setCartItems] = useState([])
+  const [showRemoveItem, setShowRemoveItem] = useState({})
+
+  const stateContextValue = {cartItems,setCartItems,showRemoveItem, setShowRemoveItem}
+  useEffect(()=>{
+    console.log(showRemoveItem)
+  },[showRemoveItem])
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <StateSharingContext.Provider value={stateContextValue}>
+    <div className="w-screen h-screen bg-background flex">
+      <HandleModalComponent/>
+      <Routes>
+        <Route path="/" element={<Outlet/>} errorElement={<h1>404</h1>}></Route>
+          <Route index element={<Homepage/>}/>
+          <Route path="cart" element={<div className="flex w-full h-full"><SideBar/><Cart/></div>}/>
+          <Route path="shop" element={<Outlet/>}>
+            <Route index element={<div className="flex w-full h-full"><SideBar/><Shop/></div>}/>
+            <Route path=":productId" element={<div className="flex w-full h-full"><SideBar/><Product/></div>}/>
+          </Route>
+        <Route path="*" element={<h1>Not found</h1>} />
+      </Routes>
     </div>
-  );
-}
+    </StateSharingContext.Provider>
+  )
 
-export default App;
+  function HandleModalComponent(){
+    return(
+      <div>
+        {showRemoveItem.state?<RemoveItemModal productData={showRemoveItem.productData}/>:<></>}
+      </div>
+    )
+  }
+}
