@@ -49,11 +49,12 @@ export default function Product() {
       <div className="block w-full md:hidden max-w-[500px] my-10">
         <ProductImage image={product.image4}/>
       </div>
-      <div className="flex min-w flex-col gap-8">
+      <div className="flex min-w flex-col gap-8 text-center md:text-left">
         <p className="font-semibold text-5xl">{product.name}</p>
         <p className="text-xl font-semibold">{`$${product.price} SGD`}</p>
-        <div className="gap-3 flex items-center">
+        <div className="gap-3 flex items-center flex-col md:flex-row">
           <p className="text-sm font-semibold mr-2">Select Size</p>
+          <div className="flex gap-3">
           <SizeChoiceBox
             size="S"
             handleSelect={() => {
@@ -89,11 +90,12 @@ export default function Product() {
             }}
             sizeChoice={sizeChoice}
           />
+          </div>
         </div>
         <div>
           <div className=" bg-slate-500 w-full h-lineBreakHeight max-w-lg" />
 
-          <div className="flex gap-5 mt-8 max-w-lg">
+          <div className="flex md:flex-row flex-col gap-5 mt-8 max-w-lg">
             <button
               className="border-2 border-black w-full h-12 font-semibold rounded-md hover:bg-black hover:text-white"
               onClick={() => handleAddToCart(product)}

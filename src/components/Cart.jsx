@@ -3,15 +3,18 @@ import { StateSharingContext } from "../App.js";
 import { IoIosArrowUp } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
+import { useNavigate } from "react-router";
 
 export default function Cart() {
+  const navigate = useNavigate()
+  
   const { cartItems, setCartItems, showRemoveItem, setShowRemoveItem } =
     useContext(StateSharingContext);
 
   const shippingPrice = 2;
   function calculateProductPrice() {
     const productPrice = cartItems.reduce((total, items) => {
-      return total + items.price*items.quantity;
+      return total + items.price * items.quantity;
     }, 0);
     return Number(productPrice.toFixed(2));
   }
@@ -51,7 +54,7 @@ export default function Cart() {
               </div>
               <div className="flex justify-between px-5">
                 <p className="text-sm text-slate-600">Shipping</p>
-                <p className="text-sm font-semibold">{`${shippingPrice} SGD`}</p>
+                <p className="text-sm font-semibold">{`$${shippingPrice} SGD`}</p>
               </div>
               <div className=" bg-slate-400 w-full h-lineBreakHeight my-3" />
               <div className="flex justify-between px-5 py-3">
@@ -59,7 +62,9 @@ export default function Cart() {
                 <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
               </div>
               <div className="pt-5 px-5">
-                <button className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black">
+                <button className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black" onClick={()=>{
+                  navigate("/checkout",{state:{cartData:cartItems}})
+                }}>
                   Checkout
                 </button>
               </div>
@@ -78,9 +83,13 @@ export default function Cart() {
           </div>
         )}
       </div>
-      {cartItems.length !== 0 ?<div className="lg:hidden absolute bottom-0 w-full left-0">
-        <MobileCartSummary />
-      </div>:<></>}
+      {cartItems.length !== 0 ? (
+        <div className="lg:hidden absolute bottom-0 w-full left-0">
+          <MobileCartSummary />
+        </div>
+      ) : (
+        <></>
+      )}
       <ToastContainer position="top-center" theme="light" />
     </div>
   );
@@ -102,7 +111,9 @@ export default function Cart() {
           <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
         </div>
         <div className="px-5">
-          <button className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black">
+          <button className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black" onClick={()=>{
+            navigate("/checkout",{cartData:cartItems})
+          }}>
             Checkout
           </button>
         </div>
@@ -117,8 +128,8 @@ function CartBox(props) {
   const { name, price, image, size, quantity } = productData;
 
   return (
-    <div className=" w-full flex gap-5 py-5 md:p-5 items-center justify-center">
-      <div className="flex gap-5 w-max items-center">
+    <div className=" w-full flex gap-5 py-5 md:p-5 items-center justify-center px-5">
+      <div className="flex gap-5 w-max items-center basis-[68%] md:basis-auto justify-between">
         <img
           src={require(`../images/${image}`)}
           className="md:w-20 md:h-20 h-24 w-24 rounded-md"
@@ -130,18 +141,18 @@ function CartBox(props) {
             <p className="text-slate-400">Size:</p>
             <p className="hidden sm:block">{size}</p>
             <div className="block sm:hidden">
-              <SizePicker elementSize="8"/>
+              <SizePicker elementSize="10" />
             </div>
           </div>
           <div className="flex-1 block sm:hidden mt-">
-              <p className="font-semibold">{`$${price} SGD`}</p>
-            </div>
+            <p className="font-semibold">{`$${price} SGD`}</p>
+          </div>
         </div>
       </div>
       <div className="flex-1 hidden sm:block">
         <p className="font-semibold text-center">{`$${price} SGD`}</p>
       </div>
-      <div className="flex max-w gap-3 items-center">
+      <div className="flex max-w gap-3 items-center flex-1 justify-end">
         <p className="text-slate-400 hidden sm:block">Quantity:</p>
         <div className="px-2 py-1 rounded-lg w-20 flex justify-between items-center border-slate-300 border-2">
           <p>{quantity}</p>
@@ -192,18 +203,23 @@ function CartBox(props) {
           </div>
         </div>
         <div className="hidden sm:block">
-          <SizePicker elementSize="10"/>
+          <SizePicker elementSize="10" />
         </div>
       </div>
     </div>
   );
   function SizePicker(props) {
-    const {elementSize} = props
-    const sizeStyle = `w-${elementSize} h-${elementSize}`
+    const { elementSize } = props;
+    const sizeStyle = `w-${elementSize} h-${elementSize}`;
+    const topOffset = elementSize + elementSize / 2;
     return (
-      <div className={`${sizeStyle} rounded-3xl flex justify-center items-center shadow-md shadow-slate-400 cursor-pointer relative group`}>
+      <div
+        className={`${sizeStyle} rounded-3xl flex justify-center items-center shadow-md shadow-slate-400 cursor-pointer relative group`}
+      >
         <p className="text-sm font-semibold">{size}</p>
-        <div className={`hidden flex-col absolute w-10 rounded-md shadow-md shadow-slate-400 top-${elementSize} group-hover:flex z-10 bg-background`}>
+        <div
+          className={`hidden flex-col absolute w-10 rounded-md shadow-md shadow-slate-400 top-10 group-hover:flex z-10 bg-background`}
+        >
           <DropdownChoice
             size="S"
             setCartItems={setCartItems}
