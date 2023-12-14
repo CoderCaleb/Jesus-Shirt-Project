@@ -5,9 +5,9 @@ export default function Shop() {
   return (
     <div className="h-full overflow-y-scroll m-auto w-full pb-10 px-5">
       <div className="flex justify-center">
-        <p className=" text-5xl font-semibold my-16">Shop</p>
+        <p className=" text-5xl font-semibold my-16">Shop 🛍️</p>
       </div>
-      <div className="flex flex-wrap gap-5 justify-center">
+      <div className="flex w-full flex-wrap gap-3 justify-center">
         {shirtData.map((value, index) => {
           return <ProductCard productData={value} index={index} key={index} />;
         })}
@@ -31,9 +31,9 @@ function ProductCard(props) {
     return colorArray[index % colorArray.length];
   }
   return (
-    <div className="md:basis-[calc(25%-15px)] basis-[calc(50%-15px)]  grow-0 shrink-0 w-0">
+    <div className="md:basis-[calc(25%-15px)] basis-[calc(50%-15px)] grow-0 shrink-0 w-0">
       <div
-        className={`  rounded-lg flex flex-col gap-2 items-center px-5 py-3 justify-center cursor-pointer hover:scale-110 transition-all duration-150 bg-cardColorOne`}
+        className={`rounded-lg flex flex-col gap-2 items-center md:px-5 md:py-3 justify-center cursor-pointer hover:scale-110 transition-all duration-150 bg-cardColorOne`}
         onClick={() => {
           navigate(`/shop/${id}`);
         }}

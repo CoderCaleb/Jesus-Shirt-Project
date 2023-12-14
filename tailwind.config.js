@@ -10,6 +10,7 @@ module.exports = {
         primary:"#A6B1E1",
         secondary:"#DCD6F7",
         accent:"#424874",
+        secondary2:"#c77135",
         cardColorOne:"#e5dcd7",
         cardColorTwo:"#CEEDC7",
         cardColorThree:"#FFF6BD",

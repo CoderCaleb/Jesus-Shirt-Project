@@ -25,10 +25,10 @@ export default function Cart() {
 
   return (
     <div className="w-full h-full relative">
-      <div className="w-full h-full py-10 sm:p-10 overflow-y-scroll pb-20">
+      <div className="w-full h-full py-10 sm:p-10 overflow-x-hidden overflow-y-scroll pb-56">
         <div className="flex justify-between sm:px-0 px-10">
-          <p className="text-3xl font-semibold">Shopping Cart</p>
-          <p className="text-3xl font-semibold">{`${cartItems.length} Items`}</p>
+          <p className="text-3xl font-semibold sm:text-left text-center flex-1">Shopping Cart</p>
+          <p className="text-3xl font-semibold hidden sm:block">{`${cartItems.length} Items`}</p>
         </div>
         <div className=" bg-slate-400 w-full h-lineBreakHeight mt-4 sm:px-0 px-10" />
         {cartItems.length !== 0 ? (
@@ -112,8 +112,8 @@ export default function Cart() {
         </div>
         <div className="px-5">
           <button className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black" onClick={()=>{
-            navigate("/checkout",{cartData:cartItems})
-          }}>
+                  navigate("/checkout",{state:{cartData:cartItems}})
+                }}>
             Checkout
           </button>
         </div>
@@ -128,32 +128,32 @@ function CartBox(props) {
   const { name, price, image, size, quantity } = productData;
 
   return (
-    <div className=" w-full flex gap-5 py-5 md:p-5 items-center justify-center px-5">
-      <div className="flex gap-5 w-max items-center basis-[68%] md:basis-auto justify-between">
+    <div className=" w-full flex py-5 md:p-5 items-center justify-center px-2">
+      <div className="flex md:gap-5 items-center basis-[66.6%] md:basis-auto justify-between">
         <img
           src={require(`../images/${image}`)}
-          className="md:w-20 md:h-20 h-24 w-24 rounded-md"
+          className="h-24 w-24 rounded-md"
           alt="product"
         />
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 text-center md:basis-auto basis-[50%] md:text-left text-sm sm:text-base">
           <p className={"font-semibold"}>{name}</p>
-          <div className="flex gap-3 sm:gap-1 items-center">
+          <div className="flex gap-3 sm:gap-1 items-center md:justify-start justify-center">
             <p className="text-slate-400">Size:</p>
             <p className="hidden sm:block">{size}</p>
             <div className="block sm:hidden">
               <SizePicker elementSize="10" />
             </div>
           </div>
-          <div className="flex-1 block sm:hidden mt-">
+          <div className="flex-1 block md:hidden">
             <p className="font-semibold">{`$${price} SGD`}</p>
           </div>
         </div>
       </div>
-      <div className="flex-1 hidden sm:block">
+      <div className="flex-1 hidden md:block">
         <p className="font-semibold text-center">{`$${price} SGD`}</p>
       </div>
       <div className="flex max-w gap-3 items-center flex-1 justify-end">
-        <p className="text-slate-400 hidden sm:block">Quantity:</p>
+        <p className="text-slate-400 hidden md:block">Quantity:</p>
         <div className="px-2 py-1 rounded-lg w-20 flex justify-between items-center border-slate-300 border-2">
           <p>{quantity}</p>
           <div className="flex flex-col justify-between">

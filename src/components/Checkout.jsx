@@ -4,10 +4,13 @@ import "/node_modules/flag-icons/css/flag-icons.min.css";
 import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import CheckoutShipping from "./CheckoutShipping";
 import CheckoutPayment from "./CheckoutPayment";
+import OrderConfirmationPage from "./OrderComfirmation";
 export const CheckoutContext = createContext();
 export default function Checkout() {
   const location = useLocation();
   const [checkoutProgress, setCheckoutProgress] = useState(1);
+  // State variables for input values
+
   const [country, setCountry] = useState({
     name: "Singapore",
     "alpha-2": "SG",
@@ -21,12 +24,47 @@ export default function Checkout() {
     "sub-region-code": "035",
     "intermediate-region-code": "",
   });
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [streetAddress, setStreetAddress] = useState("");
+  const [townCity, setTownCity] = useState("");
+  const [state, setState] = useState("");
+  const [postcode, setPostcode] = useState("");
+  const [emailAddress, setEmailAddress] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [expirationDate, setExpirationDate] = useState("");
+  const [securityCode, setSecurityCode] = useState("");
+  const [nameOnCard, setNameOnCard] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const checkoutContextValue = {
     checkoutProgress,
     setCheckoutProgress,
     country,
     setCountry,
+    showDropdown,
+    setShowDropdown,
+    firstName,
+    setFirstName,
+    lastName,
+    setLastName,
+    streetAddress,
+    setStreetAddress,
+    townCity,
+    setTownCity,
+    state,
+    setState,
+    postcode,
+    setPostcode,
+    emailAddress,
+    setEmailAddress,
+    cardNumber,
+    setCardNumber,
+    expirationDate,
+    setExpirationDate,
+    nameOnCard,
+    setNameOnCard,
+    securityCode,
+    setSecurityCode,
     showDropdown,
     setShowDropdown,
   };
@@ -46,8 +84,8 @@ export default function Checkout() {
     return (
       <CheckoutContext.Provider value={checkoutContextValue}>
         <div className=" w-full overflow-y-scroll flex">
-          {checkoutProgress === 1 ? <CheckoutShipping /> : <CheckoutPayment />}
-          <div className="w-1/2 px-5 py-5 bg-slate-200">
+          {checkoutProgress === 1 ? <CheckoutShipping /> : (checkoutProgress === 2?<CheckoutPayment />:<OrderConfirmationPage/>)}
+          <div className="w-1/2 px-5 py-5 bg-slate-200 flex-col justify-center hidden md:flex">
             <div>
               {cartData.map((product, index) => {
                 return <ItemCard productInfo={product} />;

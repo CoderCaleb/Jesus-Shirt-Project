@@ -3,9 +3,11 @@ import { useParams } from "react-router";
 import { faker } from "@faker-js/faker";
 import shirtData from "../shirtData";
 import { StateSharingContext } from "../App.js";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { setItem } from "localforage";
+import "react-responsive-carousel/lib/styles/carousel.min.css";
+import { Carousel } from "react-responsive-carousel";
 
 export default function Product() {
   const { productId } = useParams();
@@ -16,23 +18,25 @@ export default function Product() {
   function handleAddToCart(productInfo) {
     productInfo = { ...productInfo, size: sizeChoice, quantity: 1 };
     setCartItems((prev) => {
-      const productInCartIndex = prev.findIndex(item=>item && (item.id === product.id&&item.size === productInfo.size))
-      const productData = [...prev]
-      toast("Item successfully added in your cart 🛒",{
-        type:"success",
-      })
-      if(productInCartIndex !== -1){
-        console.log("Item in cart already")
-        
+      const productInCartIndex = prev.findIndex(
+        (item) =>
+          item && item.id === product.id && item.size === productInfo.size
+      );
+      const productData = [...prev];
+      toast("Item successfully added in your cart 🛒", {
+        type: "success",
+      });
+      if (productInCartIndex !== -1) {
+        console.log("Item in cart already");
+
         productData[productInCartIndex] = {
-            ...productData[productInCartIndex],
-            quantity: productData[productInCartIndex].quantity + 1,
-          }
-        console.log(productData)
-        return productData
-      }
-      else{
-        console.log("Item not in cart yet")
+          ...productData[productInCartIndex],
+          quantity: productData[productInCartIndex].quantity + 1,
+        };
+        console.log(productData);
+        return productData;
+      } else {
+        console.log("Item not in cart yet");
         return [...prev, productInfo];
       }
     });
@@ -46,72 +50,82 @@ export default function Product() {
         <ProductImage image={product.image3} />
         <ProductImage image={product.image4} />
       </div>
-      <div className="block w-full md:hidden max-w-[500px] my-10">
-        <ProductImage image={product.image4}/>
+      <div className="block w-full md:hidden max-w-[500px]">
+        <Carousel showArrows={true}>
+          <div>
+            <img src={product.image4} alt="product"/>
+          </div>
+          <div>
+            <img src={product.image2} alt="product"/>
+          </div>
+          <div>
+            <img src={product.image3} alt="product"/>
+          </div>
+          <div>
+            <img src={product.image4} alt="product"/>
+          </div>
+        </Carousel>
       </div>
-      <div className="flex min-w flex-col gap-8 text-center md:text-left">
-        <p className="font-semibold text-5xl">{product.name}</p>
-        <p className="text-xl font-semibold">{`$${product.price} SGD`}</p>
+      <div className="flex min-w flex-col md:w-auto w-full gap-6 text-center md:text-left">
+        <p className="font-bold text-4xl">{product.name}</p>
+        <p className="text-lg font-semibold text-secondary2">{`$${product.price} SGD`}</p>
         <div className="gap-3 flex items-center flex-col md:flex-row">
           <p className="text-sm font-semibold mr-2">Select Size</p>
           <div className="flex gap-3">
-          <SizeChoiceBox
-            size="S"
-            handleSelect={() => {
-              setSizeChoice("S");
-            }}
-            sizeChoice={sizeChoice}
-          />
-          <SizeChoiceBox
-            size="M"
-            handleSelect={() => {
-              setSizeChoice("M");
-            }}
-            sizeChoice={sizeChoice}
-          />
-          <SizeChoiceBox
-            size="L"
-            handleSelect={() => {
-              setSizeChoice("L");
-            }}
-            sizeChoice={sizeChoice}
-          />
-          <SizeChoiceBox
-            size="XL"
-            handleSelect={() => {
-              setSizeChoice("XL");
-            }}
-            sizeChoice={sizeChoice}
-          />
-          <SizeChoiceBox
-            size="XXL"
-            handleSelect={() => {
-              setSizeChoice("XXL");
-            }}
-            sizeChoice={sizeChoice}
-          />
+            <SizeChoiceBox
+              size="S"
+              handleSelect={() => {
+                setSizeChoice("S");
+              }}
+              sizeChoice={sizeChoice}
+            />
+            <SizeChoiceBox
+              size="M"
+              handleSelect={() => {
+                setSizeChoice("M");
+              }}
+              sizeChoice={sizeChoice}
+            />
+            <SizeChoiceBox
+              size="L"
+              handleSelect={() => {
+                setSizeChoice("L");
+              }}
+              sizeChoice={sizeChoice}
+            />
+            <SizeChoiceBox
+              size="XL"
+              handleSelect={() => {
+                setSizeChoice("XL");
+              }}
+              sizeChoice={sizeChoice}
+            />
+            <SizeChoiceBox
+              size="XXL"
+              handleSelect={() => {
+                setSizeChoice("XXL");
+              }}
+              sizeChoice={sizeChoice}
+            />
           </div>
         </div>
-        <div>
-          <div className=" bg-slate-500 w-full h-lineBreakHeight max-w-lg" />
+        <div className="">
+          <div className=" bg-slate-500 w-full h-lineBreakHeight max-w-lg m-auto" />
 
-          <div className="flex md:flex-row flex-col gap-5 mt-8 max-w-lg">
+          <div className="flex md:flex-row flex-col gap-5 mt-8 max-w-lg m-auto">
             <button
               className="border-2 border-black w-full h-12 font-semibold rounded-md hover:bg-black hover:text-white"
               onClick={() => handleAddToCart(product)}
             >
               Add to Cart
             </button>
-            <button className="border-2 border-none text-white bg-indigo-700 w-full h-12 font-semibold rounded-md hover:shadow-xl shadow-indigo-800">
+            <button className="border-2 border-none text-white bg-black w-full h-12 font-semibold rounded-md hover:shadow-xl shadow-indigo-800">
               Buy Now
             </button>
           </div>
         </div>
       </div>
-      <ToastContainer 
-        position="top-center"
-        theme="light"
-      />
+      <ToastContainer position="top-center" theme="light" />
     </div>
   );
 }
@@ -131,12 +145,12 @@ function SizeChoiceBox(props) {
   const { size, handleSelect, sizeChoice } = props;
   return (
     <button
-      className={`p-1 cursor-pointer rounded-lg border-2 ${
-        sizeChoice === size ? " bg-lime-300 border-indigo-700" : "border-black"
+      className={`w-10 h-10 cursor-pointer rounded-lg border-2 border-slate-300${
+        sizeChoice === size ? " bg-secondary2 border-0" : ""
       }`}
       onClick={handleSelect}
     >
-      <p className={` text-xs ${sizeChoice === size ? " font-semibold" : ""}`}>
+      <p className={` text-xs text-black ${sizeChoice === size ? " font-semibold text-white" : ""}`}>
         {size}
       </p>
     </button>
