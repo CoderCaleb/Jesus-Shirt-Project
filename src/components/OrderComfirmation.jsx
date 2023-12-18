@@ -1,25 +1,129 @@
-import React from 'react';
+import React, { useContext, useState, useEffect, useRef } from "react";
+import { CiCircleCheck } from "react-icons/ci";
+import { useNavigate } from "react-router";
+import ItemCard from "./ItemCard";
+import { CheckoutContext } from "../App";
+import { useStripe } from "@stripe/react-stripe-js";
+import { ToastContainer, toast } from "react-toastify";
 
-const OrderConfirmationPage = ({ orderNumber, items, shippingInfo, paymentInfo }) => {
+const OrderConfirmationPage = () => {
+  const {
+    emailAddress,
+    firstName,
+    streetAddress,
+    townCity,
+    state,
+    postcode,
+    checkoutItems,
+    setCheckoutItems,
+  } = useContext(CheckoutContext);
+  const [message, setMessage] = useState("");
+  const checkoutItemsSaved = useRef([])
+  const stripe = useStripe();
+
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!stripe) {
+      return;
+    }
+
+    const clientSecret = new URLSearchParams(window.location.search).get(
+      "payment_intent_client_secret"
+    );
+
+    if (!clientSecret) {
+      return;
+    }
+
+    stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
+      switch (paymentIntent.status) {
+        case "succeeded":
+          setMessage("Payment succeeded!");
+          toast("Payment succeeded!", {
+            type: "success",
+          });
+          checkoutItemsSaved.current = checkoutItems
+          setCheckoutItems([])
+          break;
+        case "processing":
+          setMessage("Your payment is processing.");
+          toast("Your payment is processing.", {
+            type: "info",
+          });
+          break;
+        case "requires_payment_method":
+          setMessage("Your payment was not successful, please try again.");
+          toast("Your payment was not successful, please try again.", {
+            type: "error",
+          });
+          break;
+        default:
+          setMessage("Something went wrong.");
+          toast("Something went wrong", {
+            type: "error",
+          });
+          break;
+      }
+    });
+  }, [stripe]);
+
+  useEffect(()=>{
+    console.log(message)
+  },[message])
+    
   return (
-    <div>
-      <h2>Thank You for Your Purchase!</h2>
+    <div className="w-full h-full flex items-center justify-around">
       
-      <p>Your order has been confirmed with the following details:</p>
-      
-      {/* Display order summary */}
-      <div>
-        <h3>Order Summary</h3>
-        {/* Display items, shipping info, payment info */}
+      <div className="w-full flex h-min px-5 sm:px-10 flex-col sm:min-w-[400px] py-5 overflow-y-scroll md:w-1/2">
+        <p className="text-xl font-bold mb-7">Checkout</p>
+
+        <div className="flex items-center gap-2">
+          <CiCircleCheck size={45} />
+          <div className="flex flex-col">
+            <p className="text-lg font-bold">{`Thank you ${firstName}`}</p>
+          </div>
+        </div>
+        <div className="rounded-lg border-slate-300 border-1 text-sm mt-7">
+          <div className="p-3 gap-7 flex">
+            <p className="text-slate-500 font-semibold">Contact</p>
+            <p className="text-black">{emailAddress}</p>
+          </div>
+          <div className=" bg-slate-300 w-full h-lineBreakHeight" />
+          <div className="p-3 gap-7 flex">
+            <p className="text-slate-500 font-semibold">Address</p>
+            <div className="flex flex-col gap-2">
+              <p className="text-black">{streetAddress}</p>
+              <p className="text-black">{townCity}</p>
+              <p className="text-black">{state}</p>
+              <p className="text-black">{postcode}</p>
+            </div>
+          </div>
+          <div className=" bg-slate-300 w-full h-lineBreakHeight" />
+          <div className="flex pl-3 pt-3">
+            <p className="text-slate-500 font-semibold">Items</p>
+            <div className="w-full overflow-y-scroll">
+              {checkoutItemsSaved.current.map((product, index) => {
+                return <ItemCard productInfo={product} />;
+              })}
+            </div>
+          </div>
+        </div>
+        <div className="w-full">
+          <button
+            className="border-2 float-right w-44 mt-10 h-12 font-semibold rounded-lg border-black bg-black text-white hover:bg-white hover:text-black"
+            onClick={() => {
+              navigate("/shop");
+            }}
+          >
+            Continue Shopping
+          </button>
+        </div>
       </div>
-      
-      <p>Your Order Confirmation Number: {orderNumber}</p>
-      
-      <p>We will send you an email with the order details shortly.</p>
-      
-      {/* Additional information or next steps */}
-      
-      <p>Feel free to contact us if you have any questions or concerns.</p>
+      <div className="w-1/2 hidden md:block">
+       
+      </div>
+      <ToastContainer position="top-center" theme="light" />
     </div>
   );
 };

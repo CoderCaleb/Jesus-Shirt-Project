@@ -1,93 +1,78 @@
-import React, { useState, createContext } from "react";
+import React, { useState, createContext, useEffect, useContext } from "react";
 import { useLocation } from "react-router";
 import "/node_modules/flag-icons/css/flag-icons.min.css";
-import { PayPalScriptProvider, PayPalButtons } from "@paypal/react-paypal-js";
 import CheckoutShipping from "./CheckoutShipping";
 import CheckoutPayment from "./CheckoutPayment";
 import OrderConfirmationPage from "./OrderComfirmation";
-export const CheckoutContext = createContext();
-export default function Checkout() {
-  const location = useLocation();
-  const [checkoutProgress, setCheckoutProgress] = useState(1);
-  // State variables for input values
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import ItemCard from "./ItemCard";
+import { CheckoutContext } from "../App";
 
-  const [country, setCountry] = useState({
-    name: "Singapore",
-    "alpha-2": "SG",
-    "alpha-3": "SGP",
-    "country-code": "702",
-    "iso_3166-2": "ISO 3166-2:SG",
-    region: "Asia",
-    "sub-region": "South-eastern Asia",
-    "intermediate-region": "",
-    "region-code": "142",
-    "sub-region-code": "035",
-    "intermediate-region-code": "",
-  });
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [streetAddress, setStreetAddress] = useState("");
-  const [townCity, setTownCity] = useState("");
-  const [state, setState] = useState("");
-  const [postcode, setPostcode] = useState("");
-  const [emailAddress, setEmailAddress] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expirationDate, setExpirationDate] = useState("");
-  const [securityCode, setSecurityCode] = useState("");
-  const [nameOnCard, setNameOnCard] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
-  const checkoutContextValue = {
+export default function Checkout() {
+  const {
     checkoutProgress,
-    setCheckoutProgress,
-    country,
-    setCountry,
-    showDropdown,
-    setShowDropdown,
-    firstName,
-    setFirstName,
-    lastName,
-    setLastName,
-    streetAddress,
-    setStreetAddress,
-    townCity,
-    setTownCity,
-    state,
-    setState,
-    postcode,
-    setPostcode,
-    emailAddress,
-    setEmailAddress,
-    cardNumber,
-    setCardNumber,
-    expirationDate,
-    setExpirationDate,
-    nameOnCard,
-    setNameOnCard,
-    securityCode,
-    setSecurityCode,
-    showDropdown,
-    setShowDropdown,
-  };
-  if (location.state) {
-    const { cartData } = location.state;
-    const shippingPrice = 2;
-    function calculateProductPrice() {
-      const productPrice = cartData.reduce((total, items) => {
-        return total + items.price * items.quantity;
-      }, 0);
-      return Number(productPrice.toFixed(2));
-    }
-    function calculateTotalPrice() {
-      const total = calculateProductPrice() + shippingPrice;
-      return Number(total).toFixed(2);
-    }
+    checkoutItems,
+    clientSecret,
+    paymentIntentId,
+    isLoading,
+    setIsLoading,
+  } = useContext(CheckoutContext);
+  const location = useLocation();
+  const shippingPrice = 2;
+  function calculateProductPrice() {
+    const productPrice = checkoutItems.reduce((total, items) => {
+      return total + items.price * items.quantity;
+    }, 0);
+    return Number(productPrice.toFixed(2));
+  }
+  function calculateTotalPrice() {
+    const total = calculateProductPrice() + shippingPrice;
+    return Number(total).toFixed(2);
+  }
+  useEffect(() => {
+    console.log("Checkout Items", checkoutItems);
+    fetch("/update-payment-intent", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        paymentIntentId,
+        checkoutItems,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        // Handle success, if needed
+        console.log("PaymentIntent updated successfully", data);
+      })
+      .catch((error) => {
+        // Handle error
+        console.error("Error updating PaymentIntent", error);
+      });
+  }, []);
+
+  useEffect(() => {
+    console.log(clientSecret);
+  }, [clientSecret]);
+
+  if (checkoutItems) {
     return (
-      <CheckoutContext.Provider value={checkoutContextValue}>
-        <div className=" w-full overflow-y-scroll flex">
-          {checkoutProgress === 1 ? <CheckoutShipping /> : (checkoutProgress === 2?<CheckoutPayment />:<OrderConfirmationPage/>)}
+      <div className="w-full h-full relative">
+        {isLoading && (
+          <div className="flex flex-col gap-5 absolute w-full h-full justify-center items-center bg-darkenBg z-50">
+            <img src={require("../images/payment-loading.gif")} alt={"payment-loading"} className=" w-48"/>
+            <p className="font-semibold text-lg text-white">Processing payment. Please wait...</p>
+          </div>
+        )}
+        <div className=" w-full h-full overflow-y-scroll flex">
+          {checkoutProgress === 1 ? (
+            <CheckoutShipping cartData={checkoutItems} />
+          ) : (
+            <CheckoutPayment cartData={checkoutItems} />
+          )}
           <div className="w-1/2 px-5 py-5 bg-slate-200 flex-col justify-center hidden md:flex">
             <div>
-              {cartData.map((product, index) => {
+              {checkoutItems.map((product, index) => {
                 return <ItemCard productInfo={product} />;
               })}
             </div>
@@ -108,35 +93,8 @@ export default function Checkout() {
             </div>
           </div>{" "}
         </div>
-      </CheckoutContext.Provider>
+      </div>
     );
-
-    function ItemCard(props) {
-      const { productInfo } = props;
-      return (
-        <div className="flex w-full justify-between p-6 items-center">
-          <div className="flex gap-3 items-center">
-            <div className="w-16 h-16 relative border-1 border-slate-300 bg-slate-300 rounded-lg p-1 flex items-center justify-center">
-              <img
-                alt="item"
-                src={require(`../images/${productInfo.image}`)}
-                className="w-full h-full"
-              />
-              <div className="absolute bg-black rounded-3xl w-5 h-5 flex items-center justify-center text-white font-semibold text-sm -top-1 -left-1">
-                <p>{productInfo.quantity}</p>
-              </div>
-            </div>
-            <div className="text-sm font-semibold">
-              <p>{productInfo.name}</p>
-              <p className="text-slate-500">{`${productInfo.size}`}</p>
-            </div>
-          </div>
-          <div className="font-semibold">
-            <p>{"$" + productInfo.price}</p>
-          </div>
-        </div>
-      );
-    }
   } else {
     return (
       <>

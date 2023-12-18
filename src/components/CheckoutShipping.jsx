@@ -2,7 +2,10 @@ import React, { useState, useContext } from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { countryData } from "../countries";
 import { MdOutlineMail } from "react-icons/md";
-import { CheckoutContext } from "./Checkout";
+import { FaChevronDown } from "react-icons/fa6";
+import { AiOutlineCloseCircle } from "react-icons/ai";
+import { CheckoutContext } from "../App";
+import ItemCard from "./ItemCard";
 export default function CheckoutShipping() {
   const {
     checkoutProgress,
@@ -25,6 +28,9 @@ export default function CheckoutShipping() {
     setPostcode,
     emailAddress,
     setEmailAddress,
+    cartItems,
+    showItems,
+    setShowItems,
   } = useContext(CheckoutContext);
 
   // State variables for error state (no error = true)
@@ -90,10 +96,46 @@ export default function CheckoutShipping() {
     return false;
   }
   return (
-    <div className="w-full flex items-center justify-center px-3 sm:px-10 flex-col sm:min-w-[400px] py-5 overflow-y-scroll md:w-1/2">
-      <p className="font-semibold text-xl mb-10 w-full">
-        How would you like to get your order
-      </p>
+    <div className="w-full h-full flex items-center justify-center px-3 sm:px-10 relative flex-col sm:min-w-[400px] py-5 overflow-y-scroll md:w-1/2">
+      {showItems ? (
+        <div
+          className={`w-full h-full overflow-y-scroll absolute bg-slate-200 z-30 md:hidden ${
+            showItems ? "animate-fade-up" : "animate-fade-down"
+          }`}
+        >
+          <div className="flex items-center mx-5">
+            <p className="text-3xl font-semibold sm:text-left text-center flex-1 my-5">
+              Your Orders 🛒
+            </p>
+            <AiOutlineCloseCircle
+              size={40}
+              className="cursor-pointer"
+              onClick={() => {
+                setShowItems(false);
+              }}
+            />
+          </div>
+
+          {cartItems.map((product, index) => {
+            return <ItemCard productInfo={product} />;
+          })}
+        </div>
+      ) : (
+        <></>
+      )}
+      <div className="font-semibold flex justify-between text-lg md:text-xl mb-10 w-full">
+        <p className="flex-1">How do you want your order?</p>
+      </div>
+      <div
+        className="text-base font-semibold flex absolute gap-2 items-center cursor-pointer md:hidden top-5 right-5"
+        onClick={() => {
+          setShowItems((prev) => !prev);
+        }}
+      >
+        <p>My Order</p>
+        <FaChevronDown />
+      </div>
+
       <div className="flex gap-3 w-full mb-9">
         <div className="flex-1">
           <p className="text-sm mb-2">First name</p>
@@ -105,7 +147,10 @@ export default function CheckoutShipping() {
             }}
             value={firstName}
           />
-          <InputError content="Please enter a valid first name" isValid={firstNameError}/>
+          <InputError
+            content="Please enter a valid first name"
+            isValid={firstNameError}
+          />
         </div>
         <div className="flex-1">
           <p className="text-sm mb-2">Last name</p>
@@ -117,7 +162,10 @@ export default function CheckoutShipping() {
             }}
             value={lastName}
           />
-          <InputError content="Please enter a valid last name" isValid={lastNameError}/>
+          <InputError
+            content="Please enter a valid last name"
+            isValid={lastNameError}
+          />
         </div>
       </div>
       <div className="flex flex-col gap-3 w-full">
@@ -131,7 +179,10 @@ export default function CheckoutShipping() {
             value={streetAddress}
             className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
           />
-          <InputError content="Please enter a valid street address" isValid={streetAddressError}/>
+          <InputError
+            content="Please enter a valid street address"
+            isValid={streetAddressError}
+          />
         </div>
         <div className="flex gap-3">
           <div className="w-3/5">
@@ -144,7 +195,10 @@ export default function CheckoutShipping() {
               value={townCity}
               className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
             />
-            <InputError content="Please enter a valid town/city" isValid={townCityError}/>
+            <InputError
+              content="Please enter a valid town/city"
+              isValid={townCityError}
+            />
           </div>
           <div className="w-1/5">
             <p className="text-sm mb-2">State</p>
@@ -156,7 +210,10 @@ export default function CheckoutShipping() {
               value={state}
               className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
             />
-            <InputError content="Please enter a valid state" isValid={stateError}/>
+            <InputError
+              content="Please enter a valid state"
+              isValid={stateError}
+            />
           </div>
           <div className="w-1/5">
             <p className="text-sm mb-2">Postcode</p>
@@ -168,7 +225,10 @@ export default function CheckoutShipping() {
               value={postcode}
               className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
             />
-            <InputError content="Please enter a valid postcode." isValid={postcodeError}/>
+            <InputError
+              content="Please enter a valid postcode."
+              isValid={postcodeError}
+            />
           </div>
         </div>
         <div className="flex-1 relative">
@@ -188,7 +248,6 @@ export default function CheckoutShipping() {
                 setShowDropdown(!showDropdown);
               }}
             />
-
           </div>
           <div
             className={`absolute bg-white flex-col w-full rounded-lg h-44 overflow-y-scroll top-20 text-sm font-semibold ${
@@ -226,7 +285,10 @@ export default function CheckoutShipping() {
                 value={emailAddress}
               />
             </div>
-            <InputError content="Please enter a valid email address." isValid={emailAddressError}/>
+            <InputError
+              content="Please enter a valid email address."
+              isValid={emailAddressError}
+            />
           </div>
         </div>
         <button
@@ -240,13 +302,14 @@ export default function CheckoutShipping() {
             setPostcodeError(isValidPostcode(postcode));
             setEmailAddressError(isValidEmailAddress(emailAddress));
             if (
-              isValidFirstName(firstName) &&
-              isValidLastName(lastName) &&
-              isValidStreetAddress(streetAddress) &&
-              isValidTownCity(townCity) &&
-              isValidState(state) &&
-              isValidPostcode(postcode) &&
-              isValidEmailAddress(emailAddress) ||1
+              (isValidFirstName(firstName) &&
+                isValidLastName(lastName) &&
+                isValidStreetAddress(streetAddress) &&
+                isValidTownCity(townCity) &&
+                isValidState(state) &&
+                isValidPostcode(postcode) &&
+                isValidEmailAddress(emailAddress)) ||
+              1
             ) {
               setCheckoutProgress(2);
             }
@@ -255,7 +318,7 @@ export default function CheckoutShipping() {
           Continue to payment
         </button>
       </div>
-      <div className="flex gap-5 w-full px-5 mt-7">
+      <div className="flex gap-5 w-full px-5 mt-12">
         <div className="flex-col flex-1 flex">
           <p
             className={`font-semibold ${

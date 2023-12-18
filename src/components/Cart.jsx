@@ -1,15 +1,16 @@
 import React, { useState, useContext, useEffect } from "react";
-import { StateSharingContext } from "../App.js";
+import { StateSharingContext, CheckoutContext } from "../App.js";
 import { IoIosArrowUp } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
 import { useNavigate } from "react-router";
 
 export default function Cart() {
-  const navigate = useNavigate()
-  
+  const navigate = useNavigate();
+
   const { cartItems, setCartItems, showRemoveItem, setShowRemoveItem } =
     useContext(StateSharingContext);
+  const { setCheckoutItems } = useContext(CheckoutContext);
 
   const shippingPrice = 2;
   function calculateProductPrice() {
@@ -27,7 +28,9 @@ export default function Cart() {
     <div className="w-full h-full relative">
       <div className="w-full h-full py-10 sm:p-10 overflow-x-hidden overflow-y-scroll pb-56">
         <div className="flex justify-between sm:px-0 px-10">
-          <p className="text-3xl font-semibold sm:text-left text-center flex-1">Shopping Cart</p>
+          <p className="text-3xl font-semibold sm:text-left text-center flex-1">
+            Shopping Cart
+          </p>
           <p className="text-3xl font-semibold hidden sm:block">{`${cartItems.length} Items`}</p>
         </div>
         <div className=" bg-slate-400 w-full h-lineBreakHeight mt-4 sm:px-0 px-10" />
@@ -62,9 +65,12 @@ export default function Cart() {
                 <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
               </div>
               <div className="pt-5 px-5">
-                <button className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black" onClick={()=>{
-                  navigate("/checkout",{state:{cartData:cartItems}})
-                }}>
+                <button
+                  className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black"
+                  onClick={() => {
+                    setCheckoutItems(cartItems)
+                  }}
+                >
                   Checkout
                 </button>
               </div>
@@ -111,9 +117,12 @@ export default function Cart() {
           <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
         </div>
         <div className="px-5">
-          <button className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black" onClick={()=>{
-                  navigate("/checkout",{state:{cartData:cartItems}})
-                }}>
+          <button
+            className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black"
+            onClick={() => {
+              setCheckoutItems(cartItems)
+            }}
+          >
             Checkout
           </button>
         </div>

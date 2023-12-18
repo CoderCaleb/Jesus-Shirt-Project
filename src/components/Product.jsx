@@ -1,8 +1,8 @@
 import React, { useState, useContext } from "react";
-import { useParams } from "react-router";
+import { useParams, useNavigate } from "react-router";
 import { faker } from "@faker-js/faker";
 import shirtData from "../shirtData";
-import { StateSharingContext } from "../App.js";
+import { StateSharingContext, CheckoutContext } from "../App.js";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { setItem } from "localforage";
@@ -14,6 +14,9 @@ export default function Product() {
   const product = shirtData.find((shirt) => shirt.id === Number(productId));
   const [sizeChoice, setSizeChoice] = useState("S");
   const { setCartItems } = useContext(StateSharingContext);
+  const { setCheckoutItems } = useContext(CheckoutContext);
+
+  const navigate = useNavigate()
 
   function handleAddToCart(productInfo) {
     productInfo = { ...productInfo, size: sizeChoice, quantity: 1 };
@@ -41,7 +44,11 @@ export default function Product() {
       }
     });
   }
-
+  
+  function handleBuyNow(product){
+    const productArr = [{...product, size: sizeChoice, quantity: 1 }]
+    setCheckoutItems(productArr)
+  }
   return (
     <div className="flex flex-col md:flex-row p-10 md:justify-center gap-10 items-center w-full overflow-y-scroll">
       <div className=" grid-cols-2 gap-4 w-6/12 max-w-maxImageGridWidth h-min hidden min-w-minPictureGrid md:grid">
@@ -119,7 +126,9 @@ export default function Product() {
             >
               Add to Cart
             </button>
-            <button className="border-2 border-none text-white bg-black w-full h-12 font-semibold rounded-md hover:shadow-xl shadow-indigo-800">
+            <button className="border-2 border-none text-white bg-black w-full h-12 font-semibold rounded-md hover:shadow-xl shadow-indigo-800" onClick={()=>{
+                  handleBuyNow(product)
+                }}>
               Buy Now
             </button>
           </div>

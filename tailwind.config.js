@@ -15,7 +15,7 @@ module.exports = {
         cardColorTwo:"#CEEDC7",
         cardColorThree:"#FFF6BD",
         cardColorFour:"#C0DEFF",
-        darkenBg:"rgba(0, 0, 0, 0.3)"
+        darkenBg:"rgba(0, 0, 0, 0.6)"
       },
       height:{
         lineBreakHeight: '1px',
@@ -41,6 +41,9 @@ module.exports = {
 
     },
   },
-  plugins: [],
+  plugins: [
+    require('autoprefixer'),
+    require('tailwindcss-animated')
+  ],
 }
 

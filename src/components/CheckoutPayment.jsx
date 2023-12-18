@@ -1,180 +1,217 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { IoMdArrowBack } from "react-icons/io";
+import { FaChevronDown } from "react-icons/fa6";
+import { AiOutlineCloseCircle } from "react-icons/ai";
+import ItemCard from "./ItemCard";
+import {
+  PaymentElement,
+  useStripe,
+  useElements,
+} from "@stripe/react-stripe-js";
+import { loadStripe } from "@stripe/stripe-js";
+import { Elements } from "@stripe/react-stripe-js";
+import { CheckoutContext } from "../App";
 
-import { CheckoutContext } from "./Checkout";
 export default function CheckoutPayment() {
   const {
     checkoutProgress,
-    setCheckoutProgress,
-    cardNumber,
-    setCardNumber,
-    expirationDate,
-    setExpirationDate,
-    nameOnCard,
-    setNameOnCard,
-    securityCode,
-    setSecurityCode,
+    cartItems,
+    showItems,
+    setShowItems,
+    isLoading, setIsLoading
   } = useContext(CheckoutContext);
   const [cardNumberError, setCardNumberError] = useState(true);
   const [expirationDateError, setExpirationDateError] = useState(true);
   const [securityCodeError, setSecurityCodeError] = useState(true);
   const [nameOnCardError, setNameOnCardError] = useState(true);
-  // Function to validate Card Number
-  function isValidCardNumber(cardNumber) {
-    // Validating a generic 16-digit credit card number
-    const regex = /^[0-9]{16}$/;
-    return regex.test(cardNumber);
-  }
+  const [message, setMessage] = useState("")
 
-  // Function to validate Expiration Date (MM/YY)
-  function isValidExpirationDate(expirationDate) {
-    // Validating MM/YY format for expiration date
-    const regex = /^(0[1-9]|1[0-2])\/[0-9]{2}$/;
-    return regex.test(expirationDate);
-  }
+  const stripe = useStripe();
+  const elements = useElements();
 
-  // Function to validate Security Code
-  function isValidSecurityCode(securityCode) {
-    // Validating a 3 or 4-digit security code
-    const regex = /^[0-9]{3,4}$/;
-    return regex.test(securityCode);
-  }
-
-  // Function to validate Name on Card
-  function isValidNameOnCard(nameOnCard) {
-    // Alphabets and spaces allowed, 2 to 50 characters
-    const regex = /^[a-zA-Z\s]{2,50}$/;
-    return regex.test(nameOnCard);
-  }
-
+  useEffect(()=>{
+    elements.fetchUpdates().then((result) => {
+      if (result.error) {
+        console.error("Error fetching updates:", result.error);
+      } else {
+        console.log("Successfully fetched updates:", result);
+      }
+    });
+  },[])
   function checkCompleted(number) {
     if (checkoutProgress >= number) {
       return true;
     }
     return false;
   }
-  return (
-    <div className="w-full flex items-center justify-center flex-col px-2 sm:px-10 sm:min-w-[400px] py-5 md:w-1/2">
-      <div className="flex flex-col gap-3 w-full">
-        <div className="mb-10 flex items-center gap-3">
-          <IoMdArrowBack onClick={()=>setCheckoutProgress(prev=>prev-=1)} className="cursor-pointer"/>
-          <p className="font-semibold text-xl w-full">
-            How would you like to pay
-          </p>
-        </div>
-        <div className="w-full">
-          <p className="text-sm mb-2">Card number</p>
-          <input
-            placeholder="1234 5678 9012 3456"
-            className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-            onChange={(e) => {
-              setCardNumber(e.target.value);
-            }}
-            value={cardNumber}
-          />
-          <InputError
-            content="Please enter a valid 16-digit credit card number."
-            isValid={cardNumberError}
-          />
-        </div>
-        <div className="flex gap-3 w-full items-end">
-          <div className="flex-1">
-            <p className="text-sm mb-2">{"Expiration date (MM/YY)"}</p>
-            <input
-              placeholder="05/21"
-              onChange={(e) => {
-                setExpirationDate(e.target.value);
-              }}
-              value={expirationDate}
-              className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-            />
-            <InputError
-              content="Please enter a valid expiration date in MM/YY format."
-              isValid={expirationDateError}
-            />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm mb-2">Security code</p>
-            <input
-              placeholder="123"
-              value={securityCode}
-              onChange={(e) => {
-                setSecurityCode(e.target.value);
-              }}
-              className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-            />
-            <InputError
-              content="Please enter a valid 3 or 4-digit security code."
-              isValid={securityCodeError}
-            />
-          </div>
-        </div>
-        <div className="w-full">
-          <p className="text-sm mb-2">Name on card</p>
-          <input
-            placeholder="Larry Tan Yao Xuan"
-            onChange={(e) => {
-              setNameOnCard(e.target.value);
-            }}
-            value={nameOnCard}
-            className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-          />
-          <InputError
-            content="Please enter a valid name on the card"
-            isValid={nameOnCardError}
-          />
-        </div>
-        <div className="flex flex-col gap-3 w-full">
-          <button
-            className="border-2 w-full mt-5 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black"
-            onClick={() => {
-              setCardNumberError(isValidCardNumber(cardNumber));
-              setExpirationDateError(isValidExpirationDate(expirationDate));
-              setSecurityCodeError(isValidSecurityCode(securityCode));
-              setNameOnCardError(isValidNameOnCard(nameOnCard));
-              if (
-                !isValidCardNumber(cardNumber) ||
-                !isValidExpirationDate(expirationDate) ||
-                !isValidSecurityCode(securityCode) ||
-                !isValidNameOnCard(nameOnCard) || 1
-              ) {
-                setCheckoutProgress(3);
-              }
-            }}
-          >
-            Checkout
-          </button>
-        </div>
-      </div>
 
-      <div className="flex gap-5 w-full px-5 mt-7">
-        <div className="flex-col flex-1 flex">
-          <p
-            className={`font-semibold ${
-              checkCompleted(1) ? "text-black" : "text-slate-400"
+  const paymentElementOptions = {
+    layout: "tabs",
+  };
+
+  const appearance = {
+    theme: "flat",
+    variables: {
+      fontFamily: "sans-serif",
+      fontLineHeight: "1.5",
+      borderRadius: "10px",
+      colorBackground: "#F6F8FA",
+      accessibleColorOnColorPrimary: "#262626",
+    },
+    rules: {
+      ".Block": {
+        backgroundColor: "var(--colorBackground)",
+        boxShadow: "none",
+        padding: "12px",
+      },
+      ".Input": {
+        padding: "12px",
+        fontWeight: "550",
+        fontSize: "15px",
+        border: "2px solid #cbd5e1",
+      },
+      ".Input::placeholder": {
+        color: "#64748b",
+      },
+      ".Input:disabled, .Input--invalid:disabled": {
+        color: "lightgray",
+      },
+      ".Tab": {
+        padding: "10px 12px 8px 12px",
+        border: "none",
+      },
+      ".Tab:hover": {
+        border: "none",
+        boxShadow:
+          "0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 7px rgba(18, 42, 66, 0.04)",
+      },
+      ".Tab--selected, .Tab--selected:focus, .Tab--selected:hover": {
+        border: "none",
+        backgroundColor: "#fff",
+        boxShadow:
+          "0 0 0 1.5px var(--colorPrimaryText), 0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 7px rgba(18, 42, 66, 0.04)",
+      },
+      ".Label": {
+        fontWeight: "500",
+        fontSize: "14px",
+        paddingBottom: "6px",
+      },
+    },
+  };
+
+  return (
+    <div className="w-full h-full md:w-1/2">
+      <div className="w-full h-full flex items-center relative justify-center flex-col px-3 sm:px-10 sm:min-w-[400px] py-5">
+        {showItems ? (
+          <div
+            className={`w-full h-full overflow-y-scroll absolute bg-slate-200 z-30 md:hidden ${
+              showItems ? "animate-fade-up" : "animate-fade-down"
             }`}
           >
-            Shipping
-          </p>
+            <div className="flex items-center mx-5">
+              <p className="text-3xl font-semibold sm:text-left text-center flex-1 my-5">
+                Your Orders 🛒
+              </p>
+              <AiOutlineCloseCircle
+                size={40}
+                className="cursor-pointer"
+                onClick={() => {
+                  setShowItems(false);
+                }}
+              />
+            </div>
+
+            {cartItems.map((product, index) => {
+              return <ItemCard productInfo={product} />;
+            })}
+          </div>
+        ) : (
+          <></>
+        )}
+        <div className="flex flex-col gap-3 w-full">
+          <div className="font-semibold flex justify-between text-lg md:text-xl mb-10 w-full">
+            <p className="flex-1">How do you want your order?</p>
+          </div>
           <div
-            className={`flex-1 rounded-xl mt-1 h-2 bg-black ${
-              checkCompleted(1) ? "text-black" : "bg-slate-300"
-            }`}
+            className="text-base font-semibold flex absolute gap-2 items-center cursor-pointer md:hidden top-5 right-5"
+            onClick={() => {
+              setShowItems((prev) => !prev);
+            }}
+          >
+            <p>My Order</p>
+            <FaChevronDown />
+          </div>
+          <PaymentElement
+            id="payment-element"
+            options={paymentElementOptions}
           />
+          <div className="flex flex-col gap-3 w-full">
+            <button
+              className="border-2 w-full mt-5 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black"
+              disabled={isLoading || !stripe || !elements}
+              onClick={async (e) => {
+                e.preventDefault();
+
+                if (!stripe || !elements) {
+                  // Stripe.js hasn't yet loaded.
+                  // Make sure to disable form submission until Stripe.js has loaded.
+                  return;
+                }
+
+                setIsLoading(true);
+                const { error } = await stripe.confirmPayment({
+                  elements,
+                  confirmParams: {
+                    // Make sure to change this to your payment completion page
+                    return_url: "http://localhost:3000/order-complete",
+                  },
+                });
+                if (
+                  error.type === "card_error" ||
+                  error.type === "validation_error"
+                ) {
+                  setMessage(error.message);
+                } else {
+                  setMessage("An unexpected error occurred.");
+                }
+
+                setIsLoading(false);
+              }}
+            >
+              Checkout
+            </button>
+          </div>
         </div>
-        <div className="flex-col flex-1 gap-2">
-          <p
-            className={`font-semibold ${
-              checkCompleted(2) ? "text-black" : "text-slate-400"
-            }`}
-          >
-            Payment
-          </p>
-          <div
-            className={`flex-1 rounded-xl mt-1 h-2 bg-black ${
-              checkCompleted(2) ? "text-black" : "bg-slate-300"
-            }`}
-          />
+
+        <div className="flex gap-5 w-full px-5 mt-7">
+          <div className="flex-col flex-1 flex">
+            <p
+              className={`font-semibold ${
+                checkCompleted(1) ? "text-black" : "text-slate-400"
+              }`}
+            >
+              Shipping
+            </p>
+            <div
+              className={`flex-1 rounded-xl mt-1 h-2 bg-black ${
+                checkCompleted(1) ? "text-black" : "bg-slate-300"
+              }`}
+            />
+          </div>
+          <div className="flex-col flex-1 gap-2">
+            <p
+              className={`font-semibold ${
+                checkCompleted(2) ? "text-black" : "text-slate-400"
+              }`}
+            >
+              Payment
+            </p>
+            <div
+              className={`flex-1 rounded-xl mt-1 h-2 bg-black ${
+                checkCompleted(2) ? "text-black" : "bg-slate-300"
+              }`}
+            />
+          </div>
         </div>
       </div>
     </div>

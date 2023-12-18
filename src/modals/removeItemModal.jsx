@@ -10,7 +10,7 @@ export default function RemoveItemModal(props) {
     <>
     <div className=" absolute w-screen h-screen justify-center items-center flex bg-darkenBg z-50">
       <div className="flex flex-col gap-3 items-center justify-center p-4 bg-background rounded-md shadow-md shadow-slate-600 ">
-        <MdDeleteForever size={50} className="text-red-600" />
+        <MdDeleteForever size={50} className="text-red-500" />
         <p className="text-lg font-semibold">Remove Item</p>
         <p className="font-light text-sm text-slate-700 text-center">
           Do you want to remove <span className="font-semibold">{name}</span>{" "}
