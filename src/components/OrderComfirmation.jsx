@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useRef } from "react";
 import { CiCircleCheck } from "react-icons/ci";
-import { useNavigate } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import ItemCard from "./ItemCard";
 import { CheckoutContext } from "../App";
 import { useStripe } from "@stripe/react-stripe-js";
@@ -14,12 +14,14 @@ const OrderConfirmationPage = () => {
     townCity,
     state,
     postcode,
-    checkoutItems,
-    setCheckoutItems,
+    clientSecret,
+    setCheckoutProgress
   } = useContext(CheckoutContext);
   const [message, setMessage] = useState("");
   const checkoutItemsSaved = useRef([])
   const stripe = useStripe();
+  const location = useLocation()
+  const {checkoutItems} = location.state
 
   const navigate = useNavigate();
 
@@ -27,14 +29,10 @@ const OrderConfirmationPage = () => {
     if (!stripe) {
       return;
     }
-
-    const clientSecret = new URLSearchParams(window.location.search).get(
-      "payment_intent_client_secret"
-    );
-
     if (!clientSecret) {
       return;
     }
+    console.log(clientSecret)
 
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
       switch (paymentIntent.status) {
@@ -44,7 +42,6 @@ const OrderConfirmationPage = () => {
             type: "success",
           });
           checkoutItemsSaved.current = checkoutItems
-          setCheckoutItems([])
           break;
         case "processing":
           setMessage("Your payment is processing.");
@@ -73,9 +70,9 @@ const OrderConfirmationPage = () => {
   },[message])
     
   return (
-    <div className="w-full h-full flex items-center justify-around">
+    <div className="w-full h-full flex items-center justify-around md:w-1/2">
       
-      <div className="w-full flex h-min px-5 sm:px-10 flex-col sm:min-w-[400px] py-5 overflow-y-scroll md:w-1/2">
+      <div className="w-full flex h-min px-5 sm:px-10 flex-col sm:min-w-[400px] py-5 overflow-y-scroll">
         <p className="text-xl font-bold mb-7">Checkout</p>
 
         <div className="flex items-center gap-2">
@@ -113,15 +110,13 @@ const OrderConfirmationPage = () => {
           <button
             className="border-2 float-right w-44 mt-10 h-12 font-semibold rounded-lg border-black bg-black text-white hover:bg-white hover:text-black"
             onClick={() => {
+              setCheckoutProgress(1)
               navigate("/shop");
             }}
           >
             Continue Shopping
           </button>
         </div>
-      </div>
-      <div className="w-1/2 hidden md:block">
-       
       </div>
       <ToastContainer position="top-center" theme="light" />
     </div>

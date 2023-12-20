@@ -7,9 +7,6 @@ import Shop from "./components/Shop";
 import Product from "./components/Product";
 import RemoveItemModal from "./modals/removeItemModal";
 import Checkout from "./components/Checkout";
-import OrderConfirmationPage from "./components/OrderComfirmation";
-import { Elements } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
 export const StateSharingContext = createContext();
 export const CheckoutContext = createContext();
 
@@ -21,16 +18,10 @@ const savedCheckoutData = localStorage.getItem("checkoutData")
   ? JSON.parse(localStorage.getItem("checkoutData"))
   : [];
 
-const stripePromise = loadStripe(
-  "pk_test_51OOBnGEvVCl2vla10CIfwh6ItUYeeZO4o3haVa9xFHyxwT6ekU8D8wAuA75GsRfGOhMLmU0Znf9dZKJPLNc5xrdq00PVRX8neU"
-);
-
 export default function App() {
   const [cartItems, setCartItems] = useState(savedCartData);
   const [checkoutItems, setCheckoutItems] = useState(savedCheckoutData);
   const [showRemoveItem, setShowRemoveItem] = useState({});
-  const firstUpdate = useRef(true);
-  const navigate = useNavigate();
   // State variables for input values
   const [country, setCountry] = useState({
     name: "Singapore",
@@ -93,6 +84,7 @@ export default function App() {
     checkoutItems,
     setCheckoutItems,
     clientSecret,
+    setClientSecret,
     paymentIntentId,
     setPaymentIntentId,
     isLoading,
@@ -106,19 +98,7 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("cartData", JSON.stringify(cartItems));
   }, [cartItems]);
-
-  useEffect(() => {
-    console.log(checkoutItems);
-    if (firstUpdate.current) {
-      firstUpdate.current = false;
-      return;
-    }
-    if (checkoutItems.length === 0) {
-      return;
-    }
-    navigate("/checkout", { state: { cartData: checkoutItems } });
-    localStorage.setItem("checkoutData", JSON.stringify(checkoutItems));
-  }, [checkoutItems]);
+  /*
 
   useEffect(() => {
     // Create PaymentIntent as soon as the page loads
@@ -135,20 +115,12 @@ export default function App() {
         console.log(data);
       });
   }, []);
-
-  const appearance = {
-    theme: "stripe",
-  };
-  const options = {
-    clientSecret,
-    appearance,
-  };
+  */
 
   return (
     <CheckoutContext.Provider value={checkoutContextValue}>
       <StateSharingContext.Provider value={stateContextValue}>
-        {clientSecret && (
-          <Elements options={options} stripe={stripePromise}>
+        
             <div className="w-screen h-screen bg-background flex">
               <HandleModalComponent />
               <Routes>
@@ -196,20 +168,9 @@ export default function App() {
                     </div>
                   }
                 />
-                <Route
-                  path="/order-complete"
-                  element={
-                    <div className="flex w-full h-full">
-                      <SideBar />
-                      <OrderConfirmationPage />
-                    </div>
-                  }
-                />
                 <Route path="*" element={<h1>Not found</h1>} />
               </Routes>
             </div>
-          </Elements>
-        )}
       </StateSharingContext.Provider>
     </CheckoutContext.Provider>
   );

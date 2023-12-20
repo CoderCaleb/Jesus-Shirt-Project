@@ -10,7 +10,6 @@ export default function Cart() {
 
   const { cartItems, setCartItems, showRemoveItem, setShowRemoveItem } =
     useContext(StateSharingContext);
-  const { setCheckoutItems } = useContext(CheckoutContext);
 
   const shippingPrice = 2;
   function calculateProductPrice() {
@@ -68,7 +67,7 @@ export default function Cart() {
                 <button
                   className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black"
                   onClick={() => {
-                    setCheckoutItems(cartItems)
+                    navigate("/checkout",{state:{checkoutItems:cartItems}})
                   }}
                 >
                   Checkout
@@ -120,8 +119,7 @@ export default function Cart() {
           <button
             className="border-2 w-full h-12 font-semibold rounded-3xl border-black bg-black text-white hover:bg-white hover:text-black"
             onClick={() => {
-              setCheckoutItems(cartItems)
-            }}
+              navigate("/checkout",{state:{checkoutItems:cartItems}})            }}
           >
             Checkout
           </button>

@@ -1,25 +1,30 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { FaShop } from "react-icons/fa6";
 import { RiShoppingCartFill } from "react-icons/ri";
 import { FaCross } from "react-icons/fa";
 import { useNavigate, useLocation } from "react-router";
 import useSidebarStatus from "../hooks/useSidebarStatus";
+import { CheckoutContext } from "../App";
 let savedPageStatus = ""
 export default function SideBar() {
     const location = useLocation();
     let savedPageStatus = location.pathname.split("/")[1];
     const [pageStatus, setPageStatus] = useSidebarStatus(savedPageStatus)
-
+    const {
+      setCheckoutProgress
+    } = useContext(CheckoutContext);
     const onShopIconClicked = (navigateTo) => {
       navigateTo("/shop");
       setPageStatus("shop")
       savedPageStatus = "shop"
+      setCheckoutProgress(1)
     };
     
     const onCartIconClicked = (navigateTo) => {
       navigateTo("/cart");
       setPageStatus("cart")
       savedPageStatus = "cart"
+      setCheckoutProgress(1)
     };
 
     const checkIconActive = (iconPage) => {

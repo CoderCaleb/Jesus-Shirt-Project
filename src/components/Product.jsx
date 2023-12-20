@@ -14,7 +14,6 @@ export default function Product() {
   const product = shirtData.find((shirt) => shirt.id === Number(productId));
   const [sizeChoice, setSizeChoice] = useState("S");
   const { setCartItems } = useContext(StateSharingContext);
-  const { setCheckoutItems } = useContext(CheckoutContext);
 
   const navigate = useNavigate()
 
@@ -47,7 +46,7 @@ export default function Product() {
   
   function handleBuyNow(product){
     const productArr = [{...product, size: sizeChoice, quantity: 1 }]
-    setCheckoutItems(productArr)
+    navigate("/checkout",{state:{checkoutItems:productArr}})
   }
   return (
     <div className="flex flex-col md:flex-row p-10 md:justify-center gap-10 items-center w-full overflow-y-scroll">
@@ -154,9 +153,9 @@ function SizeChoiceBox(props) {
   const { size, handleSelect, sizeChoice } = props;
   return (
     <button
-      className={`w-10 h-10 cursor-pointer rounded-lg border-2 border-slate-300${
-        sizeChoice === size ? " bg-secondary2 border-0" : ""
-      }`}
+      className={`${
+        sizeChoice === size ? "bg-secondary2 border-none" : ""
+      } w-10 h-10 cursor-pointer rounded-lg border-2 border-slate-300 `}
       onClick={handleSelect}
     >
       <p className={` text-xs text-black ${sizeChoice === size ? " font-semibold text-white" : ""}`}>
