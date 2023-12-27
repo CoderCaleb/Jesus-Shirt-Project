@@ -45,7 +45,7 @@ export default function App() {
   const [emailAddress, setEmailAddress] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const [showItems, setShowItems] = useState(false);
-  const [checkoutProgress, setCheckoutProgress] = useState(3);
+  const [checkoutProgress, setCheckoutProgress] = useState(1);
   const [clientSecret, setClientSecret] = useState("");
   const [paymentIntentId, setPaymentIntentId] = useState("");
   const [isLoading, setIsLoading] = useState(false);

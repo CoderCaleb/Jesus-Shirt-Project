@@ -109,9 +109,6 @@ export default function Checkout() {
     clientSecret,
     appearance,
   };
-  useEffect(() => {
-    console.log("CHECKOUT COMPONENT MOUNTED");
-  }, []);
 
   if (checkoutItems) {
     return (
@@ -139,7 +136,7 @@ export default function Checkout() {
                 <OrderConfirmationPage cartData={checkoutItems} />
               )}
               <div className="w-1/2 px-5 py-5 bg-slate-200 flex-col justify-center hidden md:flex">
-                <div>
+                <div className="overflow-y-scroll">
                   {checkoutItems.map((product, index) => {
                     return <ItemCard productInfo={product} key={index} />;
                   })}

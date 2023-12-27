@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { CiCircleCheck } from "react-icons/ci";
 import { useLocation, useNavigate } from "react-router";
 import ItemCard from "./ItemCard";
-import { CheckoutContext } from "../App";
+import { CheckoutContext, StateSharingContext } from "../App";
 import { useStripe } from "@stripe/react-stripe-js";
 import { ToastContainer, toast } from "react-toastify";
 
@@ -15,13 +15,15 @@ const OrderConfirmationPage = () => {
     state,
     postcode,
     clientSecret,
-    setCheckoutProgress
+    setCheckoutProgress,
   } = useContext(CheckoutContext);
+
+  const {setCartItems} = useContext(StateSharingContext)
   const [message, setMessage] = useState("");
-  const checkoutItemsSaved = useRef([])
+  const checkoutItemsSaved = useRef([]);
   const stripe = useStripe();
-  const location = useLocation()
-  const {checkoutItems} = location.state
+  const location = useLocation();
+  const { checkoutItems, fromCart } = location.state;
 
   const navigate = useNavigate();
 
@@ -32,10 +34,7 @@ const OrderConfirmationPage = () => {
     if (!clientSecret) {
       return;
     }
-    console.log(clientSecret)
-
-    checkoutItemsSaved.current = checkoutItems
-    window.history.replaceState({}, document.title)
+    console.log(clientSecret);
 
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
       switch (paymentIntent.status) {
@@ -44,6 +43,11 @@ const OrderConfirmationPage = () => {
           toast("Payment succeeded!", {
             type: "success",
           });
+          checkoutItemsSaved.current = checkoutItems;
+          if(fromCart){
+            setCartItems([])
+          }
+          window.history.replaceState({}, document.title);
           break;
         case "processing":
           setMessage("Your payment is processing.");
@@ -67,15 +71,14 @@ const OrderConfirmationPage = () => {
     });
   }, [stripe]);
 
-  useEffect(()=>{
-    console.log(message)
-  },[message])
-    
+  useEffect(() => {
+    console.log(message);
+  }, [message]);
+
   return (
     <div className="w-full h-full flex items-center justify-around md:w-1/2">
-      
       <div className="w-full flex h-min px-5 sm:px-10 flex-col sm:min-w-[400px] py-5 overflow-y-scroll">
-        <p className="text-xl font-bold mb-7">Checkout</p>
+        <p className="text-3xl font-bold mb-7">Checkout</p>
 
         <div className="flex items-center gap-2">
           <CiCircleCheck size={45} />
@@ -102,7 +105,7 @@ const OrderConfirmationPage = () => {
           <div className=" bg-slate-300 w-full h-lineBreakHeight" />
           <div className="flex pl-3 pt-3">
             <p className="text-slate-500 font-semibold">Items</p>
-            <div className="w-full overflow-y-scroll">
+            <div className="w-full overflow-y-scroll h-60">
               {checkoutItemsSaved.current.map((product, index) => {
                 return <ItemCard productInfo={product} />;
               })}
@@ -113,7 +116,7 @@ const OrderConfirmationPage = () => {
           <button
             className="border-2 float-right w-44 mt-10 h-12 font-semibold rounded-lg border-black bg-black text-white hover:bg-white hover:text-black"
             onClick={() => {
-              setCheckoutProgress(1)
+              setCheckoutProgress(1);
               navigate("/shop");
             }}
           >

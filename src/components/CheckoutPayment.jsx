@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaChevronDown } from "react-icons/fa6";
 import { AiOutlineCloseCircle } from "react-icons/ai";
@@ -8,8 +8,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
-import { loadStripe } from "@stripe/stripe-js";
-import { Elements } from "@stripe/react-stripe-js";
+
 import { CheckoutContext } from "../App";
 import { ToastContainer, toast } from "react-toastify";
 export default function CheckoutPayment() {
@@ -21,7 +20,6 @@ export default function CheckoutPayment() {
     setShowItems,
     isLoading,
     setIsLoading,
-    clientSecret,
   } = useContext(CheckoutContext);
   const [cardNumberError, setCardNumberError] = useState(true);
   const [expirationDateError, setExpirationDateError] = useState(true);
