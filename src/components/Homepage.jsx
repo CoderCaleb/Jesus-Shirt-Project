@@ -1,6 +1,7 @@
 import React from "react";
 import bestSellingData from "../bestSellingData";
 import ProductCard from "./ProductCard";
+import { Link } from "react-router-dom";
 export default function Homepage() {
   return (
     <div className="flex flex-1 flex-col items-center h-full overflow-y-scroll">
@@ -9,7 +10,7 @@ export default function Homepage() {
           <img
             src={require("../images/jesus-cross-logo.png")}
             alt="logo"
-            className="w-16 h-16"
+            className="w-16 h-16 cursor-pointer"
           />
         </div>
         <div className="flex gap-5 items-center">
@@ -19,20 +20,30 @@ export default function Homepage() {
           <a className="text-sm mr-2" href="/shop">
             Shop
           </a>
-          <button className="border-2 px-3 h-10 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
-            Shop Now
-          </button>
+          <Link to="/shop">
+            <button className="border-2 px-3 h-10 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
+              Shop Now
+            </button>
+          </Link>
         </div>
       </div>
       <div className="flex items-center justify-center md:w-3/5 w-4/5 text-center flex-col gap-10 py-28">
-        <p className="md:text-7xl text-6xl font-bold">Embrace your <span className="bg-gradient-to-r from-[#03bfcd] to-[#7731e7] text-transparent bg-clip-text">brave</span> side</p>
+        <p className="md:text-7xl text-6xl font-bold">
+          Embrace your{" "}
+          <span className="bg-gradient-to-r from-[#03bfcd] to-[#7731e7] text-transparent bg-clip-text">
+            brave
+          </span>{" "}
+          side
+        </p>
         <p className="md:w-11/12 w-full text-lg">
           The one stop shop for all ur clothing needs. Our clothing is nice and
           comfortable and feels nice and comfortable
         </p>
-        <button className="border-2 px-7 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
-          Shop Now
-        </button>
+        <Link to="/shop">
+          <button className="border-2 px-7 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
+            Shop Now
+          </button>
+        </Link>
       </div>
       <div className="flex m-auto items-center justify-center w-full text-center flex-col gap-10 py-28 bg-white">
         <p className="text-7xl font-bold">Best Sellers</p>
@@ -57,9 +68,11 @@ export default function Homepage() {
             good. The shirts also have very nice designs and you can proudly
             wear it outside
           </p>
-          <button className="border-2 w-fit px-12 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
-            Shop Now
-          </button>
+          <Link to="/shop">
+            <button className="border-2 w-fit px-12 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
+              Shop Now
+            </button>
+          </Link>
         </div>
       </div>
     </div>

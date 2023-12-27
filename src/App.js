@@ -98,79 +98,60 @@ export default function App() {
   useEffect(() => {
     localStorage.setItem("cartData", JSON.stringify(cartItems));
   }, [cartItems]);
-  /*
-
-  useEffect(() => {
-    // Create PaymentIntent as soon as the page loads
-    fetch("/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({}),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setClientSecret(data.clientSecret);
-        setPaymentIntentId(data.paymentIntentId);
-        console.log(data.clientSecret);
-        console.log(data);
-      });
-  }, []);
-  */
 
   return (
     <CheckoutContext.Provider value={checkoutContextValue}>
       <StateSharingContext.Provider value={stateContextValue}>
-        
-            <div className="w-screen h-screen bg-background flex">
-              <HandleModalComponent />
-              <Routes>
-                <Route
-                  path="/"
-                  element={<Outlet />}
-                  errorElement={<h1>404</h1>}
-                ></Route>
-                <Route index element={<Homepage />} />
-                <Route
-                  path="cart"
-                  element={
-                    <div className="flex w-full h-full">
-                      <SideBar />
-                      <Cart />
-                    </div>
-                  }
-                />
-                <Route path="shop" element={<Outlet />}>
-                  <Route
-                    index
-                    element={
-                      <div className="flex w-full h-full">
-                        <SideBar />
-                        <Shop />
-                      </div>
-                    }
-                  />
-                  <Route
-                    path=":productId"
-                    element={
-                      <div className="flex w-full h-full">
-                        <SideBar />
-                        <Product />
-                      </div>
-                    }
-                  />
-                </Route>
-                <Route
-                  path="checkout"
-                  element={
-                    <div className="flex w-full h-full">
-                      <SideBar />
-                      <Checkout />
-                    </div>
-                  }
-                />
-                <Route path="*" element={<h1>Not found</h1>} />
-              </Routes>
-            </div>
+        <div className="w-screen h-screen bg-background flex">
+          <HandleModalComponent />
+          <Routes>
+            <Route
+              path="/"
+              element={<Outlet />}
+              errorElement={<h1>404</h1>}
+            ></Route>
+            <Route index element={<Homepage />} />
+            <Route
+              path="cart"
+              element={
+                <div className="flex w-full h-full">
+                  <SideBar />
+                  <Cart />
+                </div>
+              }
+            />
+            <Route path="shop" element={<Outlet />}>
+              <Route
+                index
+                element={
+                  <div className="flex w-full h-full">
+                    <SideBar />
+                    <Shop />
+                  </div>
+                }
+              />
+              <Route
+                path=":productId"
+                element={
+                  <div className="flex w-full h-full">
+                    <SideBar />
+                    <Product />
+                  </div>
+                }
+              />
+            </Route>
+            <Route
+              path="checkout"
+              element={
+                <div className="flex w-full h-full">
+                  <SideBar />
+                  <Checkout />
+                </div>
+              }
+            />
+            <Route path="*" element={<h1>Not found</h1>} />
+          </Routes>
+        </div>
       </StateSharingContext.Provider>
     </CheckoutContext.Provider>
   );
