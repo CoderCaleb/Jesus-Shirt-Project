@@ -19,27 +19,33 @@ export default function Checkout() {
     clientSecret,
     isLoading,
     cartItems,
-    setClientSecret
+    setClientSecret,
   } = useContext(CheckoutContext);
 
-  useEffect(() => {
-    fetch("/create-payment-intent", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cartItems,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setClientSecret(data.clientSecret);
-        console.log(data);
-      });
-
-  }, []);
   const location = useLocation();
-  const {checkoutItems} = location.state
+  const { state } = location;
+  let checkoutItems;
+
+  if (state) {
+    checkoutItems = state.checkoutItems;
+  }
   const shippingPrice = 2;
+  useEffect(() => {
+    if (checkoutItems) {
+      fetch("/create-payment-intent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          checkoutItems,
+        }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          setClientSecret(data.clientSecret);
+          console.log(data);
+        });
+    }
+  }, []);
   function calculateProductPrice() {
     const productPrice = checkoutItems.reduce((total, items) => {
       return total + items.price * items.quantity;
@@ -103,58 +109,62 @@ export default function Checkout() {
     clientSecret,
     appearance,
   };
-  useEffect(()=>{
-    console.log("CHECKOUT COMPONENT MOUNTED")
-  },[])
+  useEffect(() => {
+    console.log("CHECKOUT COMPONENT MOUNTED");
+  }, []);
 
   if (checkoutItems) {
     return (
       <div className="w-full h-full relative">
-        {stripePromise&&clientSecret&&<Elements stripe={stripePromise} options={options} key={clientSecret}>
-          {isLoading && (
-            <div className="flex flex-col gap-5 absolute w-full h-full justify-center items-center bg-darkenBg z-50">
-              <img
-                src={require("../images/payment-loading.gif")}
-                alt={"payment-loading"}
-                className=" w-48"
-              />
-              <p className="font-semibold text-lg text-white">
-                Processing payment. Please wait...
-              </p>
-            </div>
-          )}
-          <div className=" w-full h-full overflow-y-scroll flex">
-            {checkoutProgress === 1 ? (
-              <CheckoutShipping cartData={checkoutItems} />
-            ) : checkoutProgress === 2 ? (
-              <CheckoutPayment cartData={checkoutItems} />
-            ) : (
-              <OrderConfirmationPage cartData={checkoutItems}/>
+        {stripePromise && clientSecret && (
+          <Elements stripe={stripePromise} options={options} key={clientSecret}>
+            {isLoading && (
+              <div className="flex flex-col gap-5 absolute w-full h-full justify-center items-center bg-darkenBg z-50">
+                <img
+                  src={require("../images/payment-loading.gif")}
+                  alt={"payment-loading"}
+                  className=" w-48"
+                />
+                <p className="font-semibold text-lg text-white">
+                  Processing payment. Please wait...
+                </p>
+              </div>
             )}
-            <div className="w-1/2 px-5 py-5 bg-slate-200 flex-col justify-center hidden md:flex">
-              <div>
-                {checkoutItems.map((product, index) => {
-                  return <ItemCard productInfo={product} key={index}/>;
-                })}
-              </div>
-              <div className=" bg-slate-400 w-full h-lineBreakHeight my-3" />
-              <div>
-                <div className="flex justify-between px-5">
-                  <p className="text-sm text-slate-600 mb-3">Product's price</p>
-                  <p className="text-sm font-semibold">{`$${calculateProductPrice()} SGD`}</p>
+            <div className=" w-full h-full overflow-y-scroll flex">
+              {checkoutProgress === 1 ? (
+                <CheckoutShipping cartData={checkoutItems} />
+              ) : checkoutProgress === 2 ? (
+                <CheckoutPayment cartData={checkoutItems} />
+              ) : (
+                <OrderConfirmationPage cartData={checkoutItems} />
+              )}
+              <div className="w-1/2 px-5 py-5 bg-slate-200 flex-col justify-center hidden md:flex">
+                <div>
+                  {checkoutItems.map((product, index) => {
+                    return <ItemCard productInfo={product} key={index} />;
+                  })}
                 </div>
-                <div className="flex justify-between px-5">
-                  <p className="text-sm text-slate-600">Shipping</p>
-                  <p className="text-sm font-semibold">{`$${shippingPrice} SGD`}</p>
+                <div className=" bg-slate-400 w-full h-lineBreakHeight my-3" />
+                <div>
+                  <div className="flex justify-between px-5">
+                    <p className="text-sm text-slate-600 mb-3">
+                      Product's price
+                    </p>
+                    <p className="text-sm font-semibold">{`$${calculateProductPrice()} SGD`}</p>
+                  </div>
+                  <div className="flex justify-between px-5">
+                    <p className="text-sm text-slate-600">Shipping</p>
+                    <p className="text-sm font-semibold">{`$${shippingPrice} SGD`}</p>
+                  </div>
+                  <div className="flex justify-between px-5 py-3">
+                    <p className="text-sm font-semibold">Total</p>
+                    <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
+                  </div>
                 </div>
-                <div className="flex justify-between px-5 py-3">
-                  <p className="text-sm font-semibold">Total</p>
-                  <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
-                </div>
-              </div>
-            </div>{" "}
-          </div>
-        </Elements>}
+              </div>{" "}
+            </div>
+          </Elements>
+        )}
       </div>
     );
   } else {

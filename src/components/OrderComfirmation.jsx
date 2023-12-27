@@ -34,14 +34,16 @@ const OrderConfirmationPage = () => {
     }
     console.log(clientSecret)
 
+    checkoutItemsSaved.current = checkoutItems
+    window.history.replaceState({}, document.title)
+
     stripe.retrievePaymentIntent(clientSecret).then(({ paymentIntent }) => {
       switch (paymentIntent.status) {
         case "succeeded":
-          setMessage("Payment succeeded!");
+          setMessage("Thank you!");
           toast("Payment succeeded!", {
             type: "success",
           });
-          checkoutItemsSaved.current = checkoutItems
           break;
         case "processing":
           setMessage("Your payment is processing.");
@@ -50,7 +52,7 @@ const OrderConfirmationPage = () => {
           });
           break;
         case "requires_payment_method":
-          setMessage("Your payment was not successful, please try again.");
+          setMessage("Payment not successful");
           toast("Your payment was not successful, please try again.", {
             type: "error",
           });
@@ -78,7 +80,8 @@ const OrderConfirmationPage = () => {
         <div className="flex items-center gap-2">
           <CiCircleCheck size={45} />
           <div className="flex flex-col">
-            <p className="text-lg font-bold">{`Thank you ${firstName}`}</p>
+            <p className="text-lg font-bold">{message}</p>
+            <p className="text-sm">{`${firstName}`}</p>
           </div>
         </div>
         <div className="rounded-lg border-slate-300 border-1 text-sm mt-7">
