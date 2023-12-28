@@ -2,10 +2,11 @@ import React, { useState, useEffect, useContext } from "react";
 import { FaShop } from "react-icons/fa6";
 import { RiShoppingCartFill } from "react-icons/ri";
 import { FaCross } from "react-icons/fa";
+import { IoHome } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router";
 import useSidebarStatus from "../hooks/useSidebarStatus";
 import { CheckoutContext } from "../App";
-let savedPageStatus = ""
+
 export default function SideBar() {
     const location = useLocation();
     let savedPageStatus = location.pathname.split("/")[1];
@@ -13,6 +14,7 @@ export default function SideBar() {
     const {
       setCheckoutProgress
     } = useContext(CheckoutContext);
+
     const onShopIconClicked = (navigateTo) => {
       navigateTo("/shop");
       setPageStatus("shop")
@@ -24,6 +26,13 @@ export default function SideBar() {
       navigateTo("/cart");
       setPageStatus("cart")
       savedPageStatus = "cart"
+      setCheckoutProgress(1)
+    };
+
+    const onHomeIconClicked = (navigateTo) => {
+      navigateTo("/");
+      setPageStatus("home")
+      savedPageStatus = "home"
       setCheckoutProgress(1)
     };
 
@@ -42,6 +51,7 @@ export default function SideBar() {
       <div className=" bg-slate-600 w-4/5 h-lineBreakHeight"/>
       <SideBarIcon IconElement={<FaShop className={`${checkIconActive("shop")?"text-white":"text-slate-400"}`}/> } onClickFunction={onShopIconClicked}/>
       <SideBarIcon IconElement={<RiShoppingCartFill className={`${checkIconActive("cart")?"text-white":"text-slate-400"}`} />} onClickFunction={onCartIconClicked}/>
+      <SideBarIcon IconElement={<IoHome className={`${checkIconActive("home")?"text-white":"text-slate-400"}`} />} onClickFunction={onHomeIconClicked}/>
     </div>
   );
 }

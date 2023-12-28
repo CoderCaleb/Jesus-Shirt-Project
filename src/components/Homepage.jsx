@@ -46,7 +46,7 @@ export default function Homepage() {
         </Link>
       </div>
       <div className="flex m-auto items-center justify-center w-full text-center flex-col gap-10 py-28 bg-white">
-        <p className="text-7xl font-bold">Best Sellers</p>
+        <p className="md:text-7xl text-6xl mx-16 font-bold">Best Sellers</p>
         <div className="flex overflow-x-scroll w-11/12 m-auto gap-3 justify-center">
           {bestSellingData.map((value, index) => {
             return <ProductCard productData={value} index={index} />;
