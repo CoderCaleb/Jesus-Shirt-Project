@@ -49,7 +49,7 @@ export default function Product() {
     navigate("/checkout",{state:{checkoutItems:productArr}})
   }
   return (
-    <div className="flex flex-col md:flex-row p-10 md:justify-center gap-10 items-center w-full overflow-y-scroll">
+    <div className="flex flex-col md:flex-row p-10 md:justify-center gap-16 items-center w-full overflow-y-scroll">
       <div className=" grid-cols-2 gap-4 w-6/12 max-w-maxImageGridWidth h-min hidden min-w-minPictureGrid md:grid">
         <ProductImage image={product.image4} />
         <ProductImage image={product.image2} />

@@ -9,7 +9,7 @@ export default function Shop() {
       <div className="flex justify-center">
         <p className=" text-5xl font-semibold my-16">Shop 🛍️</p>
       </div>
-      <div className="flex w-full flex-wrap gap-3 justify-center">
+      <div className="flex w-full flex-wrap gap-7 justify-center">
         {shirtData.map((value, index) => {
           return <ProductCard productData={value} index={index}/>;
         })}

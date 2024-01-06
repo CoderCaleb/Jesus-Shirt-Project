@@ -10,17 +10,43 @@ import Checkout from "./components/Checkout";
 export const StateSharingContext = createContext();
 export const CheckoutContext = createContext();
 
-const savedCartData = localStorage.getItem("cartData")
-  ? JSON.parse(localStorage.getItem("cartData"))
-  : [];
+// Function to safely parse JSON data
+const safelyParseJSON = (jsonString) => {
+  try {
+    return JSON.parse(jsonString);
+  } catch (error) {
+    console.error('Error parsing JSON:', error);
+    return null; // Return null or a default value when parsing fails
+  }
+};
 
-const savedCheckoutData = localStorage.getItem("checkoutData")
-  ? JSON.parse(localStorage.getItem("checkoutData"))
-  : [];
+// Retrieve and parse cartData
+let parsedCartData;
+try {
+  const savedCartData = localStorage.getItem('cartData');
+  parsedCartData = savedCartData && typeof savedCartData === 'string'
+    ? safelyParseJSON(savedCartData)
+    : [];
+} catch (error) {
+  console.error('Error retrieving or parsing cartData:', error);
+  parsedCartData = []; // Handle the error, set to null or another default value
+}
+
+// Retrieve and parse checkoutData
+let parsedCheckoutData;
+try {
+  const savedCheckoutData = localStorage.getItem('checkoutData');
+  parsedCheckoutData = savedCheckoutData && typeof savedCheckoutData === 'string'
+    ? safelyParseJSON(savedCheckoutData)
+    : [];
+} catch (error) {
+  console.error('Error retrieving or parsing checkoutData:', error);
+  parsedCheckoutData = []; // Handle the error, set to null or another default value
+}
 
 export default function App() {
-  const [cartItems, setCartItems] = useState(savedCartData);
-  const [checkoutItems, setCheckoutItems] = useState(savedCheckoutData);
+  const [cartItems, setCartItems] = useState(parsedCartData);
+  const [checkoutItems, setCheckoutItems] = useState(parsedCheckoutData);
   const [showRemoveItem, setShowRemoveItem] = useState({});
   // State variables for input values
   const [country, setCountry] = useState({

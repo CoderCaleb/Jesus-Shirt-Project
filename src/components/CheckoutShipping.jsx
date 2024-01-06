@@ -96,7 +96,7 @@ export default function CheckoutShipping() {
     return false;
   }
   return (
-    <div className="w-full h-full flex items-center justify-center px-3 sm:px-10 relative flex-col sm:min-w-[400px] py-5 overflow-y-scroll md:w-1/2">
+    <div className="w-full h-full flex items-center justify-center px-3 sm:px-10 relative flex-col sm:min-w-[400px] overflow-y-scroll md:w-1/2">
       {showItems ? (
         <div
           className={`w-full h-full overflow-y-scroll absolute bg-slate-200 z-30 md:hidden ${
@@ -124,7 +124,7 @@ export default function CheckoutShipping() {
         <></>
       )}
       <div className="font-semibold flex justify-between text-lg md:text-xl mb-10 w-full">
-        <p className="flex-1">How do you want your order?</p>
+        <p className="flex-1 pt-32">How do you want your order?</p>
       </div>
       <div
         className="text-base font-semibold flex absolute gap-2 items-center cursor-pointer md:hidden top-5 right-5"
@@ -318,7 +318,7 @@ export default function CheckoutShipping() {
           Continue to payment
         </button>
       </div>
-      <div className="flex gap-5 w-full px-5 mt-12">
+      <div className="flex gap-5 w-full px-5 mt-12 mb-16">
         <div className="flex-col flex-1 flex">
           <p
             className={`font-semibold ${
