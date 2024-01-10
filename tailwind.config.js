@@ -11,7 +11,7 @@ module.exports = {
         secondary:"#DCD6F7",
         accent:"#424874",
         secondary2:"#c77135",
-        cardColorOne:"#e5dcd7",
+        cardColorOne:"#e5e1de",
         cardColorTwo:"#CEEDC7",
         cardColorThree:"#FFF6BD",
         cardColorFour:"#C0DEFF",

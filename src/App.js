@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes, useNavigate } from "react-router-dom";
+import { Outlet, Route, Routes, useLocation } from "react-router-dom";
 import React, { useState, createContext, useEffect, useRef } from "react";
 import SideBar from "./components/SideBar";
 import Cart from "./components/Cart";
@@ -7,6 +7,7 @@ import Shop from "./components/Shop";
 import Product from "./components/Product";
 import RemoveItemModal from "./modals/removeItemModal";
 import Checkout from "./components/Checkout";
+import Navbar from "./components/Navbar";
 export const StateSharingContext = createContext();
 export const CheckoutContext = createContext();
 
@@ -15,7 +16,7 @@ const safelyParseJSON = (jsonString) => {
   try {
     return JSON.parse(jsonString);
   } catch (error) {
-    console.error('Error parsing JSON:', error);
+    console.error("Error parsing JSON:", error);
     return null; // Return null or a default value when parsing fails
   }
 };
@@ -23,24 +24,26 @@ const safelyParseJSON = (jsonString) => {
 // Retrieve and parse cartData
 let parsedCartData;
 try {
-  const savedCartData = localStorage.getItem('cartData');
-  parsedCartData = savedCartData && typeof savedCartData === 'string'
-    ? safelyParseJSON(savedCartData)
-    : [];
+  const savedCartData = localStorage.getItem("cartData");
+  parsedCartData =
+    savedCartData && typeof savedCartData === "string"
+      ? safelyParseJSON(savedCartData)
+      : [];
 } catch (error) {
-  console.error('Error retrieving or parsing cartData:', error);
+  console.error("Error retrieving or parsing cartData:", error);
   parsedCartData = []; // Handle the error, set to null or another default value
 }
 
 // Retrieve and parse checkoutData
 let parsedCheckoutData;
 try {
-  const savedCheckoutData = localStorage.getItem('checkoutData');
-  parsedCheckoutData = savedCheckoutData && typeof savedCheckoutData === 'string'
-    ? safelyParseJSON(savedCheckoutData)
-    : [];
+  const savedCheckoutData = localStorage.getItem("checkoutData");
+  parsedCheckoutData =
+    savedCheckoutData && typeof savedCheckoutData === "string"
+      ? safelyParseJSON(savedCheckoutData)
+      : [];
 } catch (error) {
-  console.error('Error retrieving or parsing checkoutData:', error);
+  console.error("Error retrieving or parsing checkoutData:", error);
   parsedCheckoutData = []; // Handle the error, set to null or another default value
 }
 
@@ -117,6 +120,9 @@ export default function App() {
     setIsLoading,
   };
 
+  
+  const location = useLocation();
+  
   useEffect(() => {
     console.log(showRemoveItem);
   }, [showRemoveItem]);
@@ -125,58 +131,25 @@ export default function App() {
     localStorage.setItem("cartData", JSON.stringify(cartItems));
   }, [cartItems]);
 
+
   return (
     <CheckoutContext.Provider value={checkoutContextValue}>
       <StateSharingContext.Provider value={stateContextValue}>
-        <div className="w-screen h-screen bg-background flex">
-          <HandleModalComponent />
-          <Routes>
-            <Route
-              path="/"
-              element={<Outlet />}
-              errorElement={<h1>404</h1>}
-            ></Route>
-            <Route index element={<Homepage />} />
-            <Route
-              path="cart"
-              element={
-                <div className="flex w-full h-full">
-                  <SideBar />
-                  <Cart />
-                </div>
-              }
-            />
-            <Route path="shop" element={<Outlet />}>
-              <Route
-                index
-                element={
-                  <div className="flex w-full h-full">
-                    <SideBar />
-                    <Shop />
-                  </div>
-                }
-              />
-              <Route
-                path=":productId"
-                element={
-                  <div className="flex w-full h-full">
-                    <SideBar />
-                    <Product />
-                  </div>
-                }
-              />
-            </Route>
-            <Route
-              path="checkout"
-              element={
-                <div className="flex w-full h-full">
-                  <SideBar />
-                  <Checkout />
-                </div>
-              }
-            />
-            <Route path="*" element={<h1>Not found</h1>} />
-          </Routes>
+        <div>
+          <Navbar from={location.pathname}/>
+          <div className="w-screen h-[calc(100vh-64px)] bg-background flex z-[1]">
+            <HandleModalComponent />
+            <Routes>
+              <Route index element={<Homepage />} />
+              <Route path="cart" element={<Cart />} />
+              <Route path="shop" element={<Outlet />}>
+                <Route index element={<Shop />} />
+                <Route path=":productId" element={<Product />} />
+              </Route>
+              <Route path="checkout" element={<Checkout />} />
+              <Route path="*" element={<h1>Not found</h1>} />
+            </Routes>
+          </div>
         </div>
       </StateSharingContext.Provider>
     </CheckoutContext.Provider>

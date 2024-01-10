@@ -9,7 +9,7 @@ export default function ProductCard(props) {
     return (
       <div className="md:basis-[calc(25%-35px)] basis-[calc(50%-35px)] grow-0 shrink-0 w-0" key={index}>
         <div
-          className={`rounded-lg flex flex-col gap-2 items-center md:px-5 md:py-3 justify-center cursor-pointer transition-all duration-150 bg-cardColorOne shadow-lg hover:shadow-red-200`}
+          className={`rounded-lg flex flex-col gap-2 items-center md:px-5 md:py-3 justify-center cursor-pointer transition-all duration-150 bg-cardColorOne shadow-lg hover:shadow-slate-300`}
           onClick={() => {
             navigate(`/shop/${id}`);
           }}

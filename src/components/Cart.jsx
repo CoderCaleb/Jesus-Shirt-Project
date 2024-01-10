@@ -26,13 +26,7 @@ export default function Cart() {
   return (
     <div className="w-full h-full relative">
       <div className="w-full h-full py-10 sm:p-10 overflow-x-hidden overflow-y-scroll pb-56">
-        <div className="flex justify-between sm:px-0 px-10">
-          <p className="text-3xl font-semibold sm:text-left text-center flex-1">
-            Shopping Cart
-          </p>
-          <p className="text-3xl font-semibold hidden sm:block">{`${cartItems.length} Items`}</p>
-        </div>
-        <div className=" bg-slate-400 w-full h-lineBreakHeight mt-4 sm:px-0 px-10" />
+        
         {cartItems.length !== 0 ? (
           <div className="flex w-full">
             <div className="flex gap-3 flex-col w-full lg:w-8/12">
