@@ -78,7 +78,7 @@ const OrderConfirmationPage = () => {
   return (
     <div className="w-full h-full flex items-center justify-around md:w-1/2">
       <div className="w-full flex h-min px-5 sm:px-10 flex-col sm:min-w-[400px] py-5 overflow-y-scroll">
-        <p className="text-3xl font-bold mb-7">Checkout</p>
+        <p className="text-3xl font-bold my-7">Checkout</p>
 
         <div className="flex items-center gap-2">
           <CiCircleCheck size={45} />

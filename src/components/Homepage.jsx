@@ -1,12 +1,57 @@
-import React from "react";
+import React, { useRef, useEffect, useState } from "react";
 import bestSellingData from "../bestSellingData";
 import ProductCard from "./ProductCard";
 import { Link } from "react-router-dom";
-import { useTrail, animated } from "@react-spring/web";
+import {
+  useTrail,
+  useTransition,
+  useSpring,
+  animated,
+} from "@react-spring/web";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 export default function Homepage() {
+  const firstElementRef = useRef(null);
+  let [firstElementIntersecting, setFirstElementIntersecting] = useState(false);
+  const [firstElementChildren, setFirstElementChildren] = useState(null);
+  const secondElementRef = useRef(null);
+  let [secondElementIntersecting, setSecondElementIntersecting] =
+    useState(false);
+  const thirdElementRef = useRef(null);
+  let [thirdElementIntersecting, setThirdElementIntersecting] = useState(false);
+  const [thirdElementChildren, setThirdElementChildren] = useState(null);
+  function handleIntersectionObserver(element, updateState) {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry) => {
+        updateState(entry.isIntersecting);
+      });
+    });
+    console.log(element);
+    if (firstElementRef) {
+      observer.observe(element);
+    }
+
+    return () => {
+      if (element) {
+        observer.unobserve(element);
+      }
+    };
+  }
+  useEffect(() => {
+    handleIntersectionObserver(
+      firstElementRef.current,
+      setFirstElementIntersecting
+    );
+    handleIntersectionObserver(
+      secondElementRef.current,
+      setSecondElementIntersecting
+    );
+    handleIntersectionObserver(
+      thirdElementRef.current,
+      setThirdElementIntersecting
+    );
+  }, []);
   const children = [
     <p className="md:text-8xl text-6xl">✝️</p>,
     <p className="md:text-7xl text-6xl font-bold lg:max-w-[850px]">
@@ -22,34 +67,96 @@ export default function Homepage() {
       </button>
     </Link>,
   ];
-  const [trails, api] = useTrail(
-    children.length,
-    () => ({
-      from: { opacity: 0 },
-      to: { opacity: 1 },
+  const firstElementProps = useTransition(children, {
+    from: {
+      opacity: 0,
+      scale: 0.93,
+    },
+    enter: (msg, i) => ({
+      delay: () => {
+        return i * 300;
+      },
+      opacity: 1,
+      scale: 1,
     }),
-    []
+  });
+
+  useEffect(() => {
+    setFirstElementChildren(
+      firstElementProps((styles, element) => {
+        return <animated.div style={styles}>{element}</animated.div>;
+      })
+    )
+  }, [firstElementIntersecting]);
+
+  const secondElementProps = useSpring({
+    opacity: secondElementIntersecting ? 1 : 0,
+    x: secondElementIntersecting ? 0 : 20,
+    from: { opacity: 0, x: 20 },
+    config: { tension: 2000, friction: 200 },
+  });
+
+  const bestSellingElement = bestSellingData.map((value,index)=>{
+    return(
+      <ProductCard productData={value} index={index} />
+    )
+  })
+  const thirdElementProps = useTransition(
+    bestSellingElement,
+    {
+      from: {
+        opacity: 0,
+        scale: 0.93,
+      },
+      enter: (msg, i) => ({
+        delay: () => {
+          return i * 400;
+        },
+        opacity: 1,
+        scale: 1,
+      }),
+    }
   );
+
+  useEffect(() => {
+    setThirdElementChildren(thirdElementProps((styles, element) => {
+      return (
+        <animated.div
+          style={styles}
+          className="md:basis-[calc(25%-35px)] basis-[calc(50%-35px)]"
+        >
+          {element}
+        </animated.div>
+      );
+    }));
+  }, [thirdElementIntersecting]);
+  useEffect(() => {
+    console.log("Third element intersecting", thirdElementIntersecting);
+  }, [thirdElementIntersecting]);
   return (
     <div className="flex flex-1 flex-col items-center h-full overflow-y-scroll">
       <div className="relative w-full">
         <div class="absolute -top-[150px] z-[1] left-1/2 h-[672px] w-full max-w-[1126px] -translate-x-1/2 rounded-full blur-[250px] opacity-40 [background:linear-gradient(180deg,rgba(0,102,255,0.30)_0%,rgba(143,0,255,0.30)_50%,rgba(255,0,184,0.30)_100%)]"></div>
         <div className="flex text-center w-full justify-center px-12 gap-10 items-center">
-          <div className="flex flex-col items-center gap-7 py-36 sm:w-4/5 w-full z-10">
-            {trails.map((styles, index) => {
-              return (
-                <animated.div style={styles}>{children[index]}</animated.div>
-              );
-            })}
+          <div
+            className="flex flex-col items-center gap-7 py-28 sm:w-4/5 w-full z-10"
+            ref={firstElementRef}
+          >
+            {firstElementChildren}
           </div>
         </div>
       </div>
-      <div className="flex m-auto items-center justify-center w-full text-center flex-col gap-16 pb-20">
-        <p className="text-5xl mx-3 font-bold">Best Sellers 🔥</p>
-        <div className="flex lg:w-11/12 w-full gap-7 justify-center flex-wrap">
-          {bestSellingData.map((value, index) => {
-            return <ProductCard productData={value} index={index} />;
-          })}
+      <div className="flex m-auto items-center justify-center w-full text-center flex-col gap-16 pb-20 pt-7">
+        <animated.div style={secondElementProps}>
+          <p className="text-5xl mx-3 font-bold" ref={secondElementRef}>
+            Best Sellers 🔥
+          </p>
+        </animated.div>
+        <div
+          className="flex lg:w-11/12 w-full gap-7 justify-center flex-wrap"
+          ref={thirdElementRef}
+        >
+          {thirdElementChildren}
         </div>
       </div>
       <div className="bg-white w-full">

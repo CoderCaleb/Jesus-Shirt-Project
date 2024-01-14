@@ -1,5 +1,5 @@
 import React, {useContext} from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import useSidebarStatus from "../hooks/useSidebarStatus";
 import { CheckoutContext } from "../App";
 import { Link } from "react-router-dom";
@@ -8,9 +8,11 @@ export default function Navbar({from}) {
     const location = useLocation();
     let savedPageStatus = location.pathname.split("/")[1];
     const [pageStatus, setPageStatus] = useSidebarStatus(savedPageStatus)
+    console.log(pageStatus)
     const {
       setCheckoutProgress
     } = useContext(CheckoutContext);
+    const navigate = useNavigate()
 
     const onShopIconClicked = (navigateTo) => {
       navigateTo("/shop");
@@ -28,8 +30,8 @@ export default function Navbar({from}) {
 
     const onHomeIconClicked = (navigateTo) => {
       navigateTo("/");
-      setPageStatus("home")
-      savedPageStatus = "home"
+      setPageStatus("")
+      savedPageStatus = ""
       setCheckoutProgress(1)
     };
 
@@ -48,16 +50,16 @@ export default function Navbar({from}) {
           className="w-16 h-16 cursor-pointer"
         />
       </div>
-      <div className="flex gap-5 items-center font-semibold z-10">
-        <a className="text-sm" href="/">
+      <div className="flex gap-5 items-center font-semibold z-10 cursor-pointer">
+        <div className={`text-sm ${checkIconActive("")?" border-b-2 border-black ":""}`} onClick={()=>onHomeIconClicked(navigate)}>
           Home
-        </a>
-        <a className="text-sm mr-2" href="/cart">
+        </div>
+        <div className={`text-sm mr-2 ${checkIconActive("cart")?" border-b-2 border-black":""}`} onClick={()=>onCartIconClicked(navigate)}>
           Cart
-        </a>
-        <a className="text-sm mr-2" href="/shop">
+        </div>
+        <div className={`text-sm mr-2 ${checkIconActive("shop")?" border-b-2 border-black ":""}`}  onClick={()=>onShopIconClicked(navigate)}>
           Shop
-        </a>
+        </div>
         {from==="/"?<Link to="/shop">
           <button className="border-2 px-3 h-10 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
             Shop Now

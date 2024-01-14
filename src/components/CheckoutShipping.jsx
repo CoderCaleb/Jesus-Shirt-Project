@@ -123,8 +123,8 @@ export default function CheckoutShipping() {
       ) : (
         <></>
       )}
-      <div className="font-semibold flex justify-between text-lg md:text-xl mb-10 w-full">
-        <p className="flex-1 pt-32">How do you want your order?</p>
+      <div className="font-semibold flex justify-between text-lg md:text-xl mb-10 mt-48 w-full">
+        <p className="flex-1">How do you want your order?</p>
       </div>
       <div
         className="text-base font-semibold flex absolute gap-2 items-center cursor-pointer md:hidden top-5 right-5"
@@ -318,7 +318,7 @@ export default function CheckoutShipping() {
           Continue to payment
         </button>
       </div>
-      <div className="flex gap-5 w-full px-5 mt-12 mb-16">
+      <div className="flex gap-5 w-full px-5 my-12">
         <div className="flex-col flex-1 flex">
           <p
             className={`font-semibold ${
