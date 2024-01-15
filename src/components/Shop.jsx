@@ -11,11 +11,13 @@ export default function Shop() {
       </div>
       <div className="flex w-full flex-wrap gap-7 justify-center">
         {shirtData.map((value, index) => {
-          return <ProductCard productData={value} index={index}/>;
+          return (
+            <div className="md:basis-[calc(25%-35px)] basis-[calc(50%-35px)]">
+              <ProductCard productData={value} index={index} />
+            </div>
+          );
         })}
       </div>
     </div>
   );
 }
-
-

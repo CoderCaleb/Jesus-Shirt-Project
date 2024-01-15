@@ -25,8 +25,7 @@ export default function Cart() {
 
   return (
     <div className="w-full h-full relative">
-      <div className="w-full h-full py-10 sm:p-10 overflow-x-hidden overflow-y-scroll pb-56">
-        
+      <div className="w-full h-full px-10 pt-5 overflow-x-hidden overflow-y-scroll pb-56">
         {cartItems.length !== 0 ? (
           <div className="flex w-full">
             <div className="flex gap-3 flex-col w-full lg:w-8/12">
