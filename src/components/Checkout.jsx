@@ -127,7 +127,7 @@ export default function Checkout() {
                 </p>
               </div>
             )}
-            <div className=" w-full h-full overflow-y-scroll flex">
+            <div className=" w-full h-full flex">
               {checkoutProgress === 1 ? (
                 <CheckoutShipping cartData={checkoutItems} />
               ) : checkoutProgress === 2 ? (
