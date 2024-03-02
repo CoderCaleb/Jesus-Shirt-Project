@@ -55,6 +55,5 @@
   "devDependencies": {
     "autoprefixer": "^10.4.16",
     "tailwindcss": "^3.3.5"
-  },
-  "proxy": "https://jesus-shirt-project-backend.onrender.com"
+  }
 }

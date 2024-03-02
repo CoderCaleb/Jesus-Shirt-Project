@@ -32,7 +32,7 @@ export default function Checkout() {
   const shippingPrice = 2;
   useEffect(() => {
     if (checkoutItems) {
-      fetch("/create-payment-intent", {
+      fetch("https://jesus-shirt-project-backend.onrender.com/create-payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

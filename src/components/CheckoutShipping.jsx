@@ -117,7 +117,7 @@ export default function CheckoutShipping() {
           </div>
 
           {cartItems.map((product, index) => {
-            return <ItemCard productInfo={product} />;
+            return <ItemCard productInfo={product} key={index}/>;
           })}
         </div>
       ) : (
@@ -261,6 +261,7 @@ export default function CheckoutShipping() {
                   onClick={() => {
                     setCountry(country);
                   }}
+                  key={index}
                 >
                   <span
                     className={`fi fi-${country["alpha-2"].toLowerCase()}`}
