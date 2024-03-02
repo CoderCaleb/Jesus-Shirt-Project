@@ -21,11 +21,6 @@ export default function CheckoutPayment() {
     isLoading,
     setIsLoading,
   } = useContext(CheckoutContext);
-  const [cardNumberError, setCardNumberError] = useState(true);
-  const [expirationDateError, setExpirationDateError] = useState(true);
-  const [securityCodeError, setSecurityCodeError] = useState(true);
-  const [nameOnCardError, setNameOnCardError] = useState(true);
-  const [message, setMessage] = useState("");
 
   const stripe = useStripe();
   const elements = useElements();

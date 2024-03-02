@@ -1,6 +1,5 @@
 import { Outlet, Route, Routes, useLocation } from "react-router-dom";
 import React, { useState, createContext, useEffect, useRef } from "react";
-import SideBar from "./components/SideBar";
 import Cart from "./components/Cart";
 import Homepage from "./components/Homepage";
 import Shop from "./components/Shop";
