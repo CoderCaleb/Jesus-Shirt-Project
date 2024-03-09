@@ -21,7 +21,8 @@ export default function Checkout() {
     cartItems,
     setClientSecret,
   } = useContext(CheckoutContext);
-
+  const [isConnected, setIsConnected] = useState(false);
+  const [connectionError, setConnectionError] = useState("");
   const location = useLocation();
   const { state } = location;
   let checkoutItems;
@@ -31,18 +32,29 @@ export default function Checkout() {
   }
   const shippingPrice = 2;
   useEffect(() => {
+    setIsConnected(false);
+    setConnectionError("");
     if (checkoutItems) {
-      fetch("https://jesus-shirt-project-backend.onrender.com/create-payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          checkoutItems,
-        }),
-      })
+      fetch(
+        "https://jesus-shirt-project-backend.onrender.com/create-payment-intent",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            checkoutItems,
+          }),
+        }
+      )
         .then((res) => res.json())
         .then((data) => {
           setClientSecret(data.clientSecret);
-          console.log(data);
+          setIsConnected(true);
+          setConnectionError("");
+        })
+        .catch((err) => {
+          console.log("An error occured while loading checkout");
+          setIsConnected(false);
+          setConnectionError(err);
         });
     }
   }, []);
@@ -113,7 +125,10 @@ export default function Checkout() {
   if (checkoutItems) {
     return (
       <div className="w-full h-full relative">
-        {stripePromise && clientSecret && (
+        {stripePromise &&
+        clientSecret &&
+        isConnected &&
+        connectionError === "" ? (
           <Elements stripe={stripePromise} options={options} key={clientSecret}>
             {isLoading && (
               <div className="flex flex-col gap-5 absolute w-full h-full justify-center items-center bg-darkenBg z-50">
@@ -161,6 +176,16 @@ export default function Checkout() {
               </div>{" "}
             </div>
           </Elements>
+        ) : connectionError === "" ? (
+          <div className="flex justify-center items-center w-full h-full flex-col">
+            <p className="text-xl font-semibold">Loading checkout... ☺️</p>
+            <p className="font-semibold text-sm text-slate-600">This may take a while</p>
+          </div>
+        ) : (
+          <div className="flex justify-center items-center w-full h-full flex-col">
+            <p className="text-xl font-semibold">An unexpected error occurred 😞</p>
+            <p className="font-semibold text-sm text-slate-600">Please try again later</p>
+          </div>
         )}
       </div>
     );

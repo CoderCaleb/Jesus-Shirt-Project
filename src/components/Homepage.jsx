@@ -3,12 +3,10 @@ import bestSellingData from "../bestSellingData";
 import ProductCard from "./ProductCard";
 import { Link } from "react-router-dom";
 import {
-  useTrail,
   useTransition,
   useSpring,
   animated,
 } from "@react-spring/web";
-import Navbar from "./Navbar";
 import Footer from "./Footer";
 
 export default function Homepage() {
@@ -27,7 +25,6 @@ export default function Homepage() {
         updateState(entry.isIntersecting);
       });
     });
-    console.log(element);
     if (firstElementRef) {
       observer.observe(element);
     }
@@ -130,9 +127,7 @@ export default function Homepage() {
       );
     }));
   }, [thirdElementIntersecting]);
-  useEffect(() => {
-    console.log("Third element intersecting", thirdElementIntersecting);
-  }, [thirdElementIntersecting]);
+
   return (
     <div className="flex flex-1 flex-col items-center h-full overflow-y-scroll">
       <div className="relative w-full">
