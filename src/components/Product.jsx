@@ -1,6 +1,5 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
-import { faker } from "@faker-js/faker";
 import shirtData from "../shirtData";
 import { StateSharingContext, CheckoutContext } from "../App.js";
 import { ToastContainer, toast } from "react-toastify";
@@ -11,11 +10,12 @@ import { Carousel } from "react-responsive-carousel";
 
 export default function Product() {
   const { productId } = useParams();
-  const product = shirtData.find((shirt) => shirt.id === Number(productId));
   const [sizeChoice, setSizeChoice] = useState("S");
+  const [variant, setVariant] = useState({});
+  const [product, setProduct] = useState({});
   const { setCartItems } = useContext(StateSharingContext);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   function handleAddToCart(productInfo) {
     productInfo = { ...productInfo, size: sizeChoice, quantity: 1 };
@@ -43,108 +43,141 @@ export default function Product() {
       }
     });
   }
-  
-  function handleBuyNow(product){
-    const productArr = [{...product, size: sizeChoice, quantity: 1 }]
-    navigate("/checkout",{state:{checkoutItems:productArr}})
-  }
-  return (
-    <div className="flex flex-col md:flex-row p-10 md:justify-center gap-16 items-center w-full overflow-y-scroll">
-      <div className=" grid-cols-2 gap-4 w-6/12 max-w-maxImageGridWidth h-min hidden min-w-minPictureGrid md:grid">
-        <ProductImage image={product.image4} />
-        <ProductImage image={product.image2} />
-        <ProductImage image={product.image3} />
-        <ProductImage image={product.image4} />
-      </div>
-      <div className="block w-full md:hidden max-w-[500px]">
-        <Carousel showArrows={true}>
-          <div>
-            <img src={product.image4} alt="product"/>
-          </div>
-          <div>
-            <img src={product.image2} alt="product"/>
-          </div>
-          <div>
-            <img src={product.image3} alt="product"/>
-          </div>
-          <div>
-            <img src={product.image4} alt="product"/>
-          </div>
-        </Carousel>
-      </div>
-      <div className="flex min-w flex-col md:w-auto w-full gap-6 text-center md:text-left">
-        <p className="font-bold text-4xl">{product.name}</p>
-        <p className="text-lg font-semibold text-secondary2">{`$${product.price} SGD`}</p>
-        <div className="gap-3 flex items-center flex-col md:flex-row">
-          <p className="text-sm font-semibold mr-2">Select Size</p>
-          <div className="flex gap-3">
-            <SizeChoiceBox
-              size="S"
-              handleSelect={() => {
-                setSizeChoice("S");
-              }}
-              sizeChoice={sizeChoice}
-            />
-            <SizeChoiceBox
-              size="M"
-              handleSelect={() => {
-                setSizeChoice("M");
-              }}
-              sizeChoice={sizeChoice}
-            />
-            <SizeChoiceBox
-              size="L"
-              handleSelect={() => {
-                setSizeChoice("L");
-              }}
-              sizeChoice={sizeChoice}
-            />
-            <SizeChoiceBox
-              size="XL"
-              handleSelect={() => {
-                setSizeChoice("XL");
-              }}
-              sizeChoice={sizeChoice}
-            />
-            <SizeChoiceBox
-              size="XXL"
-              handleSelect={() => {
-                setSizeChoice("XXL");
-              }}
-              sizeChoice={sizeChoice}
-            />
-          </div>
-        </div>
-        <div className="">
-          <div className=" bg-slate-500 w-full h-lineBreakHeight max-w-lg m-auto" />
 
-          <div className="flex md:flex-row flex-col gap-5 mt-8 max-w-lg m-auto">
-            <button
-              className="border-2 border-black w-full h-12 font-semibold rounded-md hover:bg-black hover:text-white"
-              onClick={() => handleAddToCart(product)}
-            >
-              Add to Cart
-            </button>
-            <button className="border-2 border-none text-white bg-black w-full h-12 font-semibold rounded-md hover:shadow-xl shadow-indigo-800" onClick={()=>{
-                  handleBuyNow(product)
-                }}>
-              Buy Now
-            </button>
+  function handleBuyNow(product) {
+    const productArr = [{ ...product, size: sizeChoice, quantity: 1 }];
+    navigate("/checkout", { state: { checkoutItems: productArr } });
+  }
+  function handleFetchProduct(id) {
+    fetch(`http://127.0.0.1:4242/fetch_product`, {
+      method: "POST",
+      body: JSON.stringify({
+        id: id,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => setProduct(data))
+      .catch((err) => console.log(err));
+  }
+
+  useEffect(() => {
+    handleFetchProduct(productId);
+  }, []);
+  useEffect(()=>{
+    console.log(product)
+  },[product])
+  useEffect(() => {
+    
+  }, [sizeChoice, product]);
+  return (
+    <div className="w-full overflow-y-scroll">
+      {Object.keys(product).length !== 0? (
+        <div className="flex flex-col md:flex-row p-10 md:justify-center gap-10 lg:gap-16 items-center h-full w-full">
+          <div className=" grid-cols-2 gap-4 w-6/12 max-w-maxImageGridWidth h-min hidden min-w-minPictureGrid lg:grid">
+            {product["product_images"].map((image,index)=>{
+              return <ProductImage image={image} index={index}/>
+            })}
           </div>
+          <div className="block w-full lg:hidden max-w-[300px]">
+            <Carousel showArrows={true}>
+            {product["product_images"].map((image,index)=>{
+              return(
+                <div key={index}>
+                <img src={image} alt="product" />
+              </div>
+              )
+            })}
+              
+            </Carousel>
+          </div>
+          <div className="flex min-w flex-col md:w-auto w-full gap-6 text-center md:text-left">
+            <p className="font-bold text-4xl">{product.name}</p>
+            <p className="text-lg font-semibold text-secondary2">{`$${product.price} SGD`}</p>
+            <div className="gap-3 flex items-center flex-col md:flex-row">
+              <p className="text-sm font-semibold mr-2 whitespace-nowrap">Select Size</p>
+              <div className="flex gap-3">
+                <SizeChoiceBox
+                  size="XS"
+                  handleSelect={() => {
+                    setSizeChoice("XS");
+                  }}
+                  sizeChoice={sizeChoice}
+                />
+                <SizeChoiceBox
+                  size="S"
+                  handleSelect={() => {
+                    setSizeChoice("S");
+                  }}
+                  sizeChoice={sizeChoice}
+                />
+                <SizeChoiceBox
+                  size="M"
+                  handleSelect={() => {
+                    setSizeChoice("M");
+                  }}
+                  sizeChoice={sizeChoice}
+                />
+                <SizeChoiceBox
+                  size="L"
+                  handleSelect={() => {
+                    setSizeChoice("L");
+                  }}
+                  sizeChoice={sizeChoice}
+                />
+                <SizeChoiceBox
+                  size="XL"
+                  handleSelect={() => {
+                    setSizeChoice("XL");
+                  }}
+                  sizeChoice={sizeChoice}
+                />
+                <SizeChoiceBox
+                  size="2XL"
+                  handleSelect={() => {
+                    setSizeChoice("2XL");
+                  }}
+                  sizeChoice={sizeChoice}
+                />
+              </div>
+            </div>
+            <div className="">
+              <div className=" bg-slate-500 w-full h-lineBreakHeight max-w-lg m-auto" />
+
+              <div className="flex md:flex-row flex-col gap-5 mt-8 max-w-lg m-auto">
+                <button
+                  className="border-2 border-black w-full h-12 font-semibold rounded-md hover:bg-black hover:text-white"
+                  onClick={() => handleAddToCart(product)}
+                >
+                  Add to Cart
+                </button>
+                <button
+                  className="border-2 border-none text-white bg-black w-full h-12 font-semibold rounded-md hover:shadow-xl shadow-indigo-800"
+                  onClick={() => {
+                    handleBuyNow(product);
+                  }}
+                >
+                  Buy Now
+                </button>
+              </div>
+            </div>
+          </div>
+          <ToastContainer position="top-center" theme="light" />
         </div>
-      </div>
-      <ToastContainer position="top-center" theme="light" />
+      ) : (
+        <>Loading...</>
+      )}
     </div>
   );
 }
 
 function ProductImage(props) {
-  const { image } = props;
+  const { image, index } = props;
   return (
     <img
       src={image}
       alt="product img"
-      className=" w-full object-fill rounded-md h-auto"
+      className=" w-full h-full object-fill rounded-md"
+      key={index}
     />
   );
 }
@@ -158,7 +191,11 @@ function SizeChoiceBox(props) {
       } w-10 h-10 cursor-pointer rounded-lg border-2 border-slate-300 `}
       onClick={handleSelect}
     >
-      <p className={` text-xs text-black ${sizeChoice === size ? " font-semibold text-white" : ""}`}>
+      <p
+        className={` text-xs text-black ${
+          sizeChoice === size ? " font-semibold text-white" : ""
+        }`}
+      >
         {size}
       </p>
     </button>

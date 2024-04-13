@@ -25,7 +25,7 @@ export default function Cart() {
 
   return (
     <div className="w-full h-full relative">
-      <div className="w-full h-full px-10 pt-5 overflow-x-hidden overflow-y-scroll pb-56">
+      <div className="w-full h-full px-10 pt-5 overflow-x-hidden overflow-y-scroll">
         {cartItems.length !== 0 ? (
           <div className="flex w-full">
             <div className="flex gap-3 flex-col w-full lg:w-8/12">
@@ -128,13 +128,13 @@ export default function Cart() {
 function CartBox(props) {
   const { productData, setShowRemoveItem } = props;
   const { setCartItems } = useContext(StateSharingContext);
-  const { name, price, image, size, quantity } = productData;
+  const { name, price, product_images, size, quantity } = productData;
 
   return (
     <div className=" w-full flex py-5 md:p-5 items-center justify-center px-2">
       <div className="flex md:gap-5 items-center basis-[66.6%] md:basis-auto justify-between">
         <img
-          src={require(`../images/${image}`)}
+          src={product_images[0]}
           className="h-24 w-24 rounded-md"
           alt="product"
         />

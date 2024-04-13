@@ -7,6 +7,7 @@ import Product from "./components/Product";
 import RemoveItemModal from "./modals/removeItemModal";
 import Checkout from "./components/Checkout";
 import Navbar from "./components/Navbar";
+import OrderTracking from "./components/OrderTracking";
 export const StateSharingContext = createContext();
 export const CheckoutContext = createContext();
 
@@ -64,19 +65,13 @@ export default function App() {
     "sub-region-code": "035",
     "intermediate-region-code": "",
   });
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [streetAddress, setStreetAddress] = useState("");
-  const [townCity, setTownCity] = useState("");
-  const [state, setState] = useState("");
-  const [postcode, setPostcode] = useState("");
   const [emailAddress, setEmailAddress] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
   const [showItems, setShowItems] = useState(false);
   const [checkoutProgress, setCheckoutProgress] = useState(1);
   const [clientSecret, setClientSecret] = useState("");
   const [paymentIntentId, setPaymentIntentId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [shippingData, setShippingData] = useState({})
   const stateContextValue = {
     cartItems,
     setCartItems,
@@ -88,24 +83,8 @@ export default function App() {
     setCheckoutProgress,
     country,
     setCountry,
-    showDropdown,
-    setShowDropdown,
-    firstName,
-    setFirstName,
-    lastName,
-    setLastName,
-    streetAddress,
-    setStreetAddress,
-    townCity,
-    setTownCity,
-    state,
-    setState,
-    postcode,
-    setPostcode,
     emailAddress,
     setEmailAddress,
-    showDropdown,
-    setShowDropdown,
     cartItems,
     showItems,
     setShowItems,
@@ -117,9 +96,10 @@ export default function App() {
     setPaymentIntentId,
     isLoading,
     setIsLoading,
+    shippingData,
+    setShippingData,
   };
 
-  
   const location = useLocation();
   
   useEffect(() => {
@@ -146,6 +126,10 @@ export default function App() {
                 <Route path=":productId" element={<Product />} />
               </Route>
               <Route path="checkout" element={<Checkout />} />
+              <Route path="/orders" element={<Outlet/>} >
+                <Route index element={<Shop/>}/>
+                <Route path=":orderId" element={<OrderTracking/>} />
+              </Route>
               <Route path="*" element={<h1>Not found</h1>} />
             </Routes>
           </div>

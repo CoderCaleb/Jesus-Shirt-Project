@@ -98,7 +98,7 @@ export default function Homepage() {
 
   const bestSellingElement = bestSellingData.map((value,index)=>{
     return(
-      <ProductCard productData={value} index={index} />
+      <ProductCard productData={value} index={index} fromPage="homepage"/>
     )
   })
   const thirdElementProps = useTransition(

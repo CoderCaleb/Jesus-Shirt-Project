@@ -6,276 +6,75 @@ import { FaChevronDown } from "react-icons/fa6";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import { CheckoutContext } from "../App";
 import ItemCard from "./ItemCard";
+import { AddressElement } from "@stripe/react-stripe-js";
+import { ToastContainer, toast } from "react-toastify";
 export default function CheckoutShipping() {
   const {
     checkoutProgress,
     setCheckoutProgress,
-    country,
-    setCountry,
-    showDropdown,
-    setShowDropdown,
-    firstName,
-    setFirstName,
-    lastName,
-    setLastName,
-    streetAddress,
-    setStreetAddress,
-    townCity,
-    setTownCity,
-    state,
-    setState,
-    postcode,
-    setPostcode,
-    emailAddress,
-    setEmailAddress,
     cartItems,
     showItems,
     setShowItems,
+    emailAddress,
+    setEmailAddress,
+    setShippingData,
+    shippingData,
   } = useContext(CheckoutContext);
 
-  // State variables for error state (no error = true)
-  const [firstNameError, setFirstNameError] = useState(true);
-  const [lastNameError, setLastNameError] = useState(true);
-  const [streetAddressError, setStreetAddressError] = useState(true);
-  const [townCityError, setTownCityError] = useState(true);
-  const [stateError, setStateError] = useState(true);
-  const [postcodeError, setPostcodeError] = useState(true);
-  const [emailAddressError, setEmailAddressError] = useState(true);
-  // Function to validate First Name
-  function isValidFirstName(firstName) {
-    // Only alphabets allowed, 2 to 30 characters
-    const regex = /^[a-zA-Z]{2,30}$/;
-    return regex.test(firstName);
-  }
-
-  // Function to validate Last Name
-  function isValidLastName(lastName) {
-    // Only alphabets allowed, 2 to 30 characters
-    const regex = /^[a-zA-Z]{2,30}$/;
-    return regex.test(lastName);
-  }
-
-  // Function to validate Street Address
-  function isValidStreetAddress(streetAddress) {
-    // Alphanumeric and special characters allowed, 2 to 100 characters
-    const regex = /^[a-zA-Z0-9\s,.'-]{2,100}$/;
-    return regex.test(streetAddress);
-  }
-
-  // Function to validate Town/City
-  function isValidTownCity(townCity) {
-    // Only alphabets allowed, 2 to 50 characters
-    const regex = /^[a-zA-Z\s]{2,50}$/;
-    return regex.test(townCity);
-  }
-
-  // Function to validate State
-  function isValidState(state) {
-    // Only alphabets allowed, 2 to 30 characters
-    const regex = /^[a-zA-Z]{2,30}$/;
-    return regex.test(state);
-  }
-
-  // Function to validate Postcode
-  function isValidPostcode(postcode) {
-    // Alphanumeric allowed, 5 to 10 characters
-    const regex = /^[a-zA-Z0-9]{4,10}$/;
-    return regex.test(postcode);
-  }
-
-  // Function to validate Email Address
-  function isValidEmailAddress(emailAddress) {
-    // Basic email validation
-    const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return regex.test(emailAddress);
-  }
   function checkCompleted(number) {
     if (checkoutProgress >= number) {
       return true;
     }
     return false;
   }
+  const addressElementOptions = {
+    mode: "shipping",
+  };
   return (
-    <div className="w-full h-full flex items-center justify-center px-3 sm:px-10 relative flex-col sm:min-w-[400px] overflow-y-scroll md:w-1/2">
-      {showItems ? (
-        <div
-          className={`w-full h-full overflow-y-scroll absolute bg-slate-200 z-30 md:hidden ${
-            showItems ? "animate-fade-up" : "animate-fade-down"
-          }`}
-        >
-          <div className="flex items-center mx-5">
-            <p className="text-3xl font-semibold sm:text-left text-center flex-1 my-5">
-              Your Orders 🛒
-            </p>
-            <AiOutlineCloseCircle
-              size={40}
-              className="cursor-pointer"
-              onClick={() => {
-                setShowItems(false);
-              }}
-            />
-          </div>
-
-          {cartItems.map((product, index) => {
-            return <ItemCard productInfo={product} key={index}/>;
-          })}
-        </div>
-      ) : (
-        <></>
-      )}
-      <div className="font-semibold flex justify-between text-lg md:text-xl mb-10 mt-48 w-full">
-        <p className="flex-1">How do you want your order?</p>
-      </div>
-      <div
-        className="text-base font-semibold flex absolute gap-2 items-center cursor-pointer md:hidden top-5 right-5"
-        onClick={() => {
-          setShowItems((prev) => !prev);
-        }}
-      >
-        <p>My Order</p>
-        <FaChevronDown />
-      </div>
-
-      <div className="flex gap-3 w-full mb-9">
-        <div className="flex-1">
-          <p className="text-sm mb-2">First name</p>
-          <input
-            placeholder="Larry"
-            className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-            onChange={(e) => {
-              setFirstName(e.target.value);
-            }}
-            value={firstName}
-          />
-          <InputError
-            content="Please enter a valid first name"
-            isValid={firstNameError}
-          />
-        </div>
-        <div className="flex-1">
-          <p className="text-sm mb-2">Last name</p>
-          <input
-            placeholder="Tan"
-            className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-            onChange={(e) => {
-              setLastName(e.target.value);
-            }}
-            value={lastName}
-          />
-          <InputError
-            content="Please enter a valid last name"
-            isValid={lastNameError}
-          />
-        </div>
-      </div>
-      <div className="flex flex-col gap-3 w-full">
-        <div className="flex-1">
-          <p className="text-sm mb-2">Street address</p>
-          <input
-            placeholder="100 Smith Street"
-            onChange={(e) => {
-              setStreetAddress(e.target.value);
-            }}
-            value={streetAddress}
-            className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-          />
-          <InputError
-            content="Please enter a valid street address"
-            isValid={streetAddressError}
-          />
-        </div>
-        <div className="flex gap-3">
-          <div className="w-3/5">
-            <p className="text-sm mb-2">Town/City</p>
-            <input
-              placeholder="Collingwood"
-              onChange={(e) => {
-                setTownCity(e.target.value);
-              }}
-              value={townCity}
-              className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-            />
-            <InputError
-              content="Please enter a valid town/city"
-              isValid={townCityError}
-            />
-          </div>
-          <div className="w-1/5">
-            <p className="text-sm mb-2">State</p>
-            <input
-              placeholder="VIC"
-              onChange={(e) => {
-                setState(e.target.value);
-              }}
-              value={state}
-              className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-            />
-            <InputError
-              content="Please enter a valid state"
-              isValid={stateError}
-            />
-          </div>
-          <div className="w-1/5">
-            <p className="text-sm mb-2">Postcode</p>
-            <input
-              placeholder="3066"
-              onChange={(e) => {
-                setPostcode(e.target.value);
-              }}
-              value={postcode}
-              className="w-full h-10 bg-transparent border-2 border-slate-300 pl-3 outline-black rounded-lg text-sm placeholder-slate-500 font-semibold"
-            />
-            <InputError
-              content="Please enter a valid postcode."
-              isValid={postcodeError}
-            />
-          </div>
-        </div>
-        <div className="flex-1 relative">
-          <p className="text-sm mb-2">Country</p>
-          <div className="flex items-center justify-between px-3 w-full h-10 bg-transparent border-2 border-slate-300 outline-black rounded-lg text-sm font-semibold">
-            <div className="flex gap-3">
-              <span
-                className={`fi fi-${country["alpha-2"].toLowerCase()}`}
-              ></span>
-              <p>{country.name}</p>
-            </div>
-            <RiArrowDropDownLine
-              size={30}
-              color={"black"}
-              className="cursor-pointer"
-              onClick={() => {
-                setShowDropdown(!showDropdown);
-              }}
-            />
-          </div>
+    <div className={`w-full h-full md:w-1/2`}>
+      <div className="w-full h-full flex items-center relative justify-center flex-col px-3 sm:px-10 sm:min-w-[400px] py-5">
+        {showItems ? (
           <div
-            className={`absolute bg-white flex-col w-full rounded-lg h-44 overflow-y-scroll top-20 text-sm font-semibold ${
-              showDropdown ? "flex" : "hidden"
+            className={`w-full h-full overflow-y-scroll absolute bg-slate-200 z-30 md:hidden ${
+              showItems ? "animate-fade-up" : "animate-fade-down"
             }`}
           >
-            {countryData.map((country, index) => {
-              return (
-                <div
-                  className="px-5 py-2 flex gap-3 cursor-pointer"
-                  onClick={() => {
-                    setCountry(country);
-                  }}
-                  key={index}
-                >
-                  <span
-                    className={`fi fi-${country["alpha-2"].toLowerCase()}`}
-                  ></span>
-                  <p>{country.name}</p>
-                </div>
-              );
+            <div className="flex items-center mx-5">
+              <p className="text-3xl font-semibold sm:text-left text-center flex-1 my-5">
+                Your Orders 🛒
+              </p>
+              <AiOutlineCloseCircle
+                size={40}
+                className="cursor-pointer"
+                onClick={() => {
+                  setShowItems(false);
+                }}
+              />
+            </div>
+
+            {cartItems.map((product, index) => {
+              return <ItemCard productInfo={product} key={index} />;
             })}
           </div>
-        </div>
-        <div>
-          <div className="pt-5">
-            <p className="text-sm mb-2">Email Address</p>
-            <div className="flex gap-2 items-center justify-between px-3 w-full h-10 bg-transparent border-2 border-slate-300 outline-black rounded-lg text-sm font-semibold">
+        ) : (
+          <></>
+        )}
+        <div className="flex flex-col gap-3 w-full overflow-y-scroll">
+          <div className="font-semibold flex justify-between text-lg md:text-xl mb-10 w-full">
+            <p className="flex-1">How do you want your order?</p>
+          </div>
+          <div
+            className="text-base font-semibold flex absolute gap-2 items-center cursor-pointer md:hidden top-5 right-5"
+            onClick={() => {
+              setShowItems((prev) => !prev);
+            }}
+          >
+            <p>My Order</p>
+            <FaChevronDown />
+          </div>
+          <div className="">
+            <p className="font-sans text-[14px] mb-2">Email Address</p>
+            <div className="flex px-3 gap-2 bg-[#F6F8FA] items-center justify-between py-3 w-full min-h-[2.5rem] h-11 bg-transparent border-2 border-slate-300 outline-black rounded-[10px] text-sm font-semibold">
               <MdOutlineMail size={25} />
               <input
                 placeholder="larrytan@gmail.com"
@@ -286,85 +85,65 @@ export default function CheckoutShipping() {
                 value={emailAddress}
               />
             </div>
-            <InputError
-              content="Please enter a valid email address."
-              isValid={emailAddressError}
+          </div>
+          <div id="address-div" className="w-full">
+            <AddressElement
+              id="address-element"
+              options={addressElementOptions}
+              onChange={(event) => {
+                console.log(event);
+                setShippingData(event)
+              }}
             />
           </div>
-        </div>
-        <button
-          className="border-2 w-full h-12 font-semibold rounded-xl mt-5 border-black bg-black text-white hover:bg-white hover:text-black"
-          onClick={() => {
-            setFirstNameError(isValidFirstName(firstName));
-            setLastNameError(isValidLastName(lastName));
-            setStreetAddressError(isValidStreetAddress(streetAddress));
-            setTownCityError(isValidTownCity(townCity));
-            setStateError(isValidState(state));
-            setPostcodeError(isValidPostcode(postcode));
-            setEmailAddressError(isValidEmailAddress(emailAddress));
-            if (
-              (isValidFirstName(firstName) &&
-                isValidLastName(lastName) &&
-                isValidStreetAddress(streetAddress) &&
-                isValidTownCity(townCity) &&
-                isValidState(state) &&
-                isValidPostcode(postcode) &&
-                isValidEmailAddress(emailAddress)) ||
-              1
-            ) {
-              setCheckoutProgress(2);
-            }
-          }}
-        >
-          Continue to payment
-        </button>
-      </div>
-      <div className="flex gap-5 w-full px-5 my-12">
-        <div className="flex-col flex-1 flex">
-          <p
-            className={`font-semibold ${
-              checkCompleted(1) ? "text-black" : "text-slate-400"
-            }`}
+          <button
+            className="border-2 w-full h-12 min-h-[3rem] font-semibold rounded-xl mt-5 border-black bg-black text-white hover:bg-white hover:text-black"
+            onClick={() => {
+              if (shippingData.complete) {
+                setCheckoutProgress(2);
+              } else {
+                toast(
+                  "Please check your inputs. All fields are required and must be correctly filled.",
+                  { type: "error" }
+                );
+              }
+            }}
           >
-            Shipping
-          </p>
-          <div
-            className={`flex-1 rounded-xl mt-1 h-2 bg-black ${
-              checkCompleted(1) ? "text-black" : "bg-slate-300"
-            }`}
-          />
-        </div>
-        <div className="flex-col flex-1 gap-2">
-          <p
-            className={`font-semibold ${
-              checkCompleted(2) ? "text-black" : "text-slate-400"
-            }`}
-          >
-            Payment
-          </p>
-          <div
-            className={`flex-1 rounded-xl mt-1 h-2 bg-black ${
-              checkCompleted(2) ? "text-black" : "bg-slate-300"
-            }`}
-          />
+            Continue to payment
+          </button>
+          <div className="flex gap-5 w-full px-5 mb-5 mt-12">
+            <div className="flex-col flex-1 flex">
+              <p
+                className={`font-semibold ${
+                  checkCompleted(1) ? "text-black" : "text-slate-400"
+                }`}
+              >
+                Shipping
+              </p>
+              <div
+                className={`flex-1 rounded-xl mt-1 h-2 bg-black ${
+                  checkCompleted(1) ? "text-black" : "bg-slate-300"
+                }`}
+              />
+            </div>
+            <div className="flex-col flex-1 gap-2">
+              <p
+                className={`font-semibold ${
+                  checkCompleted(2) ? "text-black" : "text-slate-400"
+                }`}
+              >
+                Payment
+              </p>
+              <div
+                className={`flex-1 rounded-xl mt-1 h-2 bg-black ${
+                  checkCompleted(2) ? "text-black" : "bg-slate-300"
+                }`}
+              />
+            </div>
+          </div>
         </div>
       </div>
+      <ToastContainer />
     </div>
-  );
-}
-
-function InputError(props) {
-  const { content, isValid } = props;
-
-  return (
-    <>
-      {!isValid ? (
-        <div>
-          <p className="text-red-500 text-sm mt-2">{content}</p>
-        </div>
-      ) : (
-        <></>
-      )}
-    </>
   );
 }

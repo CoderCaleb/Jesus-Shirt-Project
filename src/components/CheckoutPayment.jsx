@@ -20,6 +20,7 @@ export default function CheckoutPayment() {
     setShowItems,
     isLoading,
     setIsLoading,
+    emailAddress
   } = useContext(CheckoutContext);
 
   const stripe = useStripe();
@@ -37,7 +38,7 @@ export default function CheckoutPayment() {
   };
 
   return (
-    <div className="w-full h-full md:w-1/2">
+    <div className={`w-full h-full md:w-1/2`}>
       <div className="w-full h-full flex items-center relative justify-center flex-col px-3 sm:px-10 sm:min-w-[400px] py-5">
         {showItems ? (
           <div
@@ -65,7 +66,7 @@ export default function CheckoutPayment() {
         ) : (
           <></>
         )}
-        <div className="flex flex-col gap-3 w-full">
+        <div className="flex flex-col gap-3 w-full overflow-y-scroll">
           <div className="font-semibold flex items-center justify-between gap-3 text-lg md:text-xl mb-10 w-full">
             <IoMdArrowBack
               size={22}
@@ -85,7 +86,7 @@ export default function CheckoutPayment() {
             <p>My Order</p>
             <FaChevronDown />
           </div>
-          <div id="payment-div">
+          <div id="payment-div" className="w-[99%] m-auto">
             <PaymentElement
               id="payment-element"
               options={paymentElementOptions}
@@ -113,6 +114,11 @@ export default function CheckoutPayment() {
                     return_url: "https://example.com",
                   },
                   redirect: "if_required",
+                  payment_method_data: {
+                    billing_details: {
+                      email: emailAddress
+                    }
+                  }
                 });
 
                 if (
@@ -136,7 +142,7 @@ export default function CheckoutPayment() {
               Checkout
             </button>
           </div>
-        </div>
+
 
         <div className="flex gap-5 w-full px-5 mt-7">
           <div className="flex-col flex-1 flex">
@@ -168,6 +174,7 @@ export default function CheckoutPayment() {
             />
           </div>
         </div>
+      </div>
       </div>
       <ToastContainer />
     </div>

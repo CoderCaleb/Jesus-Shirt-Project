@@ -32,7 +32,7 @@ export default function Checkout() {
   const shippingPrice = 2;
   useEffect(() => {
     if (checkoutItems) {
-      fetch("https://jesus-shirt-project-backend.onrender.com/create-payment-intent", {
+      fetch("/create-payment-intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -43,7 +43,10 @@ export default function Checkout() {
         .then((data) => {
           setClientSecret(data.clientSecret);
           console.log(data);
-        });
+        })
+        .catch(err=>{
+          console.log(err)
+        })
     }
   }, []);
   function calculateProductPrice() {
