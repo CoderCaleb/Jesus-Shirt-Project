@@ -17,9 +17,8 @@ const OrderConfirmationPage = () => {
   const stripe = useStripe();
   const location = useLocation();
   const { checkoutItems, fromCart } = location.state;
-
+  
   const navigate = useNavigate();
-
   useEffect(() => {
     if (!stripe) {
       return;
@@ -43,7 +42,7 @@ const OrderConfirmationPage = () => {
             setCartItems([]);
           }
           window.history.replaceState({}, document.title);
-          localStorage.setItem("cartData", JSON.stringify({}));
+          localStorage.setItem("cartData", JSON.stringify([]));
           break;
         case "processing":
           setMessage("Your payment is processing.");
@@ -70,9 +69,9 @@ const OrderConfirmationPage = () => {
   const DisplayShippingAddress = ({ address }) => {
     const renderField = (label, value) => {
       if (value === null || value === "") {
-        return null; // Don't render if value is null or empty
+        return null;
       }
-      return <p>{value}</p>;
+      return <p key={label}>{value}</p>;
     };
 
     return (

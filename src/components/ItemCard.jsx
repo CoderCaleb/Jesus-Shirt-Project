@@ -5,13 +5,15 @@ export default function ItemCard(props) {
     return (
       <div className="flex w-full justify-between p-6 gap-3 items-center">
         <div className="flex gap-3 items-center">
-          <div className="w-16 h-16 min-w-[4rem] min-h-[4rem] relative border-1 border-slate-300 bg-slate-300 rounded-lg p-1 flex items-center justify-center">
+          <div className="w-16 h-16 min-w-[4rem] min-h-[4rem] relative border-1 flex items-center justify-center">
+            <div className='overflow-hidden rounded-lg'>
             <img
               alt="item"
               src={productInfo.product_images[0]}
               className="w-full h-full"
             />
-            <div className="absolute bg-black rounded-3xl w-5 h-5 flex items-center justify-center text-white font-semibold text-sm -top-1 -left-1">
+            </div>
+            <div className="absolute bg-black rounded-3xl w-5 h-5 flex items-center justify-center text-white font-semibold z-30 text-sm -top-1 -left-1">
               <p>{productInfo.quantity}</p>
             </div>
           </div>

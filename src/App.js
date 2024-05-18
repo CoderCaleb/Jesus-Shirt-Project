@@ -4,10 +4,35 @@ import Cart from "./components/Cart";
 import Homepage from "./components/Homepage";
 import Shop from "./components/Shop";
 import Product from "./components/Product";
+import Login from "./components/Login";
 import RemoveItemModal from "./modals/removeItemModal";
 import Checkout from "./components/Checkout";
 import Navbar from "./components/Navbar";
 import OrderTracking from "./components/OrderTracking";
+import { getAuth } from "firebase/auth";
+import { ToastContainer } from "react-toastify";
+import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
+import { GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
+import Signup from "./components/Signup";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyCazb0ngI_9_HHTERIbThanmB38l01nUrQ",
+  authDomain: "jesus-shirt-project.firebaseapp.com",
+  projectId: "jesus-shirt-project",
+  storageBucket: "jesus-shirt-project.appspot.com",
+  messagingSenderId: "881328349632",
+  appId: "1:881328349632:web:2ad3f9518f15460682e825",
+  measurementId: "G-DL67MPY96D"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+auth.languageCode = auth.useDeviceLanguage();
+
 export const StateSharingContext = createContext();
 export const CheckoutContext = createContext();
 
@@ -31,7 +56,7 @@ try {
       : [];
 } catch (error) {
   console.error("Error retrieving or parsing cartData:", error);
-  parsedCartData = []; // Handle the error, set to null or another default value
+  parsedCartData = [];
 }
 
 // Retrieve and parse checkoutData
@@ -44,7 +69,7 @@ try {
       : [];
 } catch (error) {
   console.error("Error retrieving or parsing checkoutData:", error);
-  parsedCheckoutData = []; // Handle the error, set to null or another default value
+  parsedCheckoutData = [];
 }
 
 export default function App() {
@@ -52,19 +77,7 @@ export default function App() {
   const [checkoutItems, setCheckoutItems] = useState(parsedCheckoutData);
   const [showRemoveItem, setShowRemoveItem] = useState({});
   // State variables for input values
-  const [country, setCountry] = useState({
-    name: "Singapore",
-    "alpha-2": "SG",
-    "alpha-3": "SGP",
-    "country-code": "702",
-    "iso_3166-2": "ISO 3166-2:SG",
-    region: "Asia",
-    "sub-region": "South-eastern Asia",
-    "intermediate-region": "",
-    "region-code": "142",
-    "sub-region-code": "035",
-    "intermediate-region-code": "",
-  });
+
   const [emailAddress, setEmailAddress] = useState("");
   const [showItems, setShowItems] = useState(false);
   const [checkoutProgress, setCheckoutProgress] = useState(1);
@@ -72,17 +85,17 @@ export default function App() {
   const [paymentIntentId, setPaymentIntentId] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [shippingData, setShippingData] = useState({})
+  const [user, setUser] = useState(null)
   const stateContextValue = {
     cartItems,
     setCartItems,
     showRemoveItem,
     setShowRemoveItem,
+    user
   };
   const checkoutContextValue = {
     checkoutProgress,
     setCheckoutProgress,
-    country,
-    setCountry,
     emailAddress,
     setEmailAddress,
     cartItems,
@@ -110,6 +123,15 @@ export default function App() {
     localStorage.setItem("cartData", JSON.stringify(cartItems));
   }, [cartItems]);
 
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
 
   return (
     <CheckoutContext.Provider value={checkoutContextValue}>
@@ -126,13 +148,16 @@ export default function App() {
                 <Route path=":productId" element={<Product />} />
               </Route>
               <Route path="checkout" element={<Checkout />} />
-              <Route path="/orders" element={<Outlet/>} >
+              <Route path="orders" element={<Outlet/>} >
                 <Route index element={<Shop/>}/>
                 <Route path=":orderId" element={<OrderTracking/>} />
               </Route>
+              <Route path="login" element={<Login/>}/>
+              <Route path="signup" element={<Signup/>}/>
               <Route path="*" element={<h1>Not found</h1>} />
             </Routes>
           </div>
+          <ToastContainer position="top-center" theme="light" />
         </div>
       </StateSharingContext.Provider>
     </CheckoutContext.Provider>

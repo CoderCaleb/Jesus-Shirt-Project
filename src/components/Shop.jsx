@@ -11,17 +11,16 @@ export default function Shop() {
       .catch((err) => console.log(err));
   }
   useEffect(() => {
-    getShopProducts();
+    if(shopData.length === 0){
+      getShopProducts();
+    }
   }, []);
-  useEffect(() => {
-    console.log(shopData);
-  }, [shopData]);
   return (
-    <div className="h-full overflow-y-scroll m-auto w-full pb-10 px-5">
+    <div className="h-full overflow-y-scroll m-auto w-full pb-10 px-8">
       <div className="flex justify-center">
         <p className=" text-5xl font-semibold my-16">Shop 🛍️</p>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 w-auto md:w-full gap-3 md:gap-7 justify-center">
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 w-auto md:w-full gap-3 md:gap-3 justify-center">
         {shopData.length !== 0 && Array.isArray(shopData) ? (
           shopData.map((product, index) => {
             return (

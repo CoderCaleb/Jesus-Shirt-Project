@@ -1,4 +1,4 @@
-import React, { useState, createContext, useEffect, useContext } from "react";
+import React, { useEffect, useContext } from "react";
 import { useLocation } from "react-router";
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import CheckoutShipping from "./CheckoutShipping";
@@ -20,6 +20,8 @@ export default function Checkout() {
     isLoading,
     cartItems,
     setClientSecret,
+    paymentIntentId,
+    setPaymentIntentId,
   } = useContext(CheckoutContext);
 
   const location = useLocation();
@@ -42,6 +44,7 @@ export default function Checkout() {
         .then((res) => res.json())
         .then((data) => {
           setClientSecret(data.clientSecret);
+          setPaymentIntentId(data.id)
           console.log(data);
         })
         .catch(err=>{
@@ -53,7 +56,7 @@ export default function Checkout() {
     const productPrice = checkoutItems.reduce((total, items) => {
       return total + items.price * items.quantity;
     }, 0);
-    return Number(productPrice.toFixed(2));
+    return Number(productPrice).toFixed(2);
   }
   function calculateTotalPrice() {
     const total = calculateProductPrice() + shippingPrice;
@@ -65,12 +68,12 @@ export default function Checkout() {
       fontFamily: "sans-serif",
       fontLineHeight: "1.5",
       borderRadius: "10px",
-      colorBackground: "#F6F8FA",
-      accessibleColorOnColorPrimary: "#262626",
+      colorBackground: "#FFFFFF",
+      accessibleColorOnColorPrimary: "#FFFFFF",
     },
     rules: {
       ".Block": {
-        backgroundColor: "var(--colorBackground)",
+        backgroundColor: "#FFFFFF",
         boxShadow: "none",
         padding: "12px",
       },
@@ -132,13 +135,13 @@ export default function Checkout() {
             )}
             <div className=" w-full h-full overflow-y-scroll flex">
               {checkoutProgress === 1 ? (
-                <CheckoutShipping cartData={checkoutItems} />
+                <CheckoutShipping checkoutItems={checkoutItems} />
               ) : checkoutProgress === 2 ? (
-                <CheckoutPayment cartData={checkoutItems} />
+                <CheckoutPayment checkoutItems={checkoutItems} />
               ) : (
                 <OrderConfirmationPage cartData={checkoutItems} />
               )}
-              <div className="w-1/2 h-full px-5 py-5 bg-slate-200 flex-col justify-center hidden md:flex">
+              <div className="w-1/2 h-full px-5 py-5 bg-slate-100 flex-col justify-center hidden md:flex">
                 <div className="overflow-y-scroll">
                   {checkoutItems.map((product, index) => {
                     return <ItemCard productInfo={product} key={index} />;

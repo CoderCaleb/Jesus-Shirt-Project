@@ -18,16 +18,16 @@ function ProductCardUI({ thumbnail_url, name, price, id }) {
   return (
     <div className="w-full h-full" key={id}>
       <div
-        className={`rounded-lg overflow-hidden flex flex-col gap-2 items-center md:px-5 md:py-3 justify-center cursor-pointer transition-all duration-150 bg-cardColorOne shadow-lg hover:shadow-slate-300`}
+        className={`rounded-md overflow-hidden flex flex-col gap-2 items-center justify-center cursor-pointer transition-all duration-150 bg-cardColorOne shadow-lg hover:shadow-slate-300`}
         onClick={() => {
           navigate(`/shop/${id}`);
         }}
       >
         <img src={thumbnail_url} alt="shirt img" className=" w-full" />
       </div>
-      <div className="my-3 font-semibold">
+      <div className="my-3 font-semibold text-lg">
         <p className="inline-block">{name}</p>
-        <p className="text-sm">{price}</p>
+        <p className="text-base">{price}</p>
       </div>
     </div>
   );

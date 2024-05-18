@@ -8,7 +8,8 @@ import { CheckoutContext } from "../App";
 import ItemCard from "./ItemCard";
 import { AddressElement } from "@stripe/react-stripe-js";
 import { ToastContainer, toast } from "react-toastify";
-export default function CheckoutShipping() {
+import InputField from "./InputField";
+export default function CheckoutShipping({checkoutItems}) {
   const {
     checkoutProgress,
     setCheckoutProgress,
@@ -19,7 +20,9 @@ export default function CheckoutShipping() {
     setEmailAddress,
     setShippingData,
     shippingData,
+    paymentIntentId
   } = useContext(CheckoutContext);
+  const [emailError, setEmailError] = useState("")
 
   function checkCompleted(number) {
     if (checkoutProgress >= number) {
@@ -29,6 +32,13 @@ export default function CheckoutShipping() {
   }
   const addressElementOptions = {
     mode: "shipping",
+  };
+  const validateEmail = (email) => {
+    return String(email)
+      .toLowerCase()
+      .match(
+        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+      );
   };
   return (
     <div className={`w-full h-full md:w-1/2`}>
@@ -52,7 +62,7 @@ export default function CheckoutShipping() {
               />
             </div>
 
-            {cartItems.map((product, index) => {
+            {checkoutItems.map((product, index) => {
               return <ItemCard productInfo={product} key={index} />;
             })}
           </div>
@@ -73,18 +83,7 @@ export default function CheckoutShipping() {
             <FaChevronDown />
           </div>
           <div className="">
-            <p className="font-sans text-[14px] mb-2">Email Address</p>
-            <div className="flex px-3 gap-2 bg-[#F6F8FA] items-center justify-between py-3 w-full min-h-[2.5rem] h-11 bg-transparent border-2 border-slate-300 outline-black rounded-[10px] text-sm font-semibold">
-              <MdOutlineMail size={25} />
-              <input
-                placeholder="larrytan@gmail.com"
-                className="bg-transparent h-full outline-none flex-1"
-                onChange={(e) => {
-                  setEmailAddress(e.target.value);
-                }}
-                value={emailAddress}
-              />
-            </div>
+            <InputField Icon={<MdOutlineMail size={22}/>} setData={setEmailAddress} data={emailAddress} setError={setEmailError} error={emailError} label={"Email Address"} placeholder={"larrytan@gmail.com"}/>
           </div>
           <div id="address-div" className="w-full">
             <AddressElement
@@ -99,13 +98,25 @@ export default function CheckoutShipping() {
           <button
             className="border-2 w-full h-12 min-h-[3rem] font-semibold rounded-xl mt-5 border-black bg-black text-white hover:bg-white hover:text-black"
             onClick={() => {
-              if (shippingData.complete) {
+              if (shippingData.complete&&validateEmail(emailAddress)) {
                 setCheckoutProgress(2);
+                fetch("http://127.0.0.1:4242/update-payment-intent",{
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    payment_intent_id: paymentIntentId,
+                    shipping: shippingData.value,
+                    receipt_email: emailAddress
+                  })
+                }).catch(err=>console.log(err))
               } else {
                 toast(
                   "Please check your inputs. All fields are required and must be correctly filled.",
                   { type: "error" }
                 );
+                if(!validateEmail(emailAddress)){
+                  setEmailError("Please enter a valid email address")
+                }
               }
             }}
           >
@@ -143,7 +154,6 @@ export default function CheckoutShipping() {
           </div>
         </div>
       </div>
-      <ToastContainer />
     </div>
   );
 }

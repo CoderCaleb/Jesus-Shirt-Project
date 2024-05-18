@@ -16,7 +16,7 @@ export default function Cart() {
     const productPrice = cartItems.reduce((total, items) => {
       return total + items.price * items.quantity;
     }, 0);
-    return Number(productPrice.toFixed(2));
+    return Number(productPrice).toFixed(2);
   }
   function calculateTotalPrice() {
     const total = calculateProductPrice() + shippingPrice;
@@ -90,7 +90,6 @@ export default function Cart() {
       ) : (
         <></>
       )}
-      <ToastContainer position="top-center" theme="light" />
     </div>
   );
 

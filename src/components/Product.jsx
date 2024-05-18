@@ -161,7 +161,6 @@ export default function Product() {
               </div>
             </div>
           </div>
-          <ToastContainer position="top-center" theme="light" />
         </div>
       ) : (
         <>Loading...</>
