@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import InputField from "./InputField";
 import { Link } from "react-router-dom";
-import { StateSharingContext } from "../App";
+import { HelperFunctionContext } from "../App";
 import {
   getAuth,
   signInWithEmailAndPassword,
@@ -18,20 +18,11 @@ export default function Login() {
   const [logInError, setLoginError] = useState(null);
   const [loginLoading, setLoginLoading] = useState(false);
   const navigate = useNavigate();
+  const { handleGetUserInfo } = useContext(HelperFunctionContext);
   useEffect(() => {
     setLoginError(null);
   }, [signInEmail, signInPassword]);
-  function handleAddingUser(user){
-    if(user){
-        fetch("http://127.0.0.1:4242/add-user",{
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-                uid:user.uid
-            }),
-        })
-    }
-}     
+
   return (
     <div className="w-full h-full justify-center items-center flex">
       <div className="w-96 flex flex-col text-center">
@@ -54,22 +45,17 @@ export default function Login() {
                 const credential =
                   GoogleAuthProvider.credentialFromResult(result);
                 const token = credential.accessToken;
-                // The signed-in user info.
                 const user = result.user;
                 navigate("/shop");
-                // IdP data available using getAdditionalUserInfo(result)
-                // ...
               })
               .catch((error) => {
                 // Handle Errors here.
                 const errorCode = error.code;
                 const errorMessage = error.message;
-                // The email of the user's account used.
-                const email = error.customData.email;
-                // The AuthCredential type that was used.
-                const credential =
-                  GoogleAuthProvider.credentialFromError(error);
-                // ...
+                setLoginError({
+                  errorCode: errorCode,
+                  errorMessage: errorMessage,
+                });
               });
           }}
         >
@@ -134,9 +120,7 @@ export default function Login() {
                 .then((userCredential) => {
                   // Signed in
                   const user = userCredential.user;
-
                   navigate("/shop");
-                  // ...
                 })
                 .catch((error) => {
                   const errorCode = error.code;

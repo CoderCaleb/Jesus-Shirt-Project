@@ -7,8 +7,13 @@ import { useStripe } from "@stripe/react-stripe-js";
 import { ToastContainer, toast } from "react-toastify";
 
 const OrderConfirmationPage = () => {
-  const { clientSecret, setCheckoutProgress, shippingData, emailAddress } =
-    useContext(CheckoutContext);
+  const {
+    clientSecret,
+    setCheckoutProgress,
+    shippingData,
+    emailAddress,
+    checkoutConfirmData,
+  } = useContext(CheckoutContext);
 
   const { setCartItems } = useContext(StateSharingContext);
   const [message, setMessage] = useState("");
@@ -17,7 +22,7 @@ const OrderConfirmationPage = () => {
   const stripe = useStripe();
   const location = useLocation();
   const { checkoutItems, fromCart } = location.state;
-  
+
   const navigate = useNavigate();
   useEffect(() => {
     if (!stripe) {
@@ -101,20 +106,24 @@ const OrderConfirmationPage = () => {
                 <CiCircleCheck size={45} />
                 <div className="flex flex-col">
                   <p className="text-lg font-bold">{message}</p>
-                  <p className="text-sm">{`${shippingData.value.name}`}</p>
+                  <p className="text-sm">{`${checkoutConfirmData.customer.name}`}</p>
                 </div>
               </div>
               <div className="rounded-lg border-slate-300 border-1 text-sm mt-7">
                 <div className="p-3 gap-7 flex">
+                  <p className="text-slate-500 font-semibold">Order Number</p>
+                  <p className="text-black">{checkoutConfirmData.orderNumber}</p>
+                </div>
+                <div className="p-3 gap-7 flex">
                   <p className="text-slate-500 font-semibold">Contact</p>
-                  <p className="text-black">{emailAddress}</p>
+                  <p className="text-black">{checkoutConfirmData.customer.emailAddress}</p>
                 </div>
                 <div className=" bg-slate-300 w-full h-lineBreakHeight" />
                 <div className="p-3 gap-7 flex">
                   <p className="text-slate-500 font-semibold">Address</p>
                   <div className="flex flex-col gap-2">
                     <DisplayShippingAddress
-                      address={shippingData.value.address}
+                      address={checkoutConfirmData.address}
                     />
                   </div>
                 </div>
@@ -122,7 +131,7 @@ const OrderConfirmationPage = () => {
                 <div className="flex pl-3 pt-3">
                   <p className="text-slate-500 font-semibold">Items</p>
                   <div className="w-full overflow-y-scroll h-60">
-                    {checkoutItemsSaved.current.map((product, index) => {
+                    {checkoutConfirmData.orderItems.map((product, index) => {
                       return <ItemCard productInfo={product} index={index} />;
                     })}
                   </div>
@@ -144,7 +153,7 @@ const OrderConfirmationPage = () => {
           <ToastContainer position="top-center" theme="light" />
         </div>
       ) : (
-        <></>
+        <div className="md:w-1/2 w-full">{message.length>0?message:"Order loading..."}</div>
       )}
     </>
   );

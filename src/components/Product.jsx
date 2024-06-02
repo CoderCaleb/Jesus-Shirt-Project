@@ -70,15 +70,15 @@ export default function Product() {
     
   }, [sizeChoice, product]);
   return (
-    <div className="w-full overflow-y-scroll">
+    <div className="w-full overflow-y-scroll p-5 sm:p-10">
       {Object.keys(product).length !== 0? (
-        <div className="flex flex-col md:flex-row p-10 md:justify-center gap-10 lg:gap-16 items-center h-full w-full">
+        <div className="flex flex-col md:flex-row md:justify-center pb-10 gap-10 lg:gap-16 items-center h-full w-full">
           <div className=" grid-cols-2 gap-4 w-6/12 max-w-maxImageGridWidth h-min hidden min-w-minPictureGrid lg:grid">
             {product["product_images"].map((image,index)=>{
-              return <ProductImage image={image} index={index}/>
+              return <ProductImage image={image} index={index} key={index}/>
             })}
           </div>
-          <div className="block w-full lg:hidden max-w-[300px]">
+          <div className="block w-full lg:hidden max-w-[600px] sm:max-w-[350px]">
             <Carousel showArrows={true}>
             {product["product_images"].map((image,index)=>{
               return(
@@ -92,7 +92,7 @@ export default function Product() {
           </div>
           <div className="flex min-w flex-col md:w-auto w-full gap-6 text-center md:text-left">
             <p className="font-bold text-4xl">{product.name}</p>
-            <p className="text-lg font-semibold text-secondary2">{`$${product.price} SGD`}</p>
+            <p className="text-lg font-semibold ">{`$${product.price} SGD`}</p>
             <div className="gap-3 flex items-center flex-col md:flex-row">
               <p className="text-sm font-semibold mr-2 whitespace-nowrap">Select Size</p>
               <div className="flex gap-3">
@@ -141,7 +141,7 @@ export default function Product() {
               </div>
             </div>
             <div className="">
-              <div className=" bg-slate-500 w-full h-lineBreakHeight max-w-lg m-auto" />
+            <div className=" bg-slate-400 w-full h-lineBreakHeight" />
 
               <div className="flex md:flex-row flex-col gap-5 mt-8 max-w-lg m-auto">
                 <button

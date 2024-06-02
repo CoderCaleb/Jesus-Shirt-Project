@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { useLocation } from "react-router";
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import CheckoutShipping from "./CheckoutShipping";
@@ -8,7 +8,8 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import ItemCard from "./ItemCard";
 import { CheckoutContext } from "../App";
-
+import TransactionFailedError from "./TransactionFailedError";
+import { HelperFunctionContext } from "../App";
 const stripePromise = loadStripe(
   "pk_test_51OOBnGEvVCl2vla10CIfwh6ItUYeeZO4o3haVa9xFHyxwT6ekU8D8wAuA75GsRfGOhMLmU0Znf9dZKJPLNc5xrdq00PVRX8neU"
 );
@@ -24,6 +25,13 @@ export default function Checkout() {
     setPaymentIntentId,
   } = useContext(CheckoutContext);
 
+  const { calculatePrices } = useContext(HelperFunctionContext);
+  const [prices, setPrices] = useState({
+    productPrice: 0,
+    totalPrice: 0,
+    shippingPrice: 0,
+  });
+
   const location = useLocation();
   const { state } = location;
   let checkoutItems;
@@ -31,7 +39,10 @@ export default function Checkout() {
   if (state) {
     checkoutItems = state.checkoutItems;
   }
-  const shippingPrice = 2;
+  useEffect(() => {
+    setPrices(calculatePrices(checkoutItems, 2));
+  }, [checkoutItems, calculatePrices]);
+
   useEffect(() => {
     if (checkoutItems) {
       fetch("/create-payment-intent", {
@@ -44,24 +55,15 @@ export default function Checkout() {
         .then((res) => res.json())
         .then((data) => {
           setClientSecret(data.clientSecret);
-          setPaymentIntentId(data.id)
+          setPaymentIntentId(data.id);
           console.log(data);
         })
-        .catch(err=>{
-          console.log(err)
-        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   }, []);
-  function calculateProductPrice() {
-    const productPrice = checkoutItems.reduce((total, items) => {
-      return total + items.price * items.quantity;
-    }, 0);
-    return Number(productPrice).toFixed(2);
-  }
-  function calculateTotalPrice() {
-    const total = calculateProductPrice() + shippingPrice;
-    return Number(total).toFixed(2);
-  }
+
   const appearance = {
     theme: "flat",
     variables: {
@@ -153,15 +155,15 @@ export default function Checkout() {
                     <p className="text-sm text-slate-600 mb-3">
                       Product's price
                     </p>
-                    <p className="text-sm font-semibold">{`$${calculateProductPrice()} SGD`}</p>
+                    <p className="text-sm font-semibold">{`$${prices.productPrice} SGD`}</p>
                   </div>
                   <div className="flex justify-between px-5">
                     <p className="text-sm text-slate-600">Shipping</p>
-                    <p className="text-sm font-semibold">{`$${shippingPrice} SGD`}</p>
+                    <p className="text-sm font-semibold">{`$${prices.shippingPrice} SGD`}</p>
                   </div>
                   <div className="flex justify-between px-5 py-3">
                     <p className="text-sm font-semibold">Total</p>
-                    <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
+                    <p className="text-sm font-semibold">{`$${prices.totalPrice} SGD`}</p>
                   </div>
                 </div>
               </div>{" "}
