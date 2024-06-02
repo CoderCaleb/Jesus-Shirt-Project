@@ -20,7 +20,7 @@ export default function Shop() {
       <div className="flex justify-center">
         <p className=" text-5xl font-semibold my-16">Shop 🛍️</p>
       </div>
-      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-4 w-auto md:w-full gap-3 md:gap-3 justify-center">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 w-auto md:w-full gap-3 md:gap-3 justify-center">
         {shopData.length !== 0 && Array.isArray(shopData) ? (
           shopData.map((product, index) => {
             return (

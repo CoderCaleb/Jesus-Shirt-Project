@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { StateSharingContext, CheckoutContext } from "../App.js";
+import { StateSharingContext, CheckoutContext, HelperFunctionContext } from "../App.js";
 import { IoIosArrowUp } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";
@@ -10,18 +10,12 @@ export default function Cart() {
 
   const { cartItems, setCartItems, showRemoveItem, setShowRemoveItem } =
     useContext(StateSharingContext);
+  const {calculatePrices} = useContext(HelperFunctionContext)  
+  const [prices, setPrices] = useState({ productPrice: 0, totalPrice: 0, shippingPrice: 0 });
 
-  const shippingPrice = 2;
-  function calculateProductPrice() {
-    const productPrice = cartItems.reduce((total, items) => {
-      return total + items.price * items.quantity;
-    }, 0);
-    return Number(productPrice).toFixed(2);
-  }
-  function calculateTotalPrice() {
-    const total = calculateProductPrice() + shippingPrice;
-    return Number(total).toFixed(2);
-  }
+  useEffect(()=>{
+    setPrices(calculatePrices(cartItems,2))
+  },[cartItems, calculatePrices])
 
   return (
     <div className="w-full h-full relative">
@@ -39,22 +33,22 @@ export default function Cart() {
                 );
               })}
             </div>
-            <div className=" w-4/12 h-min py-6 border-2 border-gray-300 mt-5 rounded-xl hidden lg:block">
+            <div className=" w-4/12 h-min py-6 border-2 border-gray-200 mt-5 rounded-xl hidden lg:block">
               <p className="text-lg font-semibold px-5">Cart Summary</p>
 
               <div className=" bg-slate-400 w-full h-lineBreakHeight my-4" />
               <div className="flex justify-between px-5">
                 <p className="text-sm text-slate-600 mb-3">Product's price</p>
-                <p className="text-sm font-semibold">{`$${calculateProductPrice()} SGD`}</p>
+                <p className="text-sm font-semibold">{`$${prices.productPrice} SGD`}</p>
               </div>
               <div className="flex justify-between px-5">
                 <p className="text-sm text-slate-600">Shipping</p>
-                <p className="text-sm font-semibold">{`$${shippingPrice} SGD`}</p>
+                <p className="text-sm font-semibold">{`$${prices.shippingPrice} SGD`}</p>
               </div>
               <div className=" bg-slate-400 w-full h-lineBreakHeight my-3" />
               <div className="flex justify-between px-5 py-3">
                 <p className="text-sm font-semibold">Total</p>
-                <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
+                <p className="text-sm font-semibold">{`$${prices.totalPrice} SGD`}</p>
               </div>
               <div className="pt-5 px-5">
                 <button
@@ -98,16 +92,16 @@ export default function Cart() {
       <div className="w-full py-5 bg-white rounded-tl-2xl rounded-tr-2xl">
         <div className="px-5 flex justify-between mb-3">
           <p className="text-sm text-slate-600 mb-3">Product's price</p>
-          <p className="text-sm font-semibold">{`$${calculateProductPrice()} SGD`}</p>
+          <p className="text-sm font-semibold">{`$${prices.productPrice} SGD`}</p>
         </div>
         <div className="px-5 flex justify-between">
           <p className="text-sm text-slate-600 mb-3">Shipping</p>
-          <p className="text-sm font-semibold">{`$${shippingPrice} SGD`}</p>
+          <p className="text-sm font-semibold">{`$${prices.shippingPrice} SGD`}</p>
         </div>
         <div className=" bg-slate-400 w-full h-lineBreakHeight my-3" />
         <div className="px-5 flex justify-between mb-3">
           <p className="text-sm font-semibold">Total</p>
-          <p className="text-sm font-semibold">{`$${calculateTotalPrice()} SGD`}</p>
+          <p className="text-sm font-semibold">{`$${prices.totalPrice} SGD`}</p>
         </div>
         <div className="px-5">
           <button

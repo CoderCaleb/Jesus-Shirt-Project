@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaChevronDown } from "react-icons/fa6";
 import { AiOutlineCloseCircle } from "react-icons/ai";
-import { useLocation } from "react-router";
+import { useLocation, useNavigate } from "react-router";
 import ItemCard from "./ItemCard";
 import {
   PaymentElement,
@@ -10,9 +10,14 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 
-import { CheckoutContext, StateSharingContext } from "../App";
+import {
+  CheckoutContext,
+  StateSharingContext,
+  HelperFunctionContext,
+} from "../App";
 import { ToastContainer, toast } from "react-toastify";
-export default function CheckoutPayment({checkoutItems}) {
+import useUserToken from "../hooks/useUserToken";
+export default function CheckoutPayment({ checkoutItems }) {
   const {
     checkoutProgress,
     setCheckoutProgress,
@@ -22,13 +27,15 @@ export default function CheckoutPayment({checkoutItems}) {
     isLoading,
     setIsLoading,
     emailAddress,
-    clientSecret,
-    shippingData,
+    setOrderNumber,
+    checkoutConfirmData,
+    setCheckoutConfirmData,
   } = useContext(CheckoutContext);
   const { user } = useContext(StateSharingContext);
+  const userToken = useUserToken(user);
   const stripe = useStripe();
   const elements = useElements();
-
+  const navigate = useNavigate();
   function checkCompleted(number) {
     if (checkoutProgress >= number) {
       return true;
@@ -36,26 +43,45 @@ export default function CheckoutPayment({checkoutItems}) {
     return false;
   }
 
+  async function updatePaymentError() {
+    try{
+      const res = await fetch(
+        `http://127.0.0.1:4242/update-payment-error`
+      );
+      if(!res.ok){
+        const errorData = await res.json()
+        return { error: errorData.error };
+      }
+      const paymentErrorData = await res.json()
+      return paymentErrorData
+    }
+    catch(error){
+      console.error('Error fetching payment error data:', error);
+      return { error: error.message };
+    }
+
+  }
+
+  function handleTransactionError(order_error_id) {
+    if (order_error_id) {
+      navigate(`/transaction-error?order-error-id=${order_error_id}`);
+    }
+  }
+  async function handlePaymentError() {
+    const paymentErrorData = await updatePaymentError()
+    if (paymentErrorData&&!paymentErrorData.error&&paymentErrorData.payment_error_id) {
+      navigate(`/payment-error?payment-error-id=${paymentErrorData.payment_error_id}`);
+    }
+  }
+
   const paymentElementOptions = {
     layout: "tabs",
   };
-  function generateSequentialOrderNumber(lastOrderNumber) {
-    console.log("last order no: ", lastOrderNumber);
-    if (!lastOrderNumber) {
-      return "ORD00001";
-    }
+  const shippingPrice = 2;
 
-    const numericPart = parseInt(lastOrderNumber.replace(/\D/g, ""), 10);
-
-    const nextNumericPart = numericPart + 1;
-
-    const nextOrderNumber = "ORD" + nextNumericPart.toString().padStart(5, "0");
-
-    return nextOrderNumber;
-  }
-  useEffect(()=>{
-    console.log(checkoutItems)
-  },[])
+  useEffect(() => {
+    console.log(checkoutItems);
+  }, []);
 
   return (
     <div className={`w-full h-full md:w-1/2`}>
@@ -80,10 +106,10 @@ export default function CheckoutPayment({checkoutItems}) {
             </div>
 
             <div className="overflow-y-scroll z-40">
-                  {checkoutItems.map((product, index) => {
-                    return <ItemCard productInfo={product} key={index} />;
-                  })}
-                </div>
+              {checkoutItems.map((product, index) => {
+                return <ItemCard productInfo={product} key={index} />;
+              })}
+            </div>
           </div>
         ) : (
           <></>
@@ -135,11 +161,6 @@ export default function CheckoutPayment({checkoutItems}) {
                       return_url: "https://example.com",
                     },
                     redirect: "if_required",
-                    payment_method_data: {
-                      billing_details: {
-                        email: emailAddress,
-                      },
-                    },
                   })
                   .then((result) => {
                     if (
@@ -148,71 +169,57 @@ export default function CheckoutPayment({checkoutItems}) {
                         result.error.type === "validation_error")
                     ) {
                       message = result.error.message;
+                      toast(message, { type: "error" });
+                      handlePaymentError();
                     } else if (result.error) {
                       message = "An unexpected error occurred.";
+                      toast(message, { type: "error" });
+                      handlePaymentError();
                     } else {
                       if (result.paymentIntent.status === "succeeded") {
+                        const orderData = {
+                          customer: {
+                            emailAddress: result.paymentIntent.receipt_email,
+                            name: result.paymentIntent.shipping.name,
+                          },
+                          status: "printing",
+                          order_items: checkoutItems,
+                          total_price: result.paymentIntent.amount,
+                          payment_id: result.paymentIntent.id,
+                          shipping_address:
+                            result.paymentIntent.shipping.address,
+                          shipping_cost: 3.5,
+                          payment_method: result.paymentIntent.payment_method,
+                          order_date: new Date().toISOString(),
+                          linked_user: user ? user.uid : null,
+                        };
                         console.log("confirm result", result);
-                        fetch("http://127.0.0.1:4242/get-latest-order")
+                        fetch("http://127.0.0.1:4242/place-order", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            Authorization: user ? `Bearer ${userToken}` : null,
+                          },
+                          body: JSON.stringify({
+                            orderData: orderData,
+                            uid: user ? user.uid : null,
+                          }),
+                        })
                           .then((res) => res.json())
-                          .then((latestOrder) => {
-                            console.log("LATEST ORDER:", latestOrder);
-                            if (!latestOrder.error) {
-                              const orderData = {
-                                customer: {
-                                  emailAddress:
-                                    result.paymentIntent.receipt_email,
-                                  name: result.paymentIntent.shipping.name,
-                                },
-                                order_number: generateSequentialOrderNumber(
-                                  latestOrder.maxOrderNumber
-                                ),
-                                status: "printing",
-                                order_items: checkoutItems,
-                                payment_id: result.paymentIntent.id,
-                                shipping_address:
-                                  result.paymentIntent.shipping.address,
-                                shipping_cost: 3.5,
-                                payment_method:
-                                  result.paymentIntent.payment_method,
-                                order_date: new Date().toISOString(),
-                              };
-                              fetch("http://127.0.0.1:4242/place-order", {
-                                method: "POST",
-                                headers: { "Content-Type": "application/json" },
-                                body: JSON.stringify({
-                                  orderData,
-                                }),
-                              })
-                                .then((res) => res.json())
-                                .then((orderData) => {
-                                  const { orderId } = orderData;
-                                  console.log(orderData)
-                                  if (user && !result.error) {
-                                    fetch(
-                                      "http://127.0.0.1:4242/add-order-to-user",
-                                      {
-                                        method: "POST",
-                                        headers: {
-                                          "Content-Type": "application/json",
-                                        },
-                                        body: JSON.stringify({
-                                          orderId: orderId,
-                                          uid: user.uid,
-                                        }),
-                                      }
-                                    );
-                                  }
-                                })
-                                .then(() => {
-                                  setIsLoading(false);
-                                  if (!result.error) {
-                                    setCheckoutProgress(3);
-                                  } else {
-                                    toast(message, { type: "error" });
-                                  }
-                                });
+                          .then((result) => {
+                            setIsLoading(false);
+                            if (result.orderResult) {
+                              const { orderData } = result.orderResult;
+
+                              setCheckoutProgress(3);
+                              setCheckoutConfirmData(orderData);
+                            } else {
+                              handleTransactionError(result.order_error_id);
                             }
+                          })
+                          .catch((e) => {
+                            console.log(e);
+                            toast(e, { type: "error" });
                           });
                       } else {
                         setIsLoading(false);

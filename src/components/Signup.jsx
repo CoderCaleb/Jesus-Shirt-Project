@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import InputField from "./InputField";
 import { Link } from "react-router-dom";
-import { StateSharingContext } from "../App";
+import { HelperFunctionContext, StateSharingContext } from "../App";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   getAuth,
@@ -9,42 +9,68 @@ import {
   signInWithPopup,
   GoogleAuthProvider,
 } from "firebase/auth";
-import DatePicker from "react-datepicker";
+import DatePicker, { registerLocale } from "react-datepicker";
 import { LuLoader2 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
+import enGB from "date-fns/locale/en-GB";
+import { toast } from "react-toastify";
+import useUserToken from "../hooks/useUserToken";
+registerLocale("en-GB", enGB);
+
 export default function Login() {
   const [signUpEmail, setSignUpEmail] = useState("");
   const [signUpEmailError, setSignUpEmailError] = useState("");
   const [signUpPassword, setSignUpPassword] = useState("");
   const [signUpPasswordError, setSignUpPasswordError] = useState("");
-  const [signUpClothingPreference, setSignUpClothingPreference] = useState("Mens");
+  const [signUpClothingPreference, setSignUpClothingPreference] =
+    useState("Mens");
   const [signUpBirthday, setSignUpBirthday] = useState(new Date());
   const [signUpBirthdayError, setSignUpBirthdayError] = useState("");
   const [signUpName, setSignUpName] = useState("");
   const [signUpNameError, setSignUpNameError] = useState("");
   const [logInError, setLoginError] = useState(null);
   const [signUpLoading, setSignUpLoading] = useState(false);
-
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const { user } = useContext(StateSharingContext);
+
   useEffect(() => {
     setLoginError(null);
   }, [signUpEmail, signUpPassword]);
-  function handleAddingUser(user) {
-    if (user) {
-      fetch("http://127.0.0.1:4242/add-user", {
+  async function handleAddingUser(user) {
+    try {
+      if (!user) {
+        return { error: "User not provided" };
+      }
+      const userToken = await user.getIdToken();
+      console.log("userToken:", userToken);
+
+      const response = await fetch("http://127.0.0.1:4242/add-user", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify({
           uid: user.uid,
           name: signUpName,
-          email:signUpEmail,
+          email: signUpEmail,
           birthday: signUpBirthday,
-          clothingPreference: signUpClothingPreference
+          clothingPreference: signUpClothingPreference,
         }),
-      }).then(()=>{
-        navigate("/shop");
       });
+      if (!response.ok) {
+        const errorData = await response.json();
+        return {
+          error: `Server error: ${errorData.error || response.statusText}`,
+        };
+      }
+
+      const responseData = await response.json();
+      return { data: responseData };
+    } catch (error) {
+      console.log(error);
+      return { error: `Unexpected error: ${error.message}` };
     }
   }
   function validateEmail(email) {
@@ -53,7 +79,7 @@ export default function Login() {
   }
   function validateName(name) {
     const regex = /^[a-zA-Z\s]*$/;
-    return name.trim() !== ''&&regex.test(name);
+    return name.trim() !== "" && regex.test(name);
   }
   function validatePassword(password) {
     // Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number
@@ -73,7 +99,7 @@ export default function Login() {
           </p>
           <button
             aria-label="Continue with Google"
-            class="flex font-semibold justify-center items-center bg-white border border-button-border-light rounded-md p-0.5 pr-3"
+            className="flex font-semibold justify-center items-center bg-white border border-button-border-light rounded-md p-0.5 pr-3"
             onClick={() => {
               const provider = new GoogleAuthProvider();
               const auth = getAuth();
@@ -85,7 +111,15 @@ export default function Login() {
                   const token = credential.accessToken;
                   // The signed-in user info.
                   const user = result.user;
-                  navigate("/shop");
+                  handleAddingUser(user).then((response) => {
+                    if (!response.error) {
+                      navigate("/shop");
+                    } else {
+                      setLoginError({
+                        errorMessage: response.error,
+                      });
+                    }
+                  });
                   // IdP data available using getAdditionalUserInfo(result)
                   // ...
                 })
@@ -98,37 +132,40 @@ export default function Login() {
                   // The AuthCredential type that was used.
                   const credential =
                     GoogleAuthProvider.credentialFromError(error);
-                  // ...
+                  setLoginError({
+                    errorCode: errorCode,
+                    errorMessage: errorMessage,
+                  });
                 });
             }}
           >
-            <div class="flex items-center justify-center bg-white w-9 h-9 rounded-l">
+            <div className="flex items-center justify-center bg-white w-9 h-9 rounded-l">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 viewBox="0 0 24 24"
-                class="w-5 h-5"
+                className="w-5 h-5"
               >
                 <title>Sign up with Google</title>
                 <desc>Google G Logo</desc>
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                  class="fill-google-logo-blue"
+                  className="fill-google-logo-blue"
                 ></path>
                 <path
                   d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                  class="fill-google-logo-green"
+                  className="fill-google-logo-green"
                 ></path>
                 <path
                   d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                  class="fill-google-logo-yellow"
+                  className="fill-google-logo-yellow"
                 ></path>
                 <path
                   d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                  class="fill-google-logo-red"
+                  className="fill-google-logo-red"
                 ></path>
               </svg>
             </div>
-            <span class="text-sm text-google-text-gray tracking-wider">
+            <span className="text-sm text-google-text-gray tracking-wider">
               Continue with Google
             </span>
           </button>
@@ -169,7 +206,9 @@ export default function Login() {
                       type="text"
                     />
                   }
+                  dateFormat="dd/MM/yyyy"
                   wrapperClassName="w-full"
+                  locale={"en-GB"}
                 />
               </div>
             </div>
@@ -186,7 +225,6 @@ export default function Login() {
               <InputField
                 data={signUpClothingPreference}
                 setData={setSignUpClothingPreference}
-               
                 label={"Clothing preferences"}
                 placeholder={"Mens/Womans"}
                 type={"dropdown"}
@@ -216,45 +254,55 @@ export default function Login() {
             <button
               className="border-2 w-full h-12 font-semibold rounded-[10px] border-black bg-black text-white hover:bg-white hover:text-black"
               onClick={() => {
-                const emailValid = validateEmail(signUpEmail)
-                const nameValid = validateName(signUpName)
-                const passwordValid = validatePassword(signUpPassword)
-                console.log(nameValid, signUpName)
-                if(!emailValid){
-                    setSignUpEmailError("Email is not valid")
+                const emailValid = validateEmail(signUpEmail);
+                const nameValid = validateName(signUpName);
+                const passwordValid = validatePassword(signUpPassword);
+                if (!emailValid) {
+                  setSignUpEmailError("Email is not valid");
                 }
-                if(!nameValid){
-                    setSignUpNameError("Name is not valid")
+                if (!nameValid) {
+                  setSignUpNameError("Name is not valid");
                 }
-                if(!passwordValid){
-                    setSignUpPasswordError("Password needs to be at least 8 characters long and contains at least one uppercase letter, one lowercase letter, and one number.")
+                if (!passwordValid) {
+                  setSignUpPasswordError(
+                    "Password needs to be at least 8 characters long and contains at least one uppercase letter, one lowercase letter, and one number."
+                  );
                 }
-                if(emailValid&&nameValid&&passwordValid){
-                    setSignUpLoading(true)
-                    const auth = getAuth();
+                if (emailValid && nameValid && passwordValid) {
+                  setSignUpLoading(true);
+                  const auth = getAuth();
 
-                    createUserWithEmailAndPassword(
-                      auth,
-                      signUpEmail,
-                      signUpPassword
-                    )
-                      .then((userCredential) => {
-                        // Signed up
-                        const user = userCredential.user;
-                        handleAddingUser(user)
-                      })
-                      .catch((error) => {
-                        const errorCode = error.code;
-                        const errorMessage = error.message;
-    
-                        setLoginError({
-                          errorCode: errorCode,
-                          errorMessage: errorMessage,
+                  createUserWithEmailAndPassword(
+                    auth,
+                    signUpEmail,
+                    signUpPassword
+                  )
+                    .then((userCredential) => {
+                      // Signed up
+                      const user = userCredential.user;
+                      handleAddingUser(user).then((response) => {
+                        if (!response.error) {
+                          navigate("/shop");
+                        } else {
+                          setLoginError({
+                            errorMessage: response.error,
                         });
-                      }).finally(()=>{
-                        setSignUpLoading(false)
+                        }
                       });
-                }  
+                    })
+                    .catch((error) => {
+                      const errorCode = error.code;
+                      const errorMessage = error.message;
+
+                      setLoginError({
+                        errorCode: errorCode,
+                        errorMessage: errorMessage,
+                      });
+                    })
+                    .finally(() => {
+                      setSignUpLoading(false);
+                    });
+                }
               }}
             >
               {!signUpLoading ? (

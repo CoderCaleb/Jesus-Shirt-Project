@@ -1,9 +1,9 @@
 import React from 'react'
 
 export default function ItemCard(props) {
-    const { productInfo } = props;
+    const { productInfo, index } = props;
     return (
-      <div className="flex w-full justify-between p-6 gap-3 items-center">
+      <div className="flex w-full justify-between p-6 gap-3 items-center" key={index}>
         <div className="flex gap-3 items-center">
           <div className="w-16 h-16 min-w-[4rem] min-h-[4rem] relative border-1 flex items-center justify-center">
             <div className='overflow-hidden rounded-lg'>

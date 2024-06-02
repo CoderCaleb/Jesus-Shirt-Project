@@ -66,6 +66,7 @@ export default function Navbar({ from }) {
   };
   const handleClick = () => {
     setIsOpen(!isOpen);
+    console.log(user)
   };
   return (
     <div>
@@ -132,8 +133,8 @@ export default function Navbar({ from }) {
           ) : (
             <></>
           )}
-          {!user?<Navlink content={"Login"} clickedFunc={onLoginIconClicked} />:<></>}
-          {!user?<Navlink content={"Sign up"} clickedFunc={onSignUpIconClicked} />:<></>}
+          {!user?<Navlink content={"Login"} clickedFunc={onLoginIconClicked} dontHide/>:<></>}
+          {!user?<Navlink content={"Sign up"} clickedFunc={onSignUpIconClicked} dontHide/>:<></>}
           {from === "/" ? (
             <Link to="/shop">
               <button className="border-2 px-3 h-10 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
@@ -177,7 +178,7 @@ export default function Navbar({ from }) {
 
   function Navlink({ content, clickedFunc, dontHide }) {
     return (
-      <div className={`md:flex gap-5 ${dontHide ? "" : "hidden"}`}>
+      <div className={`md:flex gap-5 ${dontHide ? "flex" : "hidden"}`}>
         <div className={`text-sm mr-2`} onClick={() => clickedFunc(navigate)}>
           {content}
         </div>
