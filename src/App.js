@@ -18,6 +18,7 @@ import { GoogleAuthProvider, onAuthStateChanged } from "firebase/auth";
 import Signup from "./components/Signup";
 import useUserToken from "./hooks/useUserToken";
 import TransactionFailedError from "./components/TransactionFailedError";
+import Profile from "./components/Profile";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCazb0ngI_9_HHTERIbThanmB38l01nUrQ",
@@ -99,15 +100,11 @@ export default function App() {
   async function handleGetUserInfo(uid) {
     try {
       if (user && uid&&userToken) {
-        const response = await fetch(`http://127.0.0.1:4242/get-user`, {
-          method: "POST",
+        const response = await fetch(`http://127.0.0.1:4242/get-user?uid=${user.uid}`, {
+          method: "GET",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${userToken}`,
           },
-          body: JSON.stringify({
-            uid: uid,
-          }),
         });
         const result = await response.json();
         setUserInfo(result);
@@ -217,6 +214,7 @@ export default function App() {
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<Signup />} />
                 <Route path="transaction-error" element={<TransactionFailedError />} />
+                <Route path="profile" element={<Profile />} /> 
                 <Route path="*" element={<h1>Not found</h1>} />
               </Routes>
             </div>

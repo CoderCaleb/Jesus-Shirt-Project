@@ -2,20 +2,16 @@ import React, { useContext, useState, useEffect } from "react";
 import { StateSharingContext } from "../App";
 import { useNavigate } from "react-router";
 export default function Orders() {
-  const { userInfo, user, userToken } = useContext(StateSharingContext);
+  const { user, userToken } = useContext(StateSharingContext);
   const [orders, setOrders] = useState([]);
   const navigate = useNavigate();
   async function getOrders(userToken) {
     try {
-      const response = await fetch(`http://127.0.0.1:4242/get-orders-summary`, {
-        method: "POST",
+      const response = await fetch(`http://127.0.0.1:4242/get-orders-summary?uid=${user.uid}`, {
+        method: "GET",
         headers: {
-          "Content-Type": "application/json",
           Authorization: `Bearer ${userToken}`,
         },
-        body: JSON.stringify({
-          uid: user ? user.uid : null,
-        }),
       });
 
       if (!response.ok) {

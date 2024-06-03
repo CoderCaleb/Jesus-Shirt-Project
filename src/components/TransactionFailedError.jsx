@@ -37,7 +37,7 @@ export default function TransactionFailedError() {
         orderErrorInfo ? (
           <div className="w-full h-full flex flex-col ">
             <div className="overflow-x-hidden overflow-y-scroll px-10 py-5">
-              <div className="flex flex-col justify-center items-center gap-4 h-full font-semibold text-center mb-7">
+              <div className="flex flex-col justify-center items-center gap-3 h-full font-semibold text-center mb-7">
                 <img
                   src={require("../images/Transaction-Error.png")}
                   alt="transaction-error-img"
@@ -47,7 +47,7 @@ export default function TransactionFailedError() {
                 <p className="font-semibold">
                   Something went wrong with your transaction.
                 </p>
-                <p className="text-slate-500 font-normal">
+                <p className="text-slate-600 font-semibold">
                   Don't worry, your payment has been received and your order has
                   already been logged in our database. Our team is looking into
                   the issue and will email you promptly once the issue is

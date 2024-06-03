@@ -2,11 +2,10 @@ import React, { useState, useEffect, useContext } from "react";
 import { StateSharingContext } from "../App";
 
 export default function useUserToken(user) {
-  const [userToken, setUserToken] = useState("");
+  const [userToken, setUserToken] = useState(null);
   async function handleGetUserToken() {
     try {
       const userToken = await user.getIdToken();
-      console.log("userToken:", userToken);
       return userToken;
     } catch (error) {
       console.error("Error fetching user token:", error);
@@ -27,15 +26,20 @@ export default function useUserToken(user) {
     let intervalId;
     if (user) {
       handleUserTokenData();
+      console.trace("userToken:", userToken);
       intervalId = setInterval(() => {
         handleUserTokenData();
       }, 60 * 55 * 1000);
+    }
+    else{
+        setUserToken(null)
     }
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
       }
-    };
+    }
+    
   }, [user]);
 
   return userToken;

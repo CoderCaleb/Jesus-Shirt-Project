@@ -14,7 +14,6 @@ import { LuLoader2 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 import enGB from "date-fns/locale/en-GB";
 import { toast } from "react-toastify";
-import useUserToken from "../hooks/useUserToken";
 registerLocale("en-GB", enGB);
 
 export default function Login() {
@@ -32,7 +31,6 @@ export default function Login() {
   const [signUpLoading, setSignUpLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
-  const { user } = useContext(StateSharingContext);
 
   useEffect(() => {
     setLoginError(null);
@@ -62,7 +60,7 @@ export default function Login() {
       if (!response.ok) {
         const errorData = await response.json();
         return {
-          error: `Server error: ${errorData.error || response.statusText}`,
+          error: `Server error: ${errorData.error || response.statusText}. Try to reload to see if it solves the problem :)`,
         };
       }
 
@@ -113,6 +111,7 @@ export default function Login() {
                   const user = result.user;
                   handleAddingUser(user).then((response) => {
                     if (!response.error) {
+                      toast("Sign up with google successful!")
                       navigate("/shop");
                     } else {
                       setLoginError({
@@ -257,6 +256,7 @@ export default function Login() {
                 const emailValid = validateEmail(signUpEmail);
                 const nameValid = validateName(signUpName);
                 const passwordValid = validatePassword(signUpPassword);
+
                 if (!emailValid) {
                   setSignUpEmailError("Email is not valid");
                 }
@@ -282,6 +282,7 @@ export default function Login() {
                       const user = userCredential.user;
                       handleAddingUser(user).then((response) => {
                         if (!response.error) {
+                            toast("Sign up with google successful!")
                           navigate("/shop");
                         } else {
                           setLoginError({

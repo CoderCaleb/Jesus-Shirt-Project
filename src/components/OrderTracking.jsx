@@ -8,26 +8,19 @@ export default function OrderTracking() {
   const [orderInfo, setOrderInfo] = useState({});
   const [paymentData, setPaymentData] = useState({});
   const { user, userToken } = useContext(StateSharingContext);
-  const { state } = useLocation();
   
   useEffect(() => {
-    if (user && userToken) {
+    if (user &&user.uid && userToken) {
       console.log("Fetching from backend");
-      fetch("http://127.0.0.1:4242/get-order", {
-        method: "POST",
+      fetch(`http://127.0.0.1:4242/get-order?orderNumber=${orderId}&uid=${user.uid}`,{
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: JSON.stringify({
-          orderNumber: orderId,
-          uid: user.uid,
-        }),
+          'Authorization': `Bearer ${userToken}`
+        }
       })
         .then((res) => res.json())
         .then((orderData) => {
           console.log(orderData);
-
           setOrderInfo(orderData.orderData);
           setPaymentData(orderData.paymentData);
         });

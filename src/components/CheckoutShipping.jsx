@@ -101,7 +101,7 @@ export default function CheckoutShipping({checkoutItems}) {
               if (shippingData.complete&&validateEmail(emailAddress)) {
                 setCheckoutProgress(2);
                 fetch("http://127.0.0.1:4242/update-payment-intent",{
-                  method: "POST",
+                  method: "PUT",
                   headers: { "Content-Type": "application/json" },
                   body: JSON.stringify({
                     payment_intent_id: paymentIntentId,

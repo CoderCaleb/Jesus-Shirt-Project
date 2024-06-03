@@ -49,11 +49,8 @@ export default function Product() {
     navigate("/checkout", { state: { checkoutItems: productArr } });
   }
   function handleFetchProduct(id) {
-    fetch(`http://127.0.0.1:4242/fetch_product`, {
-      method: "POST",
-      body: JSON.stringify({
-        id: id,
-      }),
+    fetch(`http://127.0.0.1:4242/fetch_product?productID=${id}`, {
+      method: "GET",
     })
       .then((res) => res.json())
       .then((data) => setProduct(data))
