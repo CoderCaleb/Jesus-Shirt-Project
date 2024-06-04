@@ -28,6 +28,7 @@ const firebaseConfig = {
   messagingSenderId: "881328349632",
   appId: "1:881328349632:web:2ad3f9518f15460682e825",
   measurementId: "G-DL67MPY96D",
+  measurementId: "G-DL67MPY96D",
 };
 
 // Initialize Firebase
@@ -139,7 +140,12 @@ export default function App() {
     userInfo,
     setUserInfo,
     userToken,
+    user,
+    userInfo,
+    setUserInfo,
+    userToken,
   };
+
 
   const checkoutContextValue = {
     checkoutProgress,
@@ -167,10 +173,15 @@ export default function App() {
 
   const helperFunctionContextValue = {
     handleGetUserInfo,
-    calculatePrices
+    calculatePrices,
+    orderNumber,
+    setOrderNumber,
+    checkoutConfirmData,
+    setCheckoutConfirmData,
   };
 
   const location = useLocation();
+
 
   useEffect(() => {
     console.log(showRemoveItem);
@@ -189,6 +200,7 @@ export default function App() {
       unsubscribe();
     };
   }, []);
+
 
 
   return (

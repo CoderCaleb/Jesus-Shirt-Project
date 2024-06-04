@@ -282,7 +282,7 @@ export default function Login() {
                       const user = userCredential.user;
                       handleAddingUser(user).then((response) => {
                         if (!response.error) {
-                            toast("Sign up with google successful!")
+                            toast("Sign up is successful!")
                           navigate("/shop");
                         } else {
                           setLoginError({

@@ -7,25 +7,25 @@ export default function OrderTracking() {
   const { orderId } = useParams();
   const [orderInfo, setOrderInfo] = useState({});
   const [paymentData, setPaymentData] = useState({});
-  const { user, userToken } = useContext(StateSharingContext);
+const { user, userToken } = useContext(StateSharingContext);
   
   useEffect(() => {
     if (user &&user.uid && userToken) {
       console.log("Fetching from backend");
       fetch(`http://127.0.0.1:4242/get-order?orderNumber=${orderId}&uid=${user.uid}`,{
-        method: 'GET',
-        headers: {
+      method: 'GET',
+      headers: {
           'Authorization': `Bearer ${userToken}`
         }
-      })
-        .then((res) => res.json())
-        .then((orderData) => {
-          console.log(orderData);
-          setOrderInfo(orderData.orderData);
+    })
+      .then((res) => res.json())
+      .then((orderData) => {
+        console.log(orderData);
+        setOrderInfo(orderData.orderData);
           setPaymentData(orderData.paymentData);
-        });
-    }
-  }, [userToken, user]);
+            });
+        }
+      }, [userToken, user]);
   function capitalizeFirstLetter(str) {
     if (str.length === 0) {
       return str;
