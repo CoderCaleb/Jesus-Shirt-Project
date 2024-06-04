@@ -28,7 +28,7 @@ const firebaseConfig = {
   messagingSenderId: "881328349632",
   appId: "1:881328349632:web:2ad3f9518f15460682e825",
   measurementId: "G-DL67MPY96D",
-  measurementId: "G-DL67MPY96D",
+
 };
 
 // Initialize Firebase
@@ -136,10 +136,6 @@ export default function App() {
     setCartItems,
     showRemoveItem,
     setShowRemoveItem,
-    user,
-    userInfo,
-    setUserInfo,
-    userToken,
     user,
     userInfo,
     setUserInfo,
