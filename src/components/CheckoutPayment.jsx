@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useContext } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaChevronDown } from "react-icons/fa6";
 import { AiOutlineCloseCircle } from "react-icons/ai";
@@ -9,30 +9,22 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import { CheckoutContext, StateSharingContext } from "../App";
+import { toast } from "react-toastify";
 
-import {
-  CheckoutContext,
-  StateSharingContext,
-  HelperFunctionContext,
-} from "../App";
-import { ToastContainer, toast } from "react-toastify";
-import useUserToken from "../hooks/useUserToken";
 export default function CheckoutPayment({ checkoutItems }) {
   const {
     checkoutProgress,
     setCheckoutProgress,
-    cartItems,
     showItems,
     setShowItems,
     isLoading,
     setIsLoading,
-    emailAddress,
-    setOrderNumber,
-    checkoutConfirmData,
-    setCheckoutConfirmData,
+    paymentIntentId,
+    setCartItems
   } = useContext(CheckoutContext);
-  const { user } = useContext(StateSharingContext);
-  const userToken = useUserToken(user);
+  const location = useLocation()
+  const { fromCart } = location.state;
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -44,22 +36,18 @@ export default function CheckoutPayment({ checkoutItems }) {
   }
 
   async function updatePaymentError() {
-    try{
-      const res = await fetch(
-        `http://127.0.0.1:4242/update-payment-error`
-      );
-      if(!res.ok){
-        const errorData = await res.json()
+    try {
+      const res = await fetch(`http://127.0.0.1:4242/update-payment-error`);
+      if (!res.ok) {
+        const errorData = await res.json();
         return { error: errorData.error };
       }
-      const paymentErrorData = await res.json()
-      return paymentErrorData
-    }
-    catch(error){
-      console.error('Error fetching payment error data:', error);
+      const paymentErrorData = await res.json();
+      return paymentErrorData;
+    } catch (error) {
+      console.error("Error fetching payment error data:", error);
       return { error: error.message };
     }
-
   }
 
   function handleTransactionError(order_error_id) {
@@ -68,21 +56,38 @@ export default function CheckoutPayment({ checkoutItems }) {
     }
   }
   async function handlePaymentError() {
-    const paymentErrorData = await updatePaymentError()
-    if (paymentErrorData&&!paymentErrorData.error&&paymentErrorData.payment_error_id) {
-      navigate(`/payment-error?payment-error-id=${paymentErrorData.payment_error_id}`);
+    const paymentErrorData = await updatePaymentError();
+    if (
+      paymentErrorData &&
+      !paymentErrorData.error &&
+      paymentErrorData.payment_error_id
+    ) {
+      navigate(
+        `/payment-error?payment-error-id=${paymentErrorData.payment_error_id}`
+      );
     }
   }
 
   const paymentElementOptions = {
     layout: "tabs",
   };
-  const shippingPrice = 2;
 
-  useEffect(() => {
-    console.log(checkoutItems);
-  }, []);
-
+  async function handlePayment() {
+    console.log("Payment intent id:", paymentIntentId)
+    const { paymentIntent, error } = stripe.confirmPayment({
+      elements,
+      confirmParams: {
+        return_url: `http://localhost:3000/checkout-complete?fromCart=${fromCart?"true":"false"}`,
+      },
+    });
+    setIsLoading(false)
+    if (error) {
+      console.error(error);
+      toast(error,{type:"error"})
+    } else {
+      console.log("Payment confirmed:", paymentIntent);
+    }
+  }
   return (
     <div className={`w-full h-full md:w-1/2`}>
       <div className="w-full h-full flex items-center relative justify-center flex-col px-3 sm:px-10 sm:min-w-[400px] py-5">
@@ -150,82 +155,9 @@ export default function CheckoutPayment({ checkoutItems }) {
                 if (!stripe || !elements) {
                   return;
                 }
-
-                let message = "";
-
                 setIsLoading(true);
-                stripe
-                  .confirmPayment({
-                    elements,
-                    confirmParams: {
-                      return_url: "https://example.com",
-                    },
-                    redirect: "if_required",
-                  })
-                  .then((result) => {
-                    if (
-                      result.error &&
-                      (result.error.type === "card_error" ||
-                        result.error.type === "validation_error")
-                    ) {
-                      message = result.error.message;
-                      toast(message, { type: "error" });
-                      handlePaymentError();
-                    } else if (result.error) {
-                      message = "An unexpected error occurred.";
-                      toast(message, { type: "error" });
-                      handlePaymentError();
-                    } else {
-                      if (result.paymentIntent.status === "succeeded") {
-                        const orderData = {
-                          customer: {
-                            emailAddress: result.paymentIntent.receipt_email,
-                            name: result.paymentIntent.shipping.name,
-                          },
-                          status: "printing",
-                          order_items: checkoutItems,
-                          total_price: result.paymentIntent.amount,
-                          payment_id: result.paymentIntent.id,
-                          shipping_address:
-                            result.paymentIntent.shipping.address,
-                          shipping_cost: 3.5,
-                          payment_method: result.paymentIntent.payment_method,
-                          order_date: new Date().toISOString(),
-                          linked_user: user ? user.uid : null,
-                        };
-                        console.log("confirm result", result);
-                        fetch("http://127.0.0.1:4242/place-order", {
-                          method: "POST",
-                          headers: {
-                            "Content-Type": "application/json",
-                            Authorization: user ? `Bearer ${userToken}` : null,
-                          },
-                          body: JSON.stringify({
-                            orderData: orderData,
-                            uid: user ? user.uid : null,
-                          }),
-                        })
-                          .then((res) => res.json())
-                          .then((result) => {
-                            setIsLoading(false);
-                            if (result.orderResult) {
-                              const { orderData } = result.orderResult;
+                handlePayment()
 
-                              setCheckoutProgress(3);
-                              setCheckoutConfirmData(orderData);
-                            } else {
-                              handleTransactionError(result.order_error_id);
-                            }
-                          })
-                          .catch((e) => {
-                            console.log(e);
-                            toast(e, { type: "error" });
-                          });
-                      } else {
-                        setIsLoading(false);
-                      }
-                    }
-                  });
               }}
             >
               Checkout
@@ -265,21 +197,5 @@ export default function CheckoutPayment({ checkoutItems }) {
         </div>
       </div>
     </div>
-  );
-}
-
-function InputError(props) {
-  const { content, isValid } = props;
-
-  return (
-    <>
-      {!isValid ? (
-        <div>
-          <p className="text-red-500 text-sm mt-2">{content}</p>
-        </div>
-      ) : (
-        <></>
-      )}
-    </>
   );
 }

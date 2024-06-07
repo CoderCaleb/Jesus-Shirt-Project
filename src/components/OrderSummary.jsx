@@ -26,11 +26,11 @@ export default function OrderSummary({ orderItems, shippingPrice }) {
       </div>
       <div>
         <div className="flex justify-between px-5">
-          <p className="text-sm text-slate-600 mb-3">Product's price</p>
+          <p className="text-sm text-slate-700 mb-3">Product's price</p>
           <p className="text-sm font-semibold">{`$${prices.productPrice} SGD`}</p>
         </div>
         <div className="flex justify-between px-5">
-          <p className="text-sm text-slate-600">Shipping</p>
+          <p className="text-sm text-slate-700">Shipping</p>
           <p className="text-sm font-semibold">{`$${prices.shippingPrice} SGD`}</p>
         </div>
         <div className="flex justify-between px-5 py-3">

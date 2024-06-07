@@ -19,6 +19,7 @@ import Signup from "./components/Signup";
 import useUserToken from "./hooks/useUserToken";
 import TransactionFailedError from "./components/TransactionFailedError";
 import Profile from "./components/Profile";
+import CheckoutComplete from "./components/CheckoutComplete.jsx"
 
 const firebaseConfig = {
   apiKey: "AIzaSyCazb0ngI_9_HHTERIbThanmB38l01nUrQ",
@@ -170,10 +171,7 @@ export default function App() {
   const helperFunctionContextValue = {
     handleGetUserInfo,
     calculatePrices,
-    orderNumber,
-    setOrderNumber,
-    checkoutConfirmData,
-    setCheckoutConfirmData,
+
   };
 
   const location = useLocation();
@@ -223,6 +221,7 @@ export default function App() {
                 <Route path="signup" element={<Signup />} />
                 <Route path="transaction-error" element={<TransactionFailedError />} />
                 <Route path="profile" element={<Profile />} /> 
+                <Route path="checkout-complete" element={<CheckoutComplete/>}/>
                 <Route path="*" element={<h1>Not found</h1>} />
               </Routes>
             </div>

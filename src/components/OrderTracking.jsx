@@ -7,25 +7,47 @@ export default function OrderTracking() {
   const { orderId } = useParams();
   const [orderInfo, setOrderInfo] = useState({});
   const [paymentData, setPaymentData] = useState({});
-const { user, userToken } = useContext(StateSharingContext);
-  
+  const { user, userToken } = useContext(StateSharingContext);
+const [error,setError] = useState(null)
   useEffect(() => {
-    if (user &&user.uid && userToken) {
+    if (user && user.uid && userToken) {
       console.log("Fetching from backend");
-      fetch(`http://127.0.0.1:4242/get-order?orderNumber=${orderId}&uid=${user.uid}`,{
-      method: 'GET',
-      headers: {
-          'Authorization': `Bearer ${userToken}`
+      fetch(
+        `http://127.0.0.1:4242/get-order?orderNumber=${orderId}&uid=${user.uid}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${userToken}`,
+          },
         }
-    })
-      .then((res) => res.json())
-      .then((orderData) => {
-        console.log(orderData);
-        setOrderInfo(orderData.orderData);
-          setPaymentData(orderData.paymentData);
+      )
+        .then((res) => res.json())
+        .then(({ orderData }) => {
+          console.log(orderData)
+          fetch(`http://127.0.0.1:4242/get-orders`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              order_items: orderData.order_items,
+            }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if(data.error){
+                setOrderInfo({"error":data.error});
+              }
+              else{
+                orderData.order_items = data.order_data;
+                setOrderInfo(orderData);
+              }
+              
             });
-        }
-      }, [userToken, user]);
+          setPaymentData(orderData.paymentData);
+        });
+    }
+  }, [userToken, user]);
   function capitalizeFirstLetter(str) {
     if (str.length === 0) {
       return str;
@@ -111,7 +133,10 @@ const { user, userToken } = useContext(StateSharingContext);
                 })}
               </div>
             </div>
-            <OrderSummary orderItems={orderInfo.order_items} shippingPrice={orderInfo.shipping_cost}/>
+            <OrderSummary
+              orderItems={orderInfo.order_items}
+              shippingPrice={orderInfo.shipping_cost}
+            />
             <div className=" bg-slate-400 w-full h-lineBreakHeight my-4" />
             {paymentData && Object.keys(paymentData).length !== 0 ? (
               <div className="flex justify-evenly items-center font-semibold">

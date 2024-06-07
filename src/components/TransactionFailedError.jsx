@@ -18,7 +18,26 @@ export default function TransactionFailedError() {
         .then((response) => response.json())
         .then((data) => {
           if (data.orderErrorInfo) {
-            setOrderErrorInfo(data.orderErrorInfo);
+            fetch(`http://127.0.0.1:4242/get-orders`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              order_items: data.orderErrorInfo.order_items
+            }),
+          }).then(res=>res.json())
+          .then(({order_data,error})=>{
+            console.log(data.orderErrorInfo)
+            if(error){
+              setError(error)
+            }
+            else{
+              data["orderErrorInfo"]["order_items"] = order_data
+              console.log("order item data:",order_data,error)
+              setOrderErrorInfo(data.orderErrorInfo);
+            }
+          })
           } else {
             setError(data.error);
           }
@@ -59,16 +78,16 @@ export default function TransactionFailedError() {
               <div className="ml-3">
                 <p className="text-slate-600 font-semibold mb-3">Error Info</p>{" "}
                 <div className="flex flex-col gap-2 px-6">
-                <p className=" text-slate-600">
+                <p className=" text-black font-semibold">
                   Order Error Id:{" "}
-                  <span className="font-semibold block sm:inline-block">
+                  <span className="font-semibold text-slate-700 block sm:inline-block">
                     {orderErrorId}
                   </span>
                 </p>
                   <p>
-                  <p className=" text-slate-600">
+                  <p className=" text-black font-semibold">
                   Estimated resolution time:{" "}
-                  <span className="font-semibold block sm:inline-block">
+                  <span className="font-semibold text-slate-700 block sm:inline-block">
                     {"24-48 hours"}
                   </span>
                 </p>

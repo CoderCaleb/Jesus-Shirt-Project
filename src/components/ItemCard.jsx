@@ -9,7 +9,7 @@ export default function ItemCard(props) {
             <div className='overflow-hidden rounded-lg'>
             <img
               alt="item"
-              src={productInfo.product_images[0]}
+              src={productInfo.product_images?productInfo.product_images[0]:productInfo.thumbnail}
               className="w-full h-full"
             />
             </div>

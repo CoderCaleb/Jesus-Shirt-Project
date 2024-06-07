@@ -3,11 +3,11 @@ import { useLocation } from "react-router";
 import "/node_modules/flag-icons/css/flag-icons.min.css";
 import CheckoutShipping from "./CheckoutShipping";
 import CheckoutPayment from "./CheckoutPayment";
-import OrderConfirmationPage from "./OrderComfirmation";
+import OrderConfirmationPage from "./CheckoutComplete";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import ItemCard from "./ItemCard";
-import { CheckoutContext } from "../App";
+import { CheckoutContext, StateSharingContext } from "../App";
 import TransactionFailedError from "./TransactionFailedError";
 import { HelperFunctionContext } from "../App";
 const stripePromise = loadStripe(
@@ -24,6 +24,8 @@ export default function Checkout() {
     paymentIntentId,
     setPaymentIntentId,
   } = useContext(CheckoutContext);
+
+  const { user, userToken } = useContext(StateSharingContext);
 
   const { calculatePrices } = useContext(HelperFunctionContext);
   const [prices, setPrices] = useState({
@@ -47,9 +49,13 @@ export default function Checkout() {
     if (checkoutItems) {
       fetch("/create-payment-intent", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
         body: JSON.stringify({
-          checkoutItems,
+          checkoutItems: checkoutItems,
+          uid: user?user.uid:null
         }),
       })
         .then((res) => res.json())
@@ -175,7 +181,7 @@ export default function Checkout() {
   } else {
     return (
       <>
-        <p>Cart is Null</p>
+        <p>Checkout items is Null</p>
       </>
     );
   }

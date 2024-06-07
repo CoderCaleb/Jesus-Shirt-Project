@@ -3,12 +3,12 @@ import shirtData from "../shirtData";
 const { useNavigate } = require("react-router");
 
 export default function ProductCard(props) {
-  const { productData, index, fromPage } = props;
-  const { id, name, product_images, price } = productData;
+  const { productData,index, fromPage } = props;
+  const { id, name, product_images, price, thumbnail } = productData;
   console.log(fromPage)
-
+  console.log(`productData ${index}: ${JSON.stringify(productData)}`)
   return (
-    <ProductCardUI id={id} name={name} thumbnail_url={product_images[0]} price={price}/>
+    <ProductCardUI id={id} name={name} thumbnail_url={product_images?product_images[0]:thumbnail} price={price}/>
   );
 }
 

@@ -26,7 +26,6 @@ export default function useUserToken(user) {
     let intervalId;
     if (user) {
       handleUserTokenData();
-      console.trace("userToken:", userToken);
       intervalId = setInterval(() => {
         handleUserTokenData();
       }, 60 * 55 * 1000);
@@ -41,6 +40,10 @@ export default function useUserToken(user) {
     }
     
   }, [user]);
+
+  useEffect(()=>{
+    console.log("user token:",userToken)
+  },[userToken])
 
   return userToken;
 }
