@@ -67,6 +67,7 @@ export default function Homepage() {
       </button>
     </Link>,
   ];
+  //useTransition returns the children elements itself while use
   const firstElementProps = useTransition(children, {
     from: {
       opacity: 0,

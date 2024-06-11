@@ -5,14 +5,15 @@ import ItemCard from "./ItemCard";
 import { CheckoutContext, StateSharingContext } from "../App";
 import { useStripe } from "@stripe/react-stripe-js";
 import { ToastContainer, toast } from "react-toastify";
+import { CiCircleRemove } from "react-icons/ci";
 
 const OrderConfirmationPage = () => {
   const { clientSecret, setCheckoutProgress, checkoutConfirmData } =
     useContext(CheckoutContext);
 
   const { setCartItems } = useContext(StateSharingContext);
-  const [message, setMessage] = useState("");
-  const [paymentIntent, setPaymentIntent] = useState({});
+  const [message, setMessage] = useState(null);
+  const [paymentIntent, setPaymentIntent] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
   const [error, setError] = useState(null);
   const location = useLocation();
@@ -21,19 +22,8 @@ const OrderConfirmationPage = () => {
   const paymentIntentId = params.get("payment_intent");
   const fromCart = params.get("fromCart");
   const navigate = useNavigate();
-  function handlePaymentIntentInfo(paymentIntent) {
-    switch (paymentIntent.status) {
-      case "succeeded":
-        if (paymentIntent.metadata.issue) {
-          if ((paymentIntent.metadata.issue = "order_transaction_failed")) {
-            if (paymentIntent.metadata.error_number) {
-              navigate(
-                `/transaction-error?order-error-id=${paymentIntent.metadata.error_number}`
-              );
-            }
-          }
-        } else {
-          fetch(`http://127.0.0.1:4242/get-orders`, {
+  function getOrderItemsData(paymentIntent){
+    fetch(`http://127.0.0.1:4242/get-orders`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -50,9 +40,21 @@ const OrderConfirmationPage = () => {
                 setOrderItems(order_data);
               }
             });
-          setMessage("Thank you!");
-          setPaymentIntent(paymentIntent);
           console.log(paymentIntent);
+  }
+  function handlePaymentIntentInfo(paymentIntent) {
+    switch (paymentIntent.status) {
+      case "succeeded":
+        if (paymentIntent.metadata.issue) {
+          if ((paymentIntent.metadata.issue = "order_transaction_failed")) {
+            if (paymentIntent.metadata.error_number) {
+              navigate(
+                `/transaction-error?order-error-id=${paymentIntent.metadata.error_number}`
+              );
+            }
+          }
+        }
+        else{
           toast("Payment succeeded!", {
             type: "success",
           });
@@ -69,6 +71,7 @@ const OrderConfirmationPage = () => {
         toast("Your payment was not successful, please try again.", {
           type: "error",
         });
+
         break;
       default:
         setMessage("Something went wrong.");
@@ -85,6 +88,8 @@ const OrderConfirmationPage = () => {
       .then((res) => res.json())
       .then(({ paymentIntent }) => {
         if (paymentIntent) {
+          setPaymentIntent(paymentIntent);
+
           console.log(paymentIntent.metadata);
           paymentIntent["metadata"]["order_items"] = JSON.parse(
             paymentIntent["metadata"]["order_items"].trim()
@@ -94,6 +99,7 @@ const OrderConfirmationPage = () => {
               ? null
               : paymentIntent["metadata"]["user_id"];
           handlePaymentIntentInfo(paymentIntent);
+          getOrderItemsData(paymentIntent)
           window.history.replaceState({}, document.title);
 
           if (fromCart === "true") {
@@ -130,7 +136,7 @@ const OrderConfirmationPage = () => {
   return (
     <>
       {!error ? (
-        paymentIntent && orderItems && Object.keys(paymentIntent).length > 0 ? (
+        paymentIntent&&orderItems ? (
           <div
             className={`w-full h-full flex items-center justify-around md:w-1/2`}
           >
@@ -139,9 +145,9 @@ const OrderConfirmationPage = () => {
                 <p className="text-3xl font-bold my-7">Checkout</p>
 
                 <div className="flex items-center gap-2">
-                  <CiCircleCheck size={45} />
+                  {!message?<CiCircleCheck size={45} />:<CiCircleRemove size={45}/>}
                   <div className="flex flex-col">
-                    <p className="text-lg font-bold">{message}</p>
+                    <p className="text-lg font-bold">{message?message:"Thank you"}</p>
                     <p className="text-sm">{`${paymentIntent["shipping"]["name"]}`}</p>
                   </div>
                 </div>
@@ -149,7 +155,7 @@ const OrderConfirmationPage = () => {
                   <div className="p-3 gap-7 flex">
                     <p className="text-slate-500 font-semibold">Order Number</p>
                     <p className="text-black">
-                      {paymentIntent.metadata.order_id}
+                      {!message?paymentIntent.metadata.order_id:"Payment failed so order is not placed"}
                     </p>
                   </div>
                   <div className="p-3 gap-7 flex">

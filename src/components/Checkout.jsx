@@ -46,7 +46,7 @@ export default function Checkout() {
   }, [checkoutItems, calculatePrices]);
 
   useEffect(() => {
-    if (checkoutItems) {
+    if (checkoutItems&&userToken) {
       fetch("/create-payment-intent", {
         method: "POST",
         headers: {
@@ -68,7 +68,7 @@ export default function Checkout() {
           console.log(err);
         });
     }
-  }, []);
+  }, [userToken]);
 
   const appearance = {
     theme: "flat",

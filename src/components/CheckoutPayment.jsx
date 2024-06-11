@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { IoMdArrowBack } from "react-icons/io";
 import { FaChevronDown } from "react-icons/fa6";
 import { AiOutlineCloseCircle } from "react-icons/ai";
@@ -9,6 +9,7 @@ import {
   useStripe,
   useElements,
 } from "@stripe/react-stripe-js";
+import MessageBox from "./MessageBox"
 import { CheckoutContext, StateSharingContext } from "../App";
 import { toast } from "react-toastify";
 
@@ -21,8 +22,8 @@ export default function CheckoutPayment({ checkoutItems }) {
     isLoading,
     setIsLoading,
     paymentIntentId,
-    setCartItems
   } = useContext(CheckoutContext);
+  const [paymentError, setPaymentError] = useState(null)
   const location = useLocation()
   const { fromCart } = location.state;
   const stripe = useStripe();
@@ -33,39 +34,6 @@ export default function CheckoutPayment({ checkoutItems }) {
       return true;
     }
     return false;
-  }
-
-  async function updatePaymentError() {
-    try {
-      const res = await fetch(`http://127.0.0.1:4242/update-payment-error`);
-      if (!res.ok) {
-        const errorData = await res.json();
-        return { error: errorData.error };
-      }
-      const paymentErrorData = await res.json();
-      return paymentErrorData;
-    } catch (error) {
-      console.error("Error fetching payment error data:", error);
-      return { error: error.message };
-    }
-  }
-
-  function handleTransactionError(order_error_id) {
-    if (order_error_id) {
-      navigate(`/transaction-error?order-error-id=${order_error_id}`);
-    }
-  }
-  async function handlePaymentError() {
-    const paymentErrorData = await updatePaymentError();
-    if (
-      paymentErrorData &&
-      !paymentErrorData.error &&
-      paymentErrorData.payment_error_id
-    ) {
-      navigate(
-        `/payment-error?payment-error-id=${paymentErrorData.payment_error_id}`
-      );
-    }
   }
 
   const paymentElementOptions = {
@@ -82,8 +50,9 @@ export default function CheckoutPayment({ checkoutItems }) {
     });
     setIsLoading(false)
     if (error) {
-      console.error(error);
+      console.error(error); 
       toast(error,{type:"error"})
+      setPaymentError(error)
     } else {
       console.log("Payment confirmed:", paymentIntent);
     }
@@ -145,6 +114,7 @@ export default function CheckoutPayment({ checkoutItems }) {
               options={paymentElementOptions}
             />
           </div>
+          {paymentError?<MessageBox type="error" message={paymentError}/>:<></>}
           <div className="flex flex-col gap-3 w-full">
             <button
               className="border-2 w-full mt-5 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black"

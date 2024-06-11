@@ -19,25 +19,25 @@ export default function TransactionFailedError() {
         .then((data) => {
           if (data.orderErrorInfo) {
             fetch(`http://127.0.0.1:4242/get-orders`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              order_items: data.orderErrorInfo.order_items
-            }),
-          }).then(res=>res.json())
-          .then(({order_data,error})=>{
-            console.log(data.orderErrorInfo)
-            if(error){
-              setError(error)
-            }
-            else{
-              data["orderErrorInfo"]["order_items"] = order_data
-              console.log("order item data:",order_data,error)
-              setOrderErrorInfo(data.orderErrorInfo);
-            }
-          })
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                order_items: data.orderErrorInfo.order_items,
+              }),
+            })
+              .then((res) => res.json())
+              .then(({ order_data, error }) => {
+                console.log(data.orderErrorInfo);
+                if (error) {
+                  setError(error);
+                } else {
+                  data["orderErrorInfo"]["order_items"] = order_data;
+                  console.log("order item data:", order_data, error);
+                  setOrderErrorInfo(data.orderErrorInfo);
+                }
+              });
           } else {
             setError(data.error);
           }
@@ -64,7 +64,7 @@ export default function TransactionFailedError() {
                 ></img>
                 <p className="text-4xl font-bold">Oops!</p>
                 <p className="font-semibold">
-                  Something went wrong with your transaction.
+                  Something went wrong with your order.
                 </p>
                 <p className="text-slate-600 font-semibold">
                   Don't worry, your payment has been received and your order has
@@ -78,19 +78,19 @@ export default function TransactionFailedError() {
               <div className="ml-3">
                 <p className="text-slate-600 font-semibold mb-3">Error Info</p>{" "}
                 <div className="flex flex-col gap-2 px-6">
-                <p className=" text-black font-semibold">
-                  Order Error Id:{" "}
-                  <span className="font-semibold text-slate-700 block sm:inline-block">
-                    {orderErrorId}
-                  </span>
-                </p>
-                  <p>
                   <p className=" text-black font-semibold">
-                  Estimated resolution time:{" "}
-                  <span className="font-semibold text-slate-700 block sm:inline-block">
-                    {"24-48 hours"}
-                  </span>
-                </p>
+                    Order Error Id:{" "}
+                    <span className="font-semibold text-slate-700 block sm:inline-block">
+                      {orderErrorId}
+                    </span>
+                  </p>
+                  <p>
+                    <p className=" text-black font-semibold">
+                      Estimated resolution time:{" "}
+                      <span className="font-semibold text-slate-700 block sm:inline-block">
+                        {"24-48 hours"}
+                      </span>
+                    </p>
                   </p>
                 </div>
               </div>
