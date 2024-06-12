@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import InputField from "./InputField";
 import { Link } from "react-router-dom";
-import { HelperFunctionContext } from "../App";
+import { HelperFunctionContext } from "../contexts";
 import {
   getAuth,
   signInWithEmailAndPassword,

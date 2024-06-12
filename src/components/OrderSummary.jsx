@@ -1,6 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import ItemCard from "./ItemCard";
-import { HelperFunctionContext } from "../App";
+import { HelperFunctionContext } from "../contexts";
 
 export default function OrderSummary({ orderItems, shippingPrice }) {
   const { calculatePrices } = useContext(HelperFunctionContext);

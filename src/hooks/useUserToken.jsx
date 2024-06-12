@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useContext } from "react";
-import { StateSharingContext } from "../App";
 
 export default function useUserToken(user) {
   const [userToken, setUserToken] = useState(null);

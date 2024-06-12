@@ -7,9 +7,8 @@ import OrderConfirmationPage from "./CheckoutComplete";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import ItemCard from "./ItemCard";
-import { CheckoutContext, StateSharingContext } from "../App";
+import { StateSharingContext, CheckoutContext, HelperFunctionContext } from "../contexts";
 import TransactionFailedError from "./TransactionFailedError";
-import { HelperFunctionContext } from "../App";
 const stripePromise = loadStripe(
   "pk_test_51OOBnGEvVCl2vla10CIfwh6ItUYeeZO4o3haVa9xFHyxwT6ekU8D8wAuA75GsRfGOhMLmU0Znf9dZKJPLNc5xrdq00PVRX8neU"
 );

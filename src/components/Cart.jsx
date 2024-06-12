@@ -1,5 +1,5 @@
 import React, { useState, useContext, useEffect } from "react";
-import { StateSharingContext, CheckoutContext, HelperFunctionContext } from "../App.js";
+import { StateSharingContext, HelperFunctionContext } from "../contexts";
 import { IoIosArrowUp } from "react-icons/io";
 import { IoIosArrowDown } from "react-icons/io";
 import { toast, ToastContainer } from "react-toastify";

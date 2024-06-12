@@ -1,13 +1,11 @@
 import React, { useState, useContext } from "react";
-import { RiArrowDropDownLine } from "react-icons/ri";
-import { countryData } from "../countries";
 import { MdOutlineMail } from "react-icons/md";
 import { FaChevronDown } from "react-icons/fa6";
 import { AiOutlineCloseCircle } from "react-icons/ai";
-import { CheckoutContext } from "../App";
+import { CheckoutContext } from "../contexts";
 import ItemCard from "./ItemCard";
 import { AddressElement } from "@stripe/react-stripe-js";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 import InputField from "./InputField";
 export default function CheckoutShipping({checkoutItems}) {
   const {

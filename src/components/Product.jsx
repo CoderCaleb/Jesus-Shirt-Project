@@ -1,7 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useParams, useNavigate } from "react-router";
 import shirtData from "../shirtData";
-import { StateSharingContext, CheckoutContext } from "../App.js";
+import { StateSharingContext } from "../contexts";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { setItem } from "localforage";

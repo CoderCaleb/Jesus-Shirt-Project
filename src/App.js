@@ -66,7 +66,8 @@ const App = () => {
       }}>
         <StateSharingContext.Provider value={{ cartItems, setCartItems, showRemoveItem, setShowRemoveItem, user, userInfo, setUserInfo, userToken }}>
           <div>
-            <Navbar from={location.pathname} />
+          <Navbar from={location.pathname} />
+
             <div className="w-screen h-[calc(100vh-64px)] bg-background flex z-[1]">
               {showRemoveItem.state && <RemoveItemModal productData={showRemoveItem.productData} />}
               <Routes>

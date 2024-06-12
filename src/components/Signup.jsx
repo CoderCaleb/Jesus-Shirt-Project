@@ -1,7 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import InputField from "./InputField";
 import { Link } from "react-router-dom";
-import { HelperFunctionContext, StateSharingContext } from "../App";
 import "react-datepicker/dist/react-datepicker.css";
 import {
   getAuth,

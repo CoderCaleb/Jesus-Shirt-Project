@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import { MdDeleteForever } from "react-icons/md";
-import { StateSharingContext } from "../App";
+import { StateSharingContext } from "../contexts";
 export default function RemoveItemModal(props) {
   const { productData } = props;
   const { name } = productData;

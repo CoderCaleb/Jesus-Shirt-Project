@@ -2,7 +2,7 @@ import React, { useContext, useState, useEffect, useRef } from "react";
 import { CiCircleCheck } from "react-icons/ci";
 import { useLocation, useNavigate } from "react-router";
 import ItemCard from "./ItemCard";
-import { CheckoutContext, StateSharingContext } from "../App";
+import { StateSharingContext, CheckoutContext } from "../contexts";
 import { useStripe } from "@stripe/react-stripe-js";
 import { ToastContainer, toast } from "react-toastify";
 import { CiCircleRemove } from "react-icons/ci";

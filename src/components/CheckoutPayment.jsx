@@ -10,7 +10,7 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import MessageBox from "./MessageBox"
-import { CheckoutContext, StateSharingContext } from "../App";
+import { CheckoutContext } from "../contexts";
 import { toast } from "react-toastify";
 
 export default function CheckoutPayment({ checkoutItems }) {

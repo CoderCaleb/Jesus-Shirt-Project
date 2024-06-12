@@ -5,7 +5,7 @@ import { FaCross } from "react-icons/fa";
 import { IoHome } from "react-icons/io5";
 import { useNavigate, useLocation } from "react-router";
 import useSidebarStatus from "../hooks/useSidebarStatus";
-import { CheckoutContext } from "../App";
+import { CheckoutContext } from "../contexts";
 
 export default function SideBar() {
     const location = useLocation();

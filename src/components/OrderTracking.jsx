@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from "react";
 import { useLocation, useParams } from "react-router";
 import ItemCard from "./ItemCard";
-import { StateSharingContext, HelperFunctionContext } from "../App";
+import { StateSharingContext } from "../contexts";
 import OrderSummary from "./OrderSummary";
 export default function OrderTracking() {
   const { orderId } = useParams();
