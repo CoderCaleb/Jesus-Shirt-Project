@@ -22,39 +22,38 @@ const OrderConfirmationPage = () => {
   const paymentIntentId = params.get("payment_intent");
   const fromCart = params.get("fromCart");
   const navigate = useNavigate();
-  function getOrderItemsData(paymentIntent){
+  function getOrderItemsData(paymentIntent) {
     fetch(`http://127.0.0.1:4242/get-orders`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              order_items: paymentIntent.metadata.order_items,
-            }),
-          })
-            .then((res) => res.json())
-            .then(({ order_data, error }) => {
-              if (error) {
-                setError(error);
-              } else {
-                setOrderItems(order_data);
-              }
-            });
-          console.log(paymentIntent);
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        order_items: paymentIntent.metadata.order_items,
+      }),
+    })
+      .then((res) => res.json())
+      .then(({ order_data, error }) => {
+        if (error) {
+          setError(error);
+        } else {
+          setOrderItems(order_data);
+        }
+      });
+    console.log(paymentIntent);
   }
   function handlePaymentIntentInfo(paymentIntent) {
     switch (paymentIntent.status) {
       case "succeeded":
-        if (paymentIntent.metadata.issue) {
-          if ((paymentIntent.metadata.issue = "order_transaction_failed")) {
-            if (paymentIntent.metadata.error_number) {
-              navigate(
-                `/transaction-error?order-error-id=${paymentIntent.metadata.error_number}`
-              );
-            }
+        if (paymentIntent.metadata.orderStatus === "failed") {
+          if (paymentIntent.metadata.error_number) {
+            navigate(
+              `/transaction-error?order-error-id=${paymentIntent.metadata.error_number}`
+            );
           }
-        }
-        else{
+        } else if (paymentIntent.metadata.orderStatus === "processing") {
+          console.log("Order is processing");
+        } else {
           toast("Payment succeeded!", {
             type: "success",
           });
@@ -82,34 +81,36 @@ const OrderConfirmationPage = () => {
     }
   }
   useEffect(() => {
-    fetch(
-      `http://127.0.0.1:4242/retrieve-payment-intent?payment_intent_id=${paymentIntentId}`
-    )
-      .then((res) => res.json())
-      .then(({ paymentIntent }) => {
-        if (paymentIntent) {
-          setPaymentIntent(paymentIntent);
+    if (paymentIntentId) {
+      fetch(
+        `http://127.0.0.1:4242/retrieve-payment-intent?payment_intent_id=${paymentIntentId}`
+      )
+        .then((res) => res.json())
+        .then(({ paymentIntent }) => {
+          if (paymentIntent) {
+            setPaymentIntent(paymentIntent);
 
-          console.log(paymentIntent.metadata);
-          paymentIntent["metadata"]["order_items"] = JSON.parse(
-            paymentIntent["metadata"]["order_items"].trim()
-          );
-          paymentIntent["metadata"]["user_id"] =
-            paymentIntent["user_id"] === "None"
-              ? null
-              : paymentIntent["metadata"]["user_id"];
-          handlePaymentIntentInfo(paymentIntent);
-          getOrderItemsData(paymentIntent)
-          window.history.replaceState({}, document.title);
+            console.log(paymentIntent.metadata);
+            paymentIntent["metadata"]["order_items"] = JSON.parse(
+              paymentIntent["metadata"]["order_items"].trim()
+            );
+            paymentIntent["metadata"]["user_id"] =
+              paymentIntent["metadata"]["user_id"] === "None"
+                ? null
+                : paymentIntent["metadata"]["user_id"];
+            handlePaymentIntentInfo(paymentIntent);
+            getOrderItemsData(paymentIntent);
+            window.history.replaceState({}, document.title);
 
-          if (fromCart === "true") {
-            setCartItems([]);
+            if (fromCart === "true") {
+              setCartItems([]);
+            }
+          } else {
+            console.log("Payment intent is null");
+            setPaymentIntent(null);
           }
-        } else {
-          console.log("Payment intent is null");
-          setPaymentIntent(null);
-        }
-      });
+        });
+    }
   }, []);
 
   const DisplayShippingAddress = ({ address }) => {
@@ -130,13 +131,13 @@ const OrderConfirmationPage = () => {
   };
 
   useEffect(() => {
-    console.log("order items:",orderItems);
+    console.log("order items:", orderItems);
   }, [orderItems]);
 
   return (
     <>
       {!error ? (
-        paymentIntent&&orderItems ? (
+        paymentIntent && orderItems ? (
           <div
             className={`w-full h-full flex items-center justify-around md:w-1/2`}
           >
@@ -145,41 +146,72 @@ const OrderConfirmationPage = () => {
                 <p className="text-3xl font-bold my-7">Checkout</p>
 
                 <div className="flex items-center gap-2">
-                  {!message?<CiCircleCheck size={45} />:<CiCircleRemove size={45}/>}
+                  {!message ? (
+                    <CiCircleCheck size={45} />
+                  ) : (
+                    <CiCircleRemove size={45} />
+                  )}
                   <div className="flex flex-col">
-                    <p className="text-lg font-bold">{message?message:"Thank you"}</p>
+                    <p className="text-lg font-bold">
+                      {message ? message : "Thank you"}
+                    </p>
                     <p className="text-sm">{`${paymentIntent["shipping"]["name"]}`}</p>
                   </div>
                 </div>
-                <div className="rounded-lg border-slate-300 border-1 text-sm mt-7">
-                  <div className="p-3 gap-7 flex">
-                    <p className="text-slate-500 font-semibold">Order Number</p>
-                    <p className="text-black">
-                      {!message?paymentIntent.metadata.order_id:"Payment failed so order is not placed"}
-                    </p>
-                  </div>
-                  <div className="p-3 gap-7 flex">
-                    <p className="text-slate-500 font-semibold">Contact</p>
-                    <p className="text-black">{paymentIntent.receipt_email}</p>
-                  </div>
-                  <div className=" bg-slate-300 w-full h-lineBreakHeight" />
-                  <div className="p-3 gap-7 flex">
-                    <p className="text-slate-500 font-semibold">Address</p>
-                    <div className="flex flex-col gap-2">
-                      <DisplayShippingAddress
-                        address={paymentIntent.shipping.address}
-                      />
+                <div className="flex-1">
+                  {paymentIntent.metadata.orderStatus === "processing" ? (
+                    <div className=" h-72 flex flex-col gap-3 text-center justify-center items-center">
+                      <p>Your Payment Intent ID: {paymentIntentId}</p>
+                      <p>
+                        Your order is still being processed. Try reloading the page. If
+                        you still get the same message, please contact our customer
+                        support with your Payment Intent ID.
+                      </p>
                     </div>
-                  </div>
-                  <div className=" bg-slate-300 w-full h-lineBreakHeight" />
-                  <div className="flex pl-3 pt-3">
-                    <p className="text-slate-500 font-semibold">Items</p>
-                    <div className="w-full overflow-y-scroll h-60">
-                      {orderItems.map((product, index) => {
-                        return <ItemCard productInfo={product} index={index} key={index}/>;
-                      })}
+                  ) : (
+                    <div className="rounded-lg border-slate-300 border-1 text-sm mt-7 w-full">
+                      <div className="p-3 gap-7 flex">
+                        <p className="text-slate-500 font-semibold">
+                          Order Number
+                        </p>
+                        <p className="text-black">
+                          {!message
+                            ? paymentIntent.metadata.order_id
+                            : "Payment failed so order is not placed"}
+                        </p>
+                      </div>
+                      <div className="p-3 gap-7 flex">
+                        <p className="text-slate-500 font-semibold">Contact</p>
+                        <p className="text-black">
+                          {paymentIntent.receipt_email}
+                        </p>
+                      </div>
+                      <div className=" bg-slate-300 w-full h-lineBreakHeight" />
+                      <div className="p-3 gap-7 flex">
+                        <p className="text-slate-500 font-semibold">Address</p>
+                        <div className="flex flex-col gap-2">
+                          <DisplayShippingAddress
+                            address={paymentIntent.shipping.address}
+                          />
+                        </div>
+                      </div>
+                      <div className=" bg-slate-300 w-full h-lineBreakHeight" />
+                      <div className="flex pl-3 pt-3">
+                        <p className="text-slate-500 font-semibold">Items</p>
+                        <div className="w-full overflow-y-scroll h-60">
+                          {orderItems.map((product, index) => {
+                            return (
+                              <ItemCard
+                                productInfo={product}
+                                index={index}
+                                key={index}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
                 <div className="w-full">
                   <button

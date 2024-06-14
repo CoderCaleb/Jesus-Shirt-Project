@@ -47,20 +47,19 @@ export const handleGetUserInfo = async (uid, user, userToken, setUserInfo) => {
   }
 };
 // File: utils.js
-export const handleAddingUser = (
-  user,
-  signUpName,
-  signUpEmail,
-  signUpBirthday,
-  signUpClothingPreference
-) => {
-  if (!user) {
-    return { error: "User not provided" };
-  }
-
-  const userTokenPromise = user.getIdToken();
-  return userTokenPromise
-    .then((userToken) => {
+export const handleAddingUser = async (
+    user,
+    signUpName,
+    signUpEmail,
+    signUpBirthday,
+    signUpClothingPreference
+  ) => {
+    if (!user) {
+      return { error: "User not provided" };
+    }
+  
+    try {
+      const userToken = await user.getIdToken();
       const url = "http://127.0.0.1:4242/add-user";
       const options = {
         method: "POST",
@@ -76,13 +75,21 @@ export const handleAddingUser = (
           clothingPreference: signUpClothingPreference,
         }),
       };
-
-      return useFetch(url, options);
-    })
-    .catch((error) => {
+  
+      const response = await fetch(url, options);
+  
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const data = await response.json();
+  
+      return { data };
+    } catch (error) {
       return { error: `Unexpected error: ${error.message}` };
-    });
-};
+    }
+  };
+  
 
 export const validateEmail = (email) => {
     return String(email)
@@ -120,4 +127,24 @@ export function validateBirthday(birthday) {
   
     return true;
   }
-  
+
+  export function capitalizeFirstLetter(str) {
+    if (str.length === 0) {
+      return str;
+    }
+
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  export function formatExpirationDate(expMonth, expYear) {
+    const formattedMonth = expMonth < 10 ? `0${expMonth}` : expMonth;
+    const formattedYear = expYear.toString().slice(-2);
+    const formattedDate = `${formattedMonth}/${formattedYear}`;
+    return formattedDate;
+  }
+
+  export function addDaysToDate(date, days) {
+    const result = new Date(date); // Create a new Date object to avoid modifying the original date
+    result.setDate(result.getDate() + days); // Add the specified number of days to the date
+    return result; // Return the new date
+  }

@@ -22,7 +22,11 @@ const useFetch = (url, options) => {
         if (result.error) {
           setError(result.error);
         } else if (returnedDictData) {
-          setData(typeof returnedDictData === "string"?JSON.parse(returnedDictData):returnedDictData);
+          setData(
+            typeof returnedDictData === "string"
+              ? JSON.parse(returnedDictData)
+              : returnedDictData
+          );
         } else {
           setData(result); // In case the result is the data itself
         }

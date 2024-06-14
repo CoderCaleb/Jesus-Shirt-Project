@@ -58,9 +58,6 @@ export default function Signup() {
     if (typeof validateBirthday(formData.birthday) === "string") {
       errors.birthday = validateBirthday(formData.birthday);
     }
-    else{
-      console.log(validateBirthday(formData.birthday), formData.birthday)
-    }
     setFormErrors(errors);
     return Object.keys(errors).length === 0;
   };
@@ -88,7 +85,7 @@ export default function Signup() {
         if (error) {
           throw new Error(error);
         } else {
-          toast("Sign up is successful!");
+          toast("Sign up is successful!",{type:"success"});
           navigate("/shop");
         }
       } catch (error) {
@@ -118,7 +115,7 @@ export default function Signup() {
       if (error) {
         throw new Error(error);
       } else {
-        toast("Sign up with Google successful!");
+        toast("Sign up with Google successful!",{type:"success"});
         navigate("/shop");
       }
     } catch (error) {
