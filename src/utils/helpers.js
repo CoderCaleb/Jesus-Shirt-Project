@@ -148,3 +148,10 @@ export function validateBirthday(birthday) {
     result.setDate(result.getDate() + days); // Add the specified number of days to the date
     return result; // Return the new date
   }
+
+  export const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+    }).format(amount);
+  };

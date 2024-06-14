@@ -97,8 +97,8 @@ export default function Homepage() {
 
   return (
     <div className="flex flex-1 flex-col items-center h-full overflow-y-scroll">
-      <div className="relative w-full">
-        <div className="absolute -top-[150px] z-[1] left-1/2 h-[672px] w-full max-w-[1126px] -translate-x-1/2 rounded-full blur-[250px] opacity-40 [background:linear-gradient(180deg,rgba(0,102,255,0.30)_0%,rgba(143,0,255,0.30)_50%,rgba(255,0,184,0.30)_100%)]"></div>
+      <div className="relative m-auto w-8/12">
+        <div className="absolute -top-[150px] z-[1] left-1/2 h-[672px] w-full max-w-[1126px] -translate-x-1/2 rounded-full blur-[250px] opacity-60 [background:linear-gradient(180deg,rgba(0,102,255,0.30)_0%,rgba(143,0,255,0.30)_50%,rgba(255,0,184,0.30)_100%)]"></div>
         <div className="flex text-center w-full justify-center px-12 gap-10 items-center">
           <div className="flex flex-col items-center gap-7 py-36 sm:w-4/5 w-full z-10" ref={firstElementRef}>
             {firstElementChildren}

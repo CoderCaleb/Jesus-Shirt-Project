@@ -90,7 +90,7 @@ const OrderTracking = () => {
         orderItems={orderInfo.order_items}
         shippingPrice={orderInfo.shipping_cost}
       />
-      <div className=" bg-slate-400 w-full h-lineBreakHeight my-4" />
+      <div className=" bg-slate-400 w-full h-lineBreakHeight mb-4" />
       <PaymentAndDeliveryDetails paymentData={paymentData} orderInfo={orderInfo} />
     </div>
   );
@@ -102,7 +102,7 @@ const OrderDetails = ({ formattedOrderDate, estimatedDelivery }) => (
       Order date: <span className="font-semibold block sm:inline-block">{formattedOrderDate}</span>
     </p>
     <div className=" bg-slate-300 h-full w-[2px]" />
-    <p className="text-sm text-green-500 font-semibold">
+    <p className="text-sm text-successGreen font-semibold">
       Estimated delivery: <span className="block sm:inline-block">{estimatedDelivery}</span>
     </p>
   </div>
@@ -134,15 +134,15 @@ const OrderTimeline = ({ timelineStatus, orderDate, index }) => {
 
 const Dot = ({ dotStatus, index, currentIndex, timeStatuses }) => (
   <div className="flex flex-1 flex-col gap-3 items-center relative" key={index}>
-    <p className={`font-semibold text-center ${index <= currentIndex ? "text-green-500" : " text-slate-400"}`}>
+    <p className={`font-semibold text-center ${index <= currentIndex ? "text-successGreen" : " text-[#9ea7bb]"}`}>
       {dotStatus}
     </p>
     <div className="flex w-full items-center">
-      <div className={`flex-1 h-1 ${index <= currentIndex ? "bg-green-500" : "bg-slate-400"}`}></div>
-      <div className={`w-5 h-5 rounded-3xl ${index <= currentIndex ? "bg-green-600" : "bg-slate-400"}`}></div>
-      <div className={`flex-1 h-1 ${index <= currentIndex ? "bg-green-500" : "bg-slate-400"}`}></div>
+      <div className={`flex-1 h-1 ${index <= currentIndex ? "bg-successGreen" : "bg-[#9ea7bb]"}`}></div>
+      <div className={`w-5 h-5 rounded-3xl ${index <= currentIndex ? "bg-successGreen" : "bg-[#9ea7bb]"}`}></div>
+      <div className={`flex-1 h-1 ${index <= currentIndex ? "bg-successGreen" : "bg-[#9ea7bb]"}`}></div>
     </div>
-    <p className="text-sm text-slate-600">{timeStatuses[index]}</p>
+    <p className="text-sm text-slate-600 font-semibold">{timeStatuses[index]}</p>
   </div>
 );
 
