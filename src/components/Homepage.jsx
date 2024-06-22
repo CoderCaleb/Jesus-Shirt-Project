@@ -1,10 +1,16 @@
 import React, { useRef, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useTrail, useTransition, useSpring, animated } from "@react-spring/web";
+import {
+  useTrail,
+  useTransition,
+  useSpring,
+  animated,
+} from "@react-spring/web";
 import bestSellingData from "../bestSellingData";
 import ProductCard from "./ProductCard";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import InfiniteScroll from "./InfiniteScroll";
 
 export default function Homepage() {
   // Refs for observing elements
@@ -13,9 +19,12 @@ export default function Homepage() {
   const thirdElementRef = useRef(null);
 
   // State for tracking intersection status
-  const [firstElementIntersecting, setFirstElementIntersecting] = useState(false);
-  const [secondElementIntersecting, setSecondElementIntersecting] = useState(false);
-  const [thirdElementIntersecting, setThirdElementIntersecting] = useState(false);
+  const [firstElementIntersecting, setFirstElementIntersecting] =
+    useState(false);
+  const [secondElementIntersecting, setSecondElementIntersecting] =
+    useState(false);
+  const [thirdElementIntersecting, setThirdElementIntersecting] =
+    useState(false);
 
   // State for animated children
   const [firstElementChildren, setFirstElementChildren] = useState(null);
@@ -29,23 +38,37 @@ export default function Homepage() {
       });
     });
     if (element) observer.observe(element);
-    return () => { if (element) observer.unobserve(element); };
+    return () => {
+      if (element) observer.unobserve(element);
+    };
   }
 
   useEffect(() => {
-    handleIntersectionObserver(firstElementRef.current, setFirstElementIntersecting);
-    handleIntersectionObserver(secondElementRef.current, setSecondElementIntersecting);
-    handleIntersectionObserver(thirdElementRef.current, setThirdElementIntersecting);
+    handleIntersectionObserver(
+      firstElementRef.current,
+      setFirstElementIntersecting
+    );
+    handleIntersectionObserver(
+      secondElementRef.current,
+      setSecondElementIntersecting
+    );
+    handleIntersectionObserver(
+      thirdElementRef.current,
+      setThirdElementIntersecting
+    );
   }, []);
 
   // Animated properties for first element
   const children = [
-    <p className="md:text-8xl text-6xl">✝️</p>,
-    <p className="md:text-7xl text-6xl font-bold lg:max-w-[850px]">
-      Embrace your <span className=" text-red-500">brave</span> side
+    <p className="md:text-8xl text-7xl font-bold lg:max-w-[850px] ">
+      Spread{" "}
+      <nobr>
+        the <span className=" text-red-500">word</span>
+      </nobr>
     </p>,
-    <p className="w-full md:w-11/12 font-semibold text-slate-700 m-auto lg:max-w-[550px]">
-      The one stop shop for all your clothing needs. Our clothing is nice and comfortable and feels nice and comfortable.
+    <p className="w-full md:w-11/12 text-slate-600 font-semibold m-auto lg:max-w-[550px]">
+      The one stop shop for all your clothing needs. Our clothing is nice and
+      comfortable and feels nice and comfortable.
     </p>,
     <Link to="/shop">
       <button className="border-2 px-7 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">
@@ -61,9 +84,11 @@ export default function Homepage() {
 
   useEffect(() => {
     if (firstElementIntersecting) {
-      setFirstElementChildren(firstElementProps((styles, element) => (
-        <animated.div style={styles}>{element}</animated.div>
-      )));
+      setFirstElementChildren(
+        firstElementProps((styles, element) => (
+          <animated.div style={styles}>{element}</animated.div>
+        ))
+      );
     }
   }, [firstElementIntersecting]);
 
@@ -87,31 +112,44 @@ export default function Homepage() {
 
   useEffect(() => {
     if (thirdElementIntersecting) {
-      setThirdElementChildren(thirdElementProps((styles, element) => (
-        <animated.div style={styles} className="md:basis-[calc(25%-35px)] basis-[calc(50%-35px)]">
-          {element}
-        </animated.div>
-      )));
+      setThirdElementChildren(
+        thirdElementProps((styles, element) => (
+          <animated.div
+            style={styles}
+            className="md:basis-[calc(25%-35px)] basis-[calc(50%-35px)]"
+          >
+            {element}
+          </animated.div>
+        ))
+      );
     }
   }, [thirdElementIntersecting]);
 
   return (
     <div className="flex flex-1 flex-col items-center h-full overflow-y-scroll">
-      <div className="relative m-auto w-8/12">
-        <div className="absolute -top-[150px] z-[1] left-1/2 h-[672px] w-full max-w-[1126px] -translate-x-1/2 rounded-full blur-[250px] opacity-60 [background:linear-gradient(180deg,rgba(0,102,255,0.30)_0%,rgba(143,0,255,0.30)_50%,rgba(255,0,184,0.30)_100%)]"></div>
-        <div className="flex text-center w-full justify-center px-12 gap-10 items-center">
-          <div className="flex flex-col items-center gap-7 py-36 sm:w-4/5 w-full z-10" ref={firstElementRef}>
+      <div className="relative w-full">
+        <div className="flex text-center w-full gap-8 items-center justify-center sm:pt-[120px] sm:pb-[125px] sm:px-[65px] py-20 px-6">
+          <div
+            className="flex flex-col items-center gap-7 h-vh z-10"
+            ref={firstElementRef}
+          >
             {firstElementChildren}
           </div>
         </div>
+        <div className="mb-10">
+          <InfiniteScroll />
+        </div>
       </div>
-      <div className="flex m-auto items-center justify-center w-full text-center flex-col gap-16 pb-20 pt-7">
+      <div className="flex m-auto items-center justify-center w-full text-center flex-col gap-16 pb-20">
         <animated.div style={secondElementProps}>
           <p className="text-5xl mx-3 font-bold" ref={secondElementRef}>
             Best Sellers 🔥
           </p>
         </animated.div>
-        <div className="flex lg:w-11/12 w-full gap-7 justify-center flex-wrap" ref={thirdElementRef}>
+        <div
+          className="flex lg:w-11/12 w-full gap-7 justify-center flex-wrap"
+          ref={thirdElementRef}
+        >
           {thirdElementChildren}
         </div>
       </div>
@@ -129,7 +167,9 @@ export default function Homepage() {
               Spreading the gospel
             </p>
             <p className="font-semibold text-slate-700">
-              This clothes make it very easy to spread the gospel as it is very good. The shirts also have very nice designs and you can proudly wear it outside.
+              This clothes make it very easy to spread the gospel as it is very
+              good. The shirts also have very nice designs and you can proudly
+              wear it outside.
             </p>
             <Link to="/shop">
               <button className="border-2 w-fit px-12 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black">

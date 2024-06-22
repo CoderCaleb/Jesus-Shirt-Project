@@ -66,7 +66,7 @@ const OrderTracking = () => {
 
   const timelineStatus = ["Order Confirmed", "Printing", "Out for Delivery", "Delivered"];
   const index = timelineStatus.findIndex((value) => value.toLowerCase() === orderInfo.status);
-  const orderDate = new Date(orderInfo.order_date);
+  const orderDate = new Date(orderInfo.order_date*1000); //convert to milliseconds
   const options = { month: "short", day: "2-digit", year: "numeric" };
   const formattedOrderDate = orderDate.toLocaleDateString("en-US", options);
 

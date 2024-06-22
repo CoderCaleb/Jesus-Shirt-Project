@@ -10,6 +10,7 @@ import {
 import { LuLoader2 } from "react-icons/lu";
 import MessageBox from "./MessageBox";
 import GoogleButton from "./GoogleButton";
+import { toast } from "react-toastify";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -40,6 +41,9 @@ export default function Login() {
         formData.email,
         formData.password
       );
+      toast("You have successfully logged in. Happy shopping!", {
+        type: "success",
+      });
       navigate("/shop");
     } catch (error) {
       setLoginError({
@@ -53,6 +57,9 @@ export default function Login() {
   const handleGoogleLogin = async () => {
     const provider = new GoogleAuthProvider();
     const auth = getAuth();
+    toast("You have successfully logged in. Happy shopping!", {
+      type: "success",
+    });
 
     try {
       const result = await signInWithPopup(auth, provider);
