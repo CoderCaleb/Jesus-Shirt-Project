@@ -1,48 +1,95 @@
-import React, { useContext, useState, useEffect, useRef } from "react";
-import { CiCircleCheck } from "react-icons/ci";
+import React, { useContext, useState, useEffect } from "react";
+import { CiCircleCheck, CiCircleRemove } from "react-icons/ci";
 import { useLocation, useNavigate } from "react-router";
-import ItemCard from "./ItemCard";
-import { StateSharingContext, CheckoutContext } from "../contexts";
-import { useStripe } from "@stripe/react-stripe-js";
 import { ToastContainer, toast } from "react-toastify";
-import { CiCircleRemove } from "react-icons/ci";
+import { useStripe } from "@stripe/react-stripe-js";
+
+import ItemCard from "./ItemCard";
+import {DisplayShippingAddress} from "./DisplayShippingAddress";
+import { StateSharingContext, CheckoutContext } from "../contexts";
 
 const OrderConfirmationPage = () => {
   const { clientSecret, setCheckoutProgress, checkoutConfirmData } =
     useContext(CheckoutContext);
-
   const { setCartItems } = useContext(StateSharingContext);
+
   const [message, setMessage] = useState(null);
   const [paymentIntent, setPaymentIntent] = useState(null);
   const [orderItems, setOrderItems] = useState([]);
   const [error, setError] = useState(null);
+
   const location = useLocation();
-  // Extract query parameters
+  const navigate = useNavigate();
   const params = new URLSearchParams(location.search);
   const paymentIntentId = params.get("payment_intent");
   const fromCart = params.get("fromCart");
-  const navigate = useNavigate();
-  function getOrderItemsData(paymentIntent) {
-    fetch(`http://127.0.0.1:4242/get-orders`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        order_items: paymentIntent.metadata.order_items,
-      }),
-    })
-      .then((res) => res.json())
-      .then(({ order_data, error }) => {
-        if (error) {
-          setError(error);
-        } else {
-          setOrderItems(order_data);
-        }
+
+  useEffect(() => {
+    if (paymentIntentId) {
+      fetchPaymentIntent(paymentIntentId);
+    }
+  }, [paymentIntentId]);
+
+  useEffect(() => {
+    if (paymentIntent) {
+      handlePaymentIntentInfo(paymentIntent);
+      fetchOrderItemsData(paymentIntent);
+      if (fromCart === "true") {
+        setCartItems([]);
+      }
+    }
+  }, [paymentIntent]);
+
+  const fetchPaymentIntent = async (id) => {
+    try {
+      const response = await fetch(
+        `http://127.0.0.1:4242/retrieve-payment-intent?payment_intent_id=${id}`
+      );
+      const { paymentIntent } = await response.json();
+      if (paymentIntent) {
+        setPaymentIntent({
+          ...paymentIntent,
+          metadata: {
+            ...paymentIntent.metadata,
+            order_items: JSON.parse(paymentIntent.metadata.order_items.trim()),
+            user_id:
+              paymentIntent.metadata.user_id === "None"
+                ? null
+                : paymentIntent.metadata.user_id,
+          },
+        });
+        window.history.replaceState({}, document.title);
+      } else {
+        setPaymentIntent(null);
+      }
+    } catch (error) {
+      console.error("Failed to fetch payment intent:", error);
+      setError("Failed to fetch payment intent");
+    }
+  };
+
+  const fetchOrderItemsData = async (paymentIntent) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:4242/get-orders`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          order_items: paymentIntent.metadata.order_items,
+        }),
       });
-    console.log(paymentIntent);
-  }
-  function handlePaymentIntentInfo(paymentIntent) {
+      const { order_data, error } = await response.json();
+      if (error) {
+        setError(error);
+      } else {
+        setOrderItems(order_data);
+      }
+    } catch (error) {
+      console.error("Failed to fetch order items:", error);
+      setError("Failed to fetch order items");
+    }
+  };
+
+  const handlePaymentIntentInfo = (paymentIntent) => {
     switch (paymentIntent.status) {
       case "succeeded":
         if (paymentIntent.metadata.orderStatus === "failed") {
@@ -52,95 +99,31 @@ const OrderConfirmationPage = () => {
             );
           }
         } else if (paymentIntent.metadata.orderStatus === "processing") {
-          console.log("Order is processing");
+          setMessage("Order is processing");
         } else {
-          toast("Payment succeeded!", {
-            type: "success",
-          });
+          toast.success("Payment succeeded!");
         }
         break;
       case "processing":
         setMessage("Your payment is processing.");
-        toast("Your payment is processing.", {
-          type: "info",
-        });
+        toast.info("Your payment is processing.");
         break;
       case "requires_payment_method":
         setMessage("Payment not successful");
-        toast("Your payment was not successful, please try again.", {
-          type: "error",
-        });
-
+        toast.error("Your payment was not successful, please try again.");
         break;
       default:
         setMessage("Something went wrong.");
-        toast("Something went wrong", {
-          type: "error",
-        });
+        toast.error("Something went wrong");
         break;
     }
-  }
-  useEffect(() => {
-    if (paymentIntentId) {
-      fetch(
-        `http://127.0.0.1:4242/retrieve-payment-intent?payment_intent_id=${paymentIntentId}`
-      )
-        .then((res) => res.json())
-        .then(({ paymentIntent }) => {
-          if (paymentIntent) {
-            setPaymentIntent(paymentIntent);
-
-            console.log(paymentIntent.metadata);
-            paymentIntent["metadata"]["order_items"] = JSON.parse(
-              paymentIntent["metadata"]["order_items"].trim()
-            );
-            paymentIntent["metadata"]["user_id"] =
-              paymentIntent["metadata"]["user_id"] === "None"
-                ? null
-                : paymentIntent["metadata"]["user_id"];
-            handlePaymentIntentInfo(paymentIntent);
-            getOrderItemsData(paymentIntent);
-            window.history.replaceState({}, document.title);
-
-            if (fromCart === "true") {
-              setCartItems([]);
-            }
-          } else {
-            console.log("Payment intent is null");
-            setPaymentIntent(null);
-          }
-        });
-    }
-  }, []);
-
-  const DisplayShippingAddress = ({ address }) => {
-    const renderField = (label, value) => {
-      if (value === null || value === "") {
-        return null;
-      }
-      return <p key={label}>{value}</p>;
-    };
-
-    return (
-      <div>
-        {Object.entries(address).map(([key, value]) => {
-          return renderField(key, value);
-        })}
-      </div>
-    );
   };
-
-  useEffect(() => {
-    console.log("order items:", orderItems);
-  }, [orderItems]);
 
   return (
     <>
       {!error ? (
         paymentIntent && orderItems ? (
-          <div
-            className={`w-full h-full flex items-center justify-around md:w-1/2`}
-          >
+          <div className="w-full h-full flex items-center justify-around md:w-1/2">
             <div className="w-full flex h-full px-5 sm:px-10 flex-col sm:min-w-[400px] py-5">
               <div className="overflow-y-scroll w-full h-full">
                 <p className="text-3xl font-bold my-7">Checkout</p>
@@ -155,7 +138,7 @@ const OrderConfirmationPage = () => {
                     <p className="text-lg font-bold">
                       {message ? message : "Thank you"}
                     </p>
-                    <p className="text-sm">{`${paymentIntent["shipping"]["name"]}`}</p>
+                    <p className="text-sm">{paymentIntent && paymentIntent.shipping && paymentIntent.shipping.name}</p>
                   </div>
                 </div>
                 <div className="flex-1">
@@ -191,7 +174,8 @@ const OrderConfirmationPage = () => {
                         <p className="text-slate-500 font-semibold">Address</p>
                         <div className="flex flex-col gap-2">
                           <DisplayShippingAddress
-                            address={paymentIntent.shipping.address}
+                            address={paymentIntent.shipping && paymentIntent.shipping.address}
+                            textStyle="text-black"
                           />
                         </div>
                       </div>
@@ -228,15 +212,15 @@ const OrderConfirmationPage = () => {
             </div>
             <ToastContainer position="top-center" theme="light" />
           </div>
-        ) : paymentIntent ? (
-          <div className="md:w-1/2 w-full">
-            {message.length > 0 ? message : "Order loading..."}
-          </div>
         ) : (
-          <>Loading...</>
+          <div className="md:w-1/2 w-full">
+            {message ? message : "Order loading..."}
+          </div>
         )
       ) : (
-        <>{error}</>
+        <div className="order-confirmation-page">
+          <div className="error-message">{error}</div>
+        </div>
       )}
     </>
   );

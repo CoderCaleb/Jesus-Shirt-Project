@@ -1,10 +1,10 @@
-export const DisplayShippingAddress = ({ address }) => {
+export const DisplayShippingAddress = ({ address, textStyle }) => {
     const renderField = (label, value) => {
       if (value === null || value === "") {
         return null;
       }
       return (
-        <p key={label} className="text-sm text-slate-600">
+        <p key={label} className={`text-sm ${textStyle}`}>
           {value}
         </p>
       );

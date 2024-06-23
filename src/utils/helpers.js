@@ -48,56 +48,55 @@ export const handleGetUserInfo = async (uid, user, userToken, setUserInfo) => {
 };
 // File: utils.js
 export const handleAddingUser = async (
-    user,
-    signUpName,
-    signUpEmail,
-    signUpBirthday,
-    signUpClothingPreference
-  ) => {
-    if (!user) {
-      return { error: "User not provided" };
+  user,
+  signUpName,
+  signUpEmail,
+  signUpBirthday,
+  signUpClothingPreference
+) => {
+  if (!user) {
+    return { error: "User not provided" };
+  }
+
+  try {
+    const userToken = await user.getIdToken();
+    const url = "http://127.0.0.1:4242/add-user";
+    const options = {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userToken}`,
+      },
+      body: JSON.stringify({
+        uid: user.uid,
+        name: signUpName,
+        email: signUpEmail,
+        birthday: signUpBirthday,
+        clothingPreference: signUpClothingPreference,
+      }),
+    };
+
+    const response = await fetch(url, options);
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
-  
-    try {
-      const userToken = await user.getIdToken();
-      const url = "http://127.0.0.1:4242/add-user";
-      const options = {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${userToken}`,
-        },
-        body: JSON.stringify({
-          uid: user.uid,
-          name: signUpName,
-          email: signUpEmail,
-          birthday: signUpBirthday,
-          clothingPreference: signUpClothingPreference,
-        }),
-      };
-  
-      const response = await fetch(url, options);
-  
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-  
-      const data = await response.json();
-  
-      return { data };
-    } catch (error) {
-      return { error: `Unexpected error: ${error.message}` };
-    }
-  };
-  
+
+    const data = await response.json();
+
+    return { data };
+  } catch (error) {
+    return { error: `Unexpected error: ${error.message}` };
+  }
+};
 
 export const validateEmail = (email) => {
-    return String(email)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  };
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    );
+};
 
 export function validateName(name) {
   const regex = /^[a-zA-Z\s]*$/;
@@ -110,48 +109,51 @@ export function validatePassword(password) {
 }
 
 export function validateBirthday(birthday) {
-    const today = new Date();
-    const age = differenceInYears(today, birthday);
-  
-    if (isBefore(birthday, new Date(1900, 0, 1))) {
-      return "Birthday cannot be before January 1, 1900";
-    }
-  
-    if (age < 10) {
-      return "You must be at least 10 years old to sign up";
-    }
-  
-    if (isBefore(today, birthday)) {
-      return "Birthday cannot be in the future";
-    }
-  
-    return true;
+  const today = new Date();
+  const age = differenceInYears(today, birthday);
+
+  if (isBefore(birthday, new Date(1900, 0, 1))) {
+    return "Birthday cannot be before January 1, 1900";
   }
 
-  export function capitalizeFirstLetter(str) {
-    if (str.length === 0) {
-      return str;
-    }
-
-    return str.charAt(0).toUpperCase() + str.slice(1);
+  if (age < 10) {
+    return "You must be at least 10 years old to sign up";
   }
 
-  export function formatExpirationDate(expMonth, expYear) {
-    const formattedMonth = expMonth < 10 ? `0${expMonth}` : expMonth;
-    const formattedYear = expYear.toString().slice(-2);
-    const formattedDate = `${formattedMonth}/${formattedYear}`;
-    return formattedDate;
+  if (isBefore(today, birthday)) {
+    return "Birthday cannot be in the future";
   }
 
-  export function addDaysToDate(date, days) {
-    const result = new Date(date); // Create a new Date object to avoid modifying the original date
-    result.setDate(result.getDate() + days); // Add the specified number of days to the date
-    return result; // Return the new date
+  return true;
+}
+
+export function capitalizeFirstLetter(str) {
+  if (str.length === 0) {
+    return str;
   }
 
-  export const formatCurrency = (amount) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function formatExpirationDate(expMonth, expYear) {
+  const formattedMonth = expMonth < 10 ? `0${expMonth}` : expMonth;
+  const formattedYear = expYear.toString().slice(-2);
+  const formattedDate = `${formattedMonth}/${formattedYear}`;
+  return formattedDate;
+}
+
+export function addDaysToDate(date, days) {
+  const result = new Date(date); // Create a new Date object to avoid modifying the original date
+  result.setDate(result.getDate() + days); // Add the specified number of days to the date
+  return result; // Return the new date
+}
+
+export const formatCurrency = (amount) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+};
+
+export const checkCheckoutComplete = (number, checkoutProgress) =>
+  checkoutProgress >= number;
