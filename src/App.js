@@ -52,7 +52,11 @@ const App = () => {
   }, [cartItems]);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, setUser);
+    const unsubscribe = onAuthStateChanged(auth, (user)=>{
+      //If not signed in, set user to false. If not firebase not loaded yet, user is null
+      setUser(user?user:false)
+      console.log(user, "AUTH STATE CHANGED")
+    });
     return () => unsubscribe();
   }, []);
 

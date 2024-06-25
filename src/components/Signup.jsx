@@ -115,7 +115,6 @@ export default function Signup() {
       if (error) {
         throw new Error(error);
       } else {
-        toast("Sign up with Google successful!",{type:"success"});
         navigate("/shop");
       }
     } catch (error) {
