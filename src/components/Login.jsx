@@ -75,11 +75,8 @@ export default function Login() {
     <div className="w-full h-full justify-center items-center flex">
       <div className="w-96 flex flex-col text-center">
         <p className="text-3xl font-semibold mb-3">Welcome Back!</p>
-        <p className="mb-5 text-sm text-slate-800 font-semibold">
-          Don't have an account yet?{" "}
-          <Link to={"/signup"}>
-            <span className="cursor-pointer text-blue-600">Sign up now</span>
-          </Link>
+        <p className="mb-5 text-sm text-slate-700 font-semibold">
+          `Login to calebtanxy@gmail.com to view your order {" "}`
         </p>
         <GoogleButton onClick={handleGoogleLogin} />
         <div className="bg-slate-300 w-full h-lineBreakHeight my-6" />
@@ -117,6 +114,12 @@ export default function Login() {
             )}
           </button>
         </div>
+        <p className="mt-5 text-sm text-slate-800 font-semibold">
+          Don't have an account yet?{" "}
+          <Link to={"/signup"}>
+            <span className="cursor-pointer text-blue-600 mt-5">Sign up now</span>
+          </Link>
+        </p>
         {logInError && (
           <MessageBox
             type="error"
