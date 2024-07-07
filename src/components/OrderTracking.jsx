@@ -68,14 +68,15 @@ const OrderTracking = () => {
 
   async function fetchOrderData(orderId, uid, token) {
     const orderResponse = await fetch(
-      `http://127.0.0.1:4242/get-order?orderNumber=${orderId}&uid=${uid}&orderToken=${orderToken}`,
+      `http://127.0.0.1:4242/get-order?orderNumber=${orderId}&uid=${uid}`,
       {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${token}`,
-        },
+          Authorization: `Bearer ${userToken}`,
+          'Order-Token': orderToken
+        }
       }
-    );
+    )
 
     const orderData = await orderResponse.json();
 
@@ -85,6 +86,7 @@ const OrderTracking = () => {
         errorInfo: { error: orderData.error, statusCode: orderResponse.status },
         statuses: orderData.statuses,
         orderTokenVerified: orderData.orderTokenVerified,
+        linkedUserEmail: orderData.linkedUserEmail
       };
     }
     console.log("order items", orderData);
@@ -139,21 +141,18 @@ const OrderTracking = () => {
       }
     } else if (orderTokenVerified === "token-invalid") {
       setError("Order token verification failed");
-      navigate(
-        `/login?from=order-tracking&state=authenticated-order-token-invalid&linked_user=${orderData.linked_user}`
-      );
     }
   };
 
   const handleFetchOrderDataErrorWithOrderToken = (orderResponse) => {
-    const { status, errorInfo, statuses, orderTokenVerified } = orderResponse;
+    const { status, errorInfo, statuses, orderTokenVerified, linkedUserEmail } = orderResponse;
     const { error, statusCode } = errorInfo;
     const {
       userAuthenticated,
       linkedUserMatchesUserUID,
       userHaveOrder,
       hasLinkedUser,
-    } = statuses;
+    } = statuses?statuses:{};
     console.log(orderResponse);
     console.log("orderTokenVerifiedFromError", orderTokenVerified);
 
@@ -167,23 +166,23 @@ const OrderTracking = () => {
         if (hasLinkedUser) {
           // User is authenticated and the order is linked to the user's account
           if (linkedUserMatchesUserUID && userHaveOrder) {
-            console.log("Never going to reach here since it is error function")
+            console.log("Never going to reach here since it is error function");
           } else {
             // User authenticated, order linked user does not match signed in user
-            navigate(`/login?from=order-tracking&state=authenticated-order-not-in-user-linked-user-not-matched`);
+            navigate(`/login?from=order-tracking&state=authenticated-order-not-in-user-linked-user-not-matched&orderId=${orderId}&orderToken=${orderToken}&linkedUserEmail=${linkedUserEmail}`);
           }
         } else {
           // User is authenticated but no linked user for the order
-          navigate(`/signup?from=order-tracking&state=authenticated-no-linked-user`);
+          navigate(`/signup?from=order-tracking&state=authenticated-no-linked-user&orderId=${orderId}&orderToken=${orderToken}`);
         }
       } else {
         // User is not authenticated
         if (hasLinkedUser) {
           // Order is linked to a user but the current user is not signed in
-          navigate(`/login?from=order-tracking&state=not-authenticated-has-linked-user`);
+          navigate(`/login?from=order-tracking&state=not-authenticated-has-linked-user&orderId=${orderId}&orderToken=${orderToken}&linkedUserEmail=${linkedUserEmail}`);
         } else {
           // User not authenticated and no linked user for the order
-          navigate(`/signup?from=order-tracking&state=not-authenticated-no-linked-user`);
+          navigate(`/signup?from=order-tracking&state=not-authenticated-no-linked-user&orderId=${orderId}&orderToken=${orderToken}`);
         }
       }
     };
@@ -193,14 +192,21 @@ const OrderTracking = () => {
   };
 
   const handleFetchOrderDataErrorNoOrderToken = (orderResponse) => {
-    const { errorInfo } = orderResponse;
+    const { errorInfo, statuses } = orderResponse;
     const { statusCode } = errorInfo;
+    const {
+      hasLinkedUser,
+    } = statuses?statuses:{};
     const handleAuthError = () => {
-      navigate(
-        `/login?from=order-tracking&state=authenticated-failed-no-order-token`
-      );
-    };
-
+      if(hasLinkedUser){
+        navigate(
+          `/login?from=order-tracking&state=authenticated-failed-no-order-token&orderId=${orderId}&orderToken=${orderToken}`
+        );
+      }
+      else{
+        setError("Need order token to authenticate")
+      }
+    };    
     handleErrors(statusCode, handleAuthError);
   };
 

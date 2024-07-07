@@ -7,6 +7,7 @@ import {
   createUserWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  signOut,
 } from "firebase/auth";
 import enGB from "date-fns/locale/en-GB";
 import { toast } from "react-toastify";
@@ -21,6 +22,7 @@ import {
 } from "../utils/helpers";
 import { LuLoader2 } from "react-icons/lu";
 import GoogleButton from "./GoogleButton";
+import useQuery from "../hooks/useQuery";
 
 registerLocale("en-GB", enGB);
 
@@ -37,7 +39,11 @@ export default function Signup() {
   const [signUpLoading, setSignUpLoading] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
-
+  const query = useQuery();
+  const from = query.get("from");
+  const state = query.get("state");
+  const orderId = query.get("orderId");
+  const orderToken = query.get("orderToken");
   useEffect(() => {
     setLoginError(null);
   }, [formData.email, formData.password]);
@@ -73,53 +79,54 @@ export default function Signup() {
           formData.email,
           formData.password
         );
+        if (from !== "order-tracking") {
+          navigate("/shop");
+          return;
+        }
         const user = userCredential.user;
         const { error } = await handleAddingUser(
           user,
           formData.name,
           formData.email,
           formData.birthday,
-          formData.clothingPreference
+          formData.clothingPreference,
+          orderToken,
+          orderId,
+          state
         );
 
         if (error) {
           throw new Error(error);
         } else {
-          toast("Sign up is successful!",{type:"success"});
-          navigate("/shop");
+          toast("Sign up is successful!", { type: "success" });
+          navigate(`/orders/${orderId}`);
         }
       } catch (error) {
-        setLoginError({ errorMessage: error.message });
-        toast(error.message, { type: "error" });
+        signOut(auth).then(() => {
+          setLoginError({ errorMessage: error.message });
+          toast(error.message, { type: "error" });
+        });
       } finally {
         setSignUpLoading(false);
       }
     }
   };
 
-  const handleGoogleSignUp = async () => {
-    const provider = new GoogleAuthProvider();
-    const auth = getAuth();
-
-    try {
-      const result = await signInWithPopup(auth, provider);
-      const user = result.user;
-      const { error } = await handleAddingUser(
-        user,
-        formData.name,
-        formData.email,
-        formData.birthday,
-        formData.clothingPreference
+  const DisplayPromptFromState = () => {
+    const style = "text-sm text-slate-700 font-semibold";
+    if (
+      state === "not-authenticated-no-linked-user" ||
+      state === "authenticated-no-linked-user"
+    ) {
+      return (
+        <p className={style}>
+          {`Sign up to view order ${
+            orderId || ""
+          } and connect it to your account.`}
+        </p>
       );
-
-      if (error) {
-        throw new Error(error);
-      } else {
-        navigate("/shop");
-      }
-    } catch (error) {
-      setLoginError({ errorMessage: error.message });
-      toast(error.message, { type: "error" });
+    } else {
+      return null;
     }
   };
 
@@ -128,14 +135,8 @@ export default function Signup() {
       <div className="justify-center items-center flex">
         <div className="w-96 flex flex-col text-center my-10">
           <p className="text-3xl font-semibold mb-3">Join Us!</p>
-          <p className="mb-5 text-sm text-slate-800 font-semibold">
-            Have an account?{" "}
-            <Link to={"/login"}>
-              <span className="cursor-pointer text-blue-600">Login</span>
-            </Link>
-          </p>
-          <GoogleButton onClick={handleGoogleSignUp} />
-          <div className="bg-slate-300 w-full h-lineBreakHeight my-6" />
+          <DisplayPromptFromState />
+          <div className="bg-slate-300 w-full h-lineBreakHeight my-4" />
           <div className="flex flex-col gap-3 text-left">
             <InputField
               data={formData.email}
@@ -229,6 +230,20 @@ export default function Signup() {
               )}
             </button>
           </div>
+          <p className="mt-5 text-sm text-slate-800 font-semibold">
+            Have an account?{" "}
+            <Link
+              to={
+                from === "order-tracking" &&
+                (state === "not-authenticated-no-linked-user" ||
+                  state === "authenticated-no-linked-user")
+                  ? `/login?from=order-tracking&state=${state}&orderId=${orderId}&orderToken=${orderToken}`
+                  : "/login"
+              }
+            >
+              <span className="cursor-pointer text-blue-600 mt-5">Login</span>
+            </Link>
+          </p>
           {logInError && (
             <MessageBox type="error" message={logInError.errorMessage} />
           )}

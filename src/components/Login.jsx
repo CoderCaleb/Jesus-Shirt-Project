@@ -6,11 +6,13 @@ import {
   signInWithEmailAndPassword,
   signInWithPopup,
   GoogleAuthProvider,
+  signOut,
 } from "firebase/auth";
 import { LuLoader2 } from "react-icons/lu";
 import MessageBox from "./MessageBox";
 import GoogleButton from "./GoogleButton";
 import { toast } from "react-toastify";
+import useQuery from "../hooks/useQuery";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -20,6 +22,14 @@ export default function Login() {
   const [formErrors, setFormErrors] = useState({});
   const [logInError, setLoginError] = useState(null);
   const [loginLoading, setLoginLoading] = useState(false);
+
+  const query = useQuery();
+  const from = query.get("from");
+  const state = query.get("state");
+  const orderId = query.get("orderId");
+  const orderToken = query.get("orderToken");
+  const linkedUserEmail = query.get("linkedUserEmail");
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,33 +51,101 @@ export default function Login() {
         formData.email,
         formData.password
       );
-      toast("You have successfully logged in. Happy shopping!", {
-        type: "success",
-      });
-      navigate("/shop");
+      const user = userCredential.user;
+      if (from !== "order-tracking") {
+        navigate("/shop");
+        return;
+      }
+
+      const { error } = await handleLoginWithState(state, user);
+      console.log("error:", error);
+      if (error) {
+        throw new Error(error);
+      } else {
+        toast("You have successfully logged in. Happy shopping!", {
+          type: "success",
+        });
+        navigate(`/orders/${orderId}`);
+      }
     } catch (error) {
-      setLoginError({
-        errorMessage: error.message,
+      signOut(auth).finally(() => {
+        setLoginError({
+          errorMessage: error.message,
+        });
       });
     } finally {
       setLoginLoading(false);
     }
   };
 
-  const handleGoogleLogin = async () => {
-    const provider = new GoogleAuthProvider();
-    const auth = getAuth();
-    toast("You have successfully logged in. Happy shopping!", {
-      type: "success",
-    });
+  async function handleLoginWithState(state, user) {
+    if (!user) {
+      return { error: "User not provided" };
+    }
 
     try {
-      const result = await signInWithPopup(auth, provider);
-      navigate("/shop");
+      const userToken = await user.getIdToken(true);
+      const url = "http://127.0.0.1:4242/login-with-state";
+      const options = {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+          "Order-Token": orderToken,
+        },
+        body: JSON.stringify({
+          uid: user.uid,
+          orderNumber: orderId,
+          state,
+        }),
+      };
+
+      const response = await fetch(url, options);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(`${data.error}`);
+      }
+
+      return { data };
     } catch (error) {
-      setLoginError({
-        errorMessage: error.message,
-      });
+      console.log(error);
+      return { error: `${error.message}` };
+    }
+  }
+
+  const DisplayPromptFromState = () => {
+    const style = " text-sm text-slate-700 font-semibold";
+
+    if (state === "authenticated-order-not-in-user-linked-user-not-matched") {
+      return (
+        <p className={style}>
+          {`Please log in to the account associated with this order: ${linkedUserEmail}`}
+        </p>
+      );
+    } else if (state === "not-authenticated-has-linked-user") {
+      return (
+        <p className={style}>
+          {`Please log in to the account associated with this order: ${linkedUserEmail}`}
+        </p>
+      );
+    } else if (
+      state === "not-authenticated-no-linked-user" ||
+      state === "authenticated-no-linked-user"
+    ) {
+      return (
+        <p className={style}>
+          {`Log in to connect order ${orderId || ""} to your existing account.`}
+        </p>
+      );
+    } else if (
+      state === "authenticated-failed-no-order-token" ||
+      state === "authenticated-order-token-invalid"
+    ) {
+      return <p className={style}>{`Login to view your order.`}</p>;
+    } else {
+      return null;
     }
   };
 
@@ -75,11 +153,10 @@ export default function Login() {
     <div className="w-full h-full justify-center items-center flex">
       <div className="w-96 flex flex-col text-center">
         <p className="text-3xl font-semibold mb-3">Welcome Back!</p>
-        <p className="mb-5 text-sm text-slate-700 font-semibold">
-          `Login to calebtanxy@gmail.com to view your order {" "}`
-        </p>
-        <GoogleButton onClick={handleGoogleLogin} />
-        <div className="bg-slate-300 w-full h-lineBreakHeight my-6" />
+        <div className="">
+          <DisplayPromptFromState />
+        </div>
+        <div className="bg-slate-300 w-full h-lineBreakHeight my-4" />
         <div className="flex flex-col gap-3 text-left">
           <InputField
             data={formData.email}
@@ -116,17 +193,22 @@ export default function Login() {
         </div>
         <p className="mt-5 text-sm text-slate-800 font-semibold">
           Don't have an account yet?{" "}
-          <Link to={"/signup"}>
-            <span className="cursor-pointer text-blue-600 mt-5">Sign up now</span>
+          <Link
+            to={
+              from === "order-tracking" &&
+              (state === "not-authenticated-no-linked-user" ||
+                state === "authenticated-no-linked-user")
+                ? `/signup?from=order-tracking&state=${state}&orderId=${orderId}&orderToken=${orderToken}`
+                : "/signup"
+            }
+          >
+            <span className="cursor-pointer text-blue-600 mt-5">
+              Sign up now
+            </span>
           </Link>
         </p>
         {logInError && (
-          <MessageBox
-            type="error"
-            message={
-              "Login unsuccessful. Please check if your email or password is correct."
-            }
-          />
+          <MessageBox type="error" message={logInError.errorMessage} />
         )}
       </div>
     </div>

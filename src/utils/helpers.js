@@ -52,7 +52,10 @@ export const handleAddingUser = async (
   signUpName,
   signUpEmail,
   signUpBirthday,
-  signUpClothingPreference
+  signUpClothingPreference,
+  orderToken,
+  orderId,
+  state,
 ) => {
   if (!user) {
     return { error: "User not provided" };
@@ -66,6 +69,7 @@ export const handleAddingUser = async (
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${userToken}`,
+        "Order-Token": orderToken,
       },
       body: JSON.stringify({
         uid: user.uid,
@@ -73,22 +77,26 @@ export const handleAddingUser = async (
         email: signUpEmail,
         birthday: signUpBirthday,
         clothingPreference: signUpClothingPreference,
+        orderNumber: orderId,
+        orderToken,
+        state,
       }),
     };
 
     const response = await fetch(url, options);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      throw new Error(`${data.error}`);
     }
 
     const data = await response.json();
 
     return { data };
   } catch (error) {
-    return { error: `Unexpected error: ${error.message}` };
+    return { error: `${error.message}` };
   }
 };
+
 
 export const validateEmail = (email) => {
   return String(email)
