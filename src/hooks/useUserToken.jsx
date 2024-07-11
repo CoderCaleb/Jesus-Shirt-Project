@@ -29,6 +29,9 @@ export default function useUserToken(user) {
         handleUserTokenData();
       }, 60 * 55 * 1000);
     }
+    else if(user===false){
+      setUserToken(false)
+    }
     else{
         setUserToken(null)
     }

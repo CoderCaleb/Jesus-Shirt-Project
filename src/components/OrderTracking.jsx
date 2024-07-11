@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useContext } from "react";
-import { useParams } from "react-router";
+import { Navigate, useNavigate, useParams } from "react-router";
 import { StateSharingContext } from "../contexts";
 import OrderSummary from "./OrderSummary";
+import { useSearchParams } from "react-router-dom";
+
 import {
   capitalizeFirstLetter,
   formatExpirationDate,
@@ -15,43 +17,213 @@ const OrderTracking = () => {
   const [paymentData, setPaymentData] = useState({});
   const { user, userToken } = useContext(StateSharingContext);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const [searchParams] = useSearchParams();
+
+  const orderToken = searchParams.get("order_token");
 
   useEffect(() => {
-    if (user && user.uid && userToken) {
-      fetchOrderData(orderId, user.uid, userToken);
+    const userIsLoading = user === null;
+    const isSignedIn = user && user.uid && userToken;
+
+    console.log(
+      "user loading:",
+      userIsLoading,
+      "signed in:",
+      isSignedIn,
+      "user:",
+      user
+    );
+
+    if (userIsLoading) {
+      return;
     }
-  }, [userToken, user]);
-
-  const fetchOrderData = async (orderId, uid, token) => {
-    try {
-      const orderResponse = await fetch(
-        `http://127.0.0.1:4242/get-order?orderNumber=${orderId}&uid=${uid}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+    if (!orderToken) {
+      fetchOrderData(orderId, user.uid, userToken).then((orderResponse) => {
+        if (orderResponse.status === "error") {
+          console.log(orderResponse);
+          handleFetchOrderDataErrorNoOrderToken(orderResponse);
+        } else {
+          handleFetchOrderDataSuccessNoOrderToken(orderResponse);
         }
-      );
-      const { orderData, paymentData } = await orderResponse.json();
-      const itemsResponse = await fetch(`http://127.0.0.1:4242/get-orders`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ order_items: orderData.order_items }),
       });
-      const itemsData = await itemsResponse.json();
+    } else {
+      fetchOrderData(orderId, user.uid, userToken).then((orderResponse) => {
+        if (orderResponse.status === "error") {
+          console.log(orderResponse);
+          handleFetchOrderDataErrorWithOrderToken(orderResponse);
+        } else {
+          handleFetchOrderDataSuccessWithOrderToken(orderResponse);
+        }
+      });
+    }
+  }, [userToken]);
 
-      if (itemsData.error) {
-        setOrderInfo({ error: itemsData.error });
-      } else {
-        orderData.order_items = itemsData.order_data;
-        setOrderInfo(orderData);
+  const handleUserNotSignedIn = (linkedUser) => {
+    navigate(
+      `/login?from=order-tracking&state=not-authenticated-no-order-token`
+    );
+  };
+
+  async function fetchOrderData(orderId, uid, token) {
+    const orderResponse = await fetch(
+      `http://127.0.0.1:4242/get-order?orderNumber=${orderId}&uid=${uid}`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+          'Order-Token': orderToken
+        }
       }
-      setPaymentData(paymentData);
-    } catch (error) {
-      setError(`Error fetching order data: ${error.message}`);
+    )
+
+    const orderData = await orderResponse.json();
+
+    if (!orderResponse.ok) {
+      return {
+        status: "error",
+        errorInfo: { error: orderData.error, statusCode: orderResponse.status },
+        statuses: orderData.statuses,
+        orderTokenVerified: orderData.orderTokenVerified,
+        linkedUserEmail: orderData.linkedUserEmail
+      };
+    }
+    console.log("order items", orderData);
+    const orderItemsResponse = await fetch(`http://127.0.0.1:4242/get-orders`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ order_items: orderData["orderData"].order_items }),
+    });
+
+    const orderItemsData = await orderItemsResponse.json();
+
+    if (!orderItemsResponse.ok) {
+      return {
+        status: "error",
+        errorInfo: {
+          error: orderItemsData.error,
+          statusCode: orderItemsResponse.status,
+        },
+      };
+    }
+
+    orderData["orderData"]["full_order_items"] = orderItemsData.order_data;
+
+    return {
+      status: "success",
+      orderData,
+      orderItemsData,
+    };
+  }
+
+  //everything under here means userToken auth is successful
+  const handleFetchOrderDataSuccessNoOrderToken = (orderResponse) => {
+    const { orderData, paymentData, orderTokenVerified } =
+      orderResponse.orderData;
+    console.log("orderTokenVerified:", orderTokenVerified, orderData);
+    setOrderInfo(orderData);
+    setPaymentData(paymentData);
+  };
+
+  const handleFetchOrderDataSuccessWithOrderToken = (orderResponse) => {
+    const { orderData, paymentData, orderTokenVerified } =
+      orderResponse.orderData;
+    console.log("orderTokenVerified:", orderTokenVerified, orderData);
+    //orderToken and userToken is verified
+    if (orderTokenVerified === "token-verified") {
+      if (orderData.linked_user) {
+        //navigate(`/login?from=order-tracking&state=authenticated-order-token-verified&linked_user=${orderData.linked_user}`);
+        setOrderInfo(orderData);
+        setPaymentData(paymentData);
+      }
+    } else if (orderTokenVerified === "token-invalid") {
+      setError("Order token verification failed");
+    }
+  };
+
+  const handleFetchOrderDataErrorWithOrderToken = (orderResponse) => {
+    const { status, errorInfo, statuses, orderTokenVerified, linkedUserEmail } = orderResponse;
+    const { error, statusCode } = errorInfo;
+    const {
+      userAuthenticated,
+      linkedUserMatchesUserUID,
+      userHaveOrder,
+      hasLinkedUser,
+    } = statuses?statuses:{};
+    console.log(orderResponse);
+    console.log("orderTokenVerifiedFromError", orderTokenVerified);
+
+    if (orderTokenVerified === "token-invalid") {
+      setError("Order token not valid");
+      return;
+    }
+    const handleAuthError = () => {
+      // User is authenticated
+      if (userAuthenticated) {
+        if (hasLinkedUser) {
+          // User is authenticated and the order is linked to the user's account
+          if (linkedUserMatchesUserUID && userHaveOrder) {
+            console.log("Never going to reach here since it is error function");
+          } else {
+            // User authenticated, order linked user does not match signed in user
+            navigate(`/login?from=order-tracking&state=authenticated-order-not-in-user-linked-user-not-matched&orderId=${orderId}&orderToken=${orderToken}&linkedUserEmail=${linkedUserEmail}`);
+          }
+        } else {
+          // User is authenticated but no linked user for the order
+          navigate(`/signup?from=order-tracking&state=authenticated-no-linked-user&orderId=${orderId}&orderToken=${orderToken}`);
+        }
+      } else {
+        // User is not authenticated
+        if (hasLinkedUser) {
+          // Order is linked to a user but the current user is not signed in
+          navigate(`/login?from=order-tracking&state=not-authenticated-has-linked-user&orderId=${orderId}&orderToken=${orderToken}&linkedUserEmail=${linkedUserEmail}`);
+        } else {
+          // User not authenticated and no linked user for the order
+          navigate(`/signup?from=order-tracking&state=not-authenticated-no-linked-user&orderId=${orderId}&orderToken=${orderToken}`);
+        }
+      }
+    };
+    
+
+    handleErrors(statusCode, handleAuthError);
+  };
+
+  const handleFetchOrderDataErrorNoOrderToken = (orderResponse) => {
+    const { errorInfo, statuses } = orderResponse;
+    const { statusCode } = errorInfo;
+    const {
+      hasLinkedUser,
+    } = statuses?statuses:{};
+    const handleAuthError = () => {
+      if(hasLinkedUser){
+        navigate(
+          `/login?from=order-tracking&state=authenticated-failed-no-order-token&orderId=${orderId}&orderToken=${orderToken}`
+        );
+      }
+      else{
+        setError("Need order token to authenticate")
+      }
+    };    
+    handleErrors(statusCode, handleAuthError);
+  };
+
+  const handleErrors = (statusCode, handleAuthError) => {
+    if (statusCode >= 401 && statusCode <= 403) {
+      handleAuthError();
+    } else {
+      if (statusCode === 404) {
+        console.error("Order not found");
+        setError("Order not found");
+      } else if (statusCode >= 500) {
+        console.error("Server error, please try again later");
+        setError("Server error, please try again later");
+      } else {
+        console.error("An unknown error occurred");
+        setError(error ? error : "An unknown error occurred");
+      }
     }
   };
 
@@ -109,7 +281,7 @@ const OrderTracking = () => {
         />
       </div>
       <OrderSummary
-        orderItems={orderInfo.order_items}
+        orderItems={orderInfo.full_order_items}
         shippingPrice={orderInfo.shipping_cost}
       />
       <div className=" bg-slate-400 w-full h-lineBreakHeight mb-4" />
