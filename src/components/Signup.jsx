@@ -9,10 +9,13 @@ import {
   GoogleAuthProvider,
   signOut,
 } from "firebase/auth";
+import DropdownInput from "./DropdownInput";
 import enGB from "date-fns/locale/en-GB";
 import { toast } from "react-toastify";
 import InputField from "./InputField";
 import MessageBox from "./MessageBox";
+import DateInput from "./DateInput";
+
 import {
   validateEmail,
   validateName,
@@ -154,31 +157,11 @@ export default function Signup() {
                 label={"Name"}
                 placeholder={"Caleb Tan"}
               />
-              <div className="w-full">
-                <p className="text-sm mb-2">Birthday</p>
-                <DatePicker
-                  selected={formData.birthday}
-                  onChange={(date) => handleChange("birthday", date)}
-                  className="w-full"
-                  customInput={
-                    <input
-                      placeholder={"Birthday"}
-                      className="w-full h-11 bg-transparent border-2 outline-none border-slate-300 pl-3 rounded-[10px] text-sm placeholder-slate-500 font-semibold"
-                      type="text"
-                    />
-                  }
-                  dateFormat="dd/MM/yyyy"
-                  wrapperClassName="w-full"
-                  locale={"en-GB"}
-                />
-                <p
-                  className={`text-sm text-red-600 ${
-                    formErrors.birthday === "" ? "hidden" : "block"
-                  }`}
-                >
-                  {formErrors.birthday}
-                </p>
-              </div>
+              <DateInput
+                formData={formData}
+                handleChange={handleChange}
+                formErrors={formErrors}
+              />
             </div>
             <InputField
               data={formData.password}
@@ -188,31 +171,16 @@ export default function Signup() {
               placeholder={"Create a secure password"}
               type={"password"}
             />
-            <div className="relative">
-              <InputField
-                data={formData.clothingPreference}
-                setData={(value) => handleChange("clothingPreference", value)}
-                label={"Clothing preferences"}
-                placeholder={"Mens/Womans"}
-                type={"dropdown"}
-                dropdownFunc={() => setShowDropdown((prev) => !prev)}
-              />
-              <div
-                className={`absolute shadow-md bg-white flex-col w-full rounded-lg h-20 overflow-y-scroll top-20 text-sm font-semibold ${
-                  showDropdown ? "flex" : "hidden"
-                }`}
-              >
-                {["Mens", "Womans"].map((choice) => (
-                  <div
-                    className="px-5 py-2 flex gap-3 cursor-pointer"
-                    onClick={() => handleChange("clothingPreference", choice)}
-                    key={choice}
-                  >
-                    <p>{choice}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
+            <DropdownInput
+              choices={["Mens", "Womens", "No preference"]}
+              data={formData.clothingPreference}
+              setData={(value) => {
+                handleChange("clothingPreference", value);
+                console.log(value);
+              }}
+              label={"Clothing preference"}
+              placeholder={"Mens/Womans"}
+            />
           </div>
           <div className="pt-5">
             <button

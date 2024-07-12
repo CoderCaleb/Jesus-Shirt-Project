@@ -22,6 +22,8 @@ import useUserToken from "./hooks/useUserToken";
 import { safelyParseJSON, calculatePrices, handleGetUserInfo } from "./utils/helpers";
 import { firebaseConfig } from "./config/firebaseConfig";
 import { StateSharingContext, CheckoutContext, HelperFunctionContext } from "./contexts";
+import ProfileSettings from "./components/ProfileSettings";
+import AccountSettings from "./components/AccountSettings";
 
 initializeApp(firebaseConfig);
 getAnalytics();
@@ -89,8 +91,11 @@ const App = () => {
                 <Route path="login" element={<Login />} />
                 <Route path="signup" element={<Signup />} />
                 <Route path="transaction-error" element={<TransactionFailedError />} />
-                <Route path="profile" element={<Profile />} /> 
                 <Route path="checkout-complete" element={<CheckoutComplete />} />
+                <Route path="profile" element={<Profile />}>
+                  <Route index element={<ProfileSettings/>}/>
+                  <Route path="account" element={<AccountSettings/>}/>
+                </Route>
                 <Route path="*" element={<h1>Not found</h1>} />
               </Routes>
             </div>

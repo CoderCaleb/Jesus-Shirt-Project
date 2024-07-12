@@ -34,7 +34,7 @@ const Orders = () => {
   useEffect(() => {
     if (user && userToken) {
       getOrders(userToken).then((orderDataArray) => {
-        console.log(orderDataArray)
+        console.log(orderDataArray);
         if (orderDataArray) {
           setOrders(orderDataArray);
         } else {
@@ -56,16 +56,19 @@ const Orders = () => {
         </div>
         <div className=" bg-slate-300 w-full h-lineBreakHeight" />
         {orders.length !== 0 ? (
-          orders.map((order, index) => (
-            order?
-            <OrderRow
-              key={index}
-              order={order}
-              navigate={navigate}
-              formatCurrency={formatCurrency}
-              capitalizeFirstLetterOfEachWord={capitalizeFirstLetter}
-            />:<></>
-          ))
+          orders.map((order, index) =>
+            order ? (
+              <OrderRow
+                key={index}
+                order={order}
+                navigate={navigate}
+                formatCurrency={formatCurrency}
+                capitalizeFirstLetterOfEachWord={capitalizeFirstLetter}
+              />
+            ) : (
+              <></>
+            )
+          )
         ) : (
           <div className="py-4 px-5 text-center">
             {error ? error : "You have not placed any orders yet."}
@@ -76,7 +79,12 @@ const Orders = () => {
   );
 };
 
-const OrderRow = ({ order, navigate, formatCurrency, capitalizeFirstLetterOfEachWord }) => {
+const OrderRow = ({
+  order,
+  navigate,
+  formatCurrency,
+  capitalizeFirstLetterOfEachWord,
+}) => {
   return (
     <div
       className="grid md:grid-cols-[3fr_1fr_1fr_1fr] grid-cols-[1fr_1fr_1fr_1fr] cursor-pointer py-4 px-5 justify-between items-center"
@@ -84,16 +92,21 @@ const OrderRow = ({ order, navigate, formatCurrency, capitalizeFirstLetterOfEach
     >
       <p>{order.order_number}</p>
       <div>
-      <OrderStatusBox status={order.status} capitalizeFirstLetterOfEachWord={capitalizeFirstLetterOfEachWord} />
+        <OrderStatusBox
+          status={order.status}
+          capitalizeFirstLetterOfEachWord={capitalizeFirstLetterOfEachWord}
+        />
       </div>
       <p className="text-center text-sm">
-        {new Date(order.order_date*1000).toLocaleDateString("en-US", {
+        {new Date(order.order_date * 1000).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric",
         })}
       </p>
-      <p className="text-right text-sm">{formatCurrency(order.total_price / 100)}</p>
+      <p className="text-right text-sm">
+        {formatCurrency(order.total_price / 100)}
+      </p>
     </div>
   );
 };

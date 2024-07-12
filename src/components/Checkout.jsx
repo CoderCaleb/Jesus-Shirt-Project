@@ -31,7 +31,9 @@ export default function Checkout() {
   }, [checkoutItems, calculatePrices]);
 
   useEffect(() => {
-    if (checkoutItems && userToken) {
+    console.log(userToken, user?.uid)
+
+    if (checkoutItems&&user!==null) {
       createPaymentIntent(checkoutItems, userToken, user?.uid);
     }
   }, [userToken]);

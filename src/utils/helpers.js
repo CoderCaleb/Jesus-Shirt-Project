@@ -37,9 +37,14 @@ export const handleGetUserInfo = async (uid, user, userToken, setUserInfo) => {
         }
       );
       const result = await response.json();
+      if(!response.ok||!result){
+        return {error:result.error}
+      }
       setUserInfo(result);
+      return {data:result}
     } else {
       setUserInfo(null);
+      return {error:"Not authenticated"}
     }
   } catch (error) {
     console.log(error);
