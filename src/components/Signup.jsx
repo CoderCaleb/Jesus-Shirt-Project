@@ -17,11 +17,8 @@ import MessageBox from "./MessageBox";
 import DateInput from "./DateInput";
 
 import {
-  validateEmail,
-  validateName,
-  validatePassword,
   handleAddingUser,
-  validateBirthday,
+  validateFields,
 } from "../utils/helpers";
 import { LuLoader2 } from "react-icons/lu";
 import GoogleButton from "./GoogleButton";
@@ -57,18 +54,8 @@ export default function Signup() {
   };
 
   const validateForm = () => {
-    const errors = {};
-    if (!validateEmail(formData.email)) errors.email = "Email is not valid";
-    if (!validateName(formData.name)) errors.name = "Name is not valid";
-    if (!validatePassword(formData.password)) {
-      errors.password =
-        "Password needs to be at least 8 characters long and contains at least one uppercase letter, one lowercase letter, and one number.";
-    }
-    if (typeof validateBirthday(formData.birthday) === "string") {
-      errors.birthday = validateBirthday(formData.birthday);
-    }
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    const fieldsToValidate = ["email", "name", "password", "birthday"];
+    return validateFields(fieldsToValidate, setFormErrors, formData);
   };
 
   const handleSignUp = async () => {

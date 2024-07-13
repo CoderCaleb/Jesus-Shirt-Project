@@ -8,7 +8,7 @@ const DateInput = ({ formData, handleChange, formErrors, additionalStyles }) => 
       <p className="text-sm mb-2">Birthday</p>
       <DatePicker
         selected={formData.birthday}
-        onChange={(date) => handleChange("birthday", date)}
+        onChange={(date) => handleChange("birthday", date.toISOString())}
         className="w-full"
         customInput={
           <input

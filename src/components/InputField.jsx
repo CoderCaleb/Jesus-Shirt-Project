@@ -24,7 +24,7 @@ export default function InputField({
       <div
         className={`flex px-3 gap-2 items-center justify-between py-3 w-full min-h-[2.5rem] h-11 border-2 rounded-[10px] text-sm font-semibold ${
           type === "info"
-            ? "bg-gray-100 text-gray-700 cursor-not-allowed border-gray-200"
+            ? "bg-[#F0F0F0] text-[#9E9E9E] cursor-not-allowed border-gray-200"
             : "bg-white border-slate-300 outline-black"
         }`}
       >

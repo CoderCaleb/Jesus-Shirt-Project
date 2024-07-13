@@ -37,14 +37,14 @@ export const handleGetUserInfo = async (uid, user, userToken, setUserInfo) => {
         }
       );
       const result = await response.json();
-      if(!response.ok||!result){
-        return {error:result.error}
+      if (!response.ok || !result) {
+        return { error: result.error };
       }
       setUserInfo(result);
-      return {data:result}
+      return { data: result };
     } else {
       setUserInfo(null);
-      return {error:"Not authenticated"}
+      return { error: "Not authenticated" };
     }
   } catch (error) {
     console.log(error);
@@ -60,7 +60,7 @@ export const handleAddingUser = async (
   signUpClothingPreference,
   orderToken,
   orderId,
-  state,
+  state
 ) => {
   if (!user) {
     return { error: "User not provided" };
@@ -102,7 +102,6 @@ export const handleAddingUser = async (
   }
 };
 
-
 export const validateEmail = (email) => {
   return String(email)
     .toLowerCase()
@@ -140,6 +139,55 @@ export function validateBirthday(birthday) {
   return true;
 }
 
+function validateClothingPreference(clothingPreference) {
+  const validPreferences = ["Mens", "Womens", "No preference"];
+  return validPreferences.includes(clothingPreference);
+}
+
+export const validateFields = (fields, setErrors, data) => {
+  const errors = {};
+
+  const validations = {
+    email: () => {
+      if (!validateEmail(data.email)) {
+        errors.email = "Email is not valid";
+      }
+    },
+    name: () => {
+      if (!validateName(data.name)) {
+        errors.name = "Name is not valid";
+      }
+    },
+    password: () => {
+      if (!validatePassword(data.password)) {
+        errors.password =
+          "Password needs to be at least 8 characters long and contains at least one uppercase letter, one lowercase letter, and one number.";
+      }
+    },
+    birthday: () => {
+      const birthdayError = validateBirthday(data.birthday);
+      if (typeof birthdayError === "string") {
+        errors.birthday = birthdayError;
+      }
+    },
+    clothingPreference: () =>{
+      if(!validateClothingPreference(data.clothingPreference)){
+        errors.clothingPreference = "Clothing preference needs to be either Men/Woman/No Preference"
+      };
+    }
+  };
+
+  fields.forEach((field) => {
+    if (validations[field]) {
+      validations[field]();
+    }
+  });
+  console.log("validation errors:",errors)
+  setErrors(errors);
+  return isEmptyObject(errors);
+};
+
+
 export function capitalizeFirstLetter(str) {
   if (str.length === 0) {
     return str;
@@ -170,3 +218,31 @@ export const formatCurrency = (amount) => {
 
 export const checkCheckoutComplete = (number, checkoutProgress) =>
   checkoutProgress >= number;
+
+export function findDifferentKeys(dict1, dict2) {
+  const differentFields = {};
+
+  for (const key in dict1) {
+    if (dict1.hasOwnProperty(key)) {
+      if (dict2.hasOwnProperty(key)) {
+        if (dict1[key] !== dict2[key]) {
+          differentFields[key] = dict2[key];
+        }
+      } else {
+        differentFields[key] = null; // Indicate that the key was removed
+      }
+    }
+  }
+
+  for (const key in dict2) {
+    if (dict2.hasOwnProperty(key) && !dict1.hasOwnProperty(key)) {
+      differentFields[key] = dict2[key];
+    }
+  }
+
+  return differentFields;
+}
+
+export function isEmptyObject(dict){
+  return Object.keys(dict).length === 0;
+}
