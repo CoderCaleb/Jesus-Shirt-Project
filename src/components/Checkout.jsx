@@ -7,12 +7,25 @@ import OrderConfirmationPage from "./CheckoutComplete";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import ItemCard from "./ItemCard";
-import { StateSharingContext, CheckoutContext, HelperFunctionContext } from "../contexts";
+import {
+  StateSharingContext,
+  CheckoutContext,
+  HelperFunctionContext,
+} from "../contexts";
 
-const stripePromise = loadStripe("pk_test_51OOBnGEvVCl2vla10CIfwh6ItUYeeZO4o3haVa9xFHyxwT6ekU8D8wAuA75GsRfGOhMLmU0Znf9dZKJPLNc5xrdq00PVRX8neU");
+const stripePromise = loadStripe(
+  "pk_test_51OOBnGEvVCl2vla10CIfwh6ItUYeeZO4o3haVa9xFHyxwT6ekU8D8wAuA75GsRfGOhMLmU0Znf9dZKJPLNc5xrdq00PVRX8neU"
+);
 
 export default function Checkout() {
-  const { checkoutProgress, clientSecret, isLoading, cartItems, setClientSecret, setPaymentIntentId } = useContext(CheckoutContext);
+  const {
+    checkoutProgress,
+    clientSecret,
+    isLoading,
+    cartItems,
+    setClientSecret,
+    setPaymentIntentId,
+  } = useContext(CheckoutContext);
   const { user, userToken } = useContext(StateSharingContext);
   const { calculatePrices } = useContext(HelperFunctionContext);
 
@@ -21,6 +34,7 @@ export default function Checkout() {
     totalPrice: 0,
     shippingPrice: 0,
   });
+  const [createPIError, setCreatePIError] = useState(null);
 
   const location = useLocation();
   const { state } = location;
@@ -31,9 +45,9 @@ export default function Checkout() {
   }, [checkoutItems, calculatePrices]);
 
   useEffect(() => {
-    console.log(userToken, user?.uid)
+    console.log(userToken, user?.uid);
 
-    if (checkoutItems&&user!==null) {
+    if (checkoutItems && user !== null) {
       createPaymentIntent(checkoutItems, userToken, user?.uid);
     }
   }, [userToken]);
@@ -48,10 +62,18 @@ export default function Checkout() {
         },
         body: JSON.stringify({ checkoutItems, uid }),
       });
+
+      if (!response.ok) {
+        setCreatePIError(
+          "Failed to checkout your products. Please try again..."
+        );
+        return;
+      }
       const data = await response.json();
       setClientSecret(data.clientSecret);
       setPaymentIntentId(data.id);
     } catch (error) {
+      setCreatePIError(error);
       console.error(error);
     }
   };
@@ -89,12 +111,14 @@ export default function Checkout() {
       },
       ".Tab:hover": {
         border: "none",
-        boxShadow: "0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 7px rgba(18, 42, 66, 0.04)",
+        boxShadow:
+          "0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 7px rgba(18, 42, 66, 0.04)",
       },
       ".Tab--selected, .Tab--selected:focus, .Tab--selected:hover": {
         border: "none",
         backgroundColor: "#fff",
-        boxShadow: "0 0 0 1.5px var(--colorPrimaryText), 0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 7px rgba(18, 42, 66, 0.04)",
+        boxShadow:
+          "0 0 0 1.5px var(--colorPrimaryText), 0px 1px 1px rgba(0, 0, 0, 0.03), 0px 3px 7px rgba(18, 42, 66, 0.04)",
       },
       ".Label": {
         fontWeight: "500",
@@ -112,15 +136,23 @@ export default function Checkout() {
 
   return (
     <div className="w-full h-full relative">
-      {stripePromise && clientSecret && (
-        <Elements stripe={stripePromise} options={options} key={clientSecret}>
-          {isLoading && (
-            <LoadingOverlay />
-          )}
-          <div className="w-full h-full overflow-y-scroll flex">
-            <CheckoutContent checkoutProgress={checkoutProgress} checkoutItems={checkoutItems} prices={prices} />
-          </div>
-        </Elements>
+      {!createPIError ? (
+        stripePromise && clientSecret ? (
+          <Elements stripe={stripePromise} options={options} key={clientSecret}>
+            {isLoading && <LoadingOverlay />}
+            <div className="w-full h-full overflow-y-scroll flex">
+              <CheckoutContent
+                checkoutProgress={checkoutProgress}
+                checkoutItems={checkoutItems}
+                prices={prices}
+              />
+            </div>
+          </Elements>
+        ) : (
+          <p className="text-center mt-10">Loading...</p>
+        )
+      ) : (
+        <p className="text-center mt-10">{createPIError}</p>
       )}
     </div>
   );

@@ -13,6 +13,7 @@ import MessageBox from "./MessageBox";
 import GoogleButton from "./GoogleButton";
 import { toast } from "react-toastify";
 import useQuery from "../hooks/useQuery";
+import { handleFieldChange } from "../utils/helpers";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -36,10 +37,7 @@ export default function Login() {
     setLoginError(null);
   }, [formData.email, formData.password]);
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-    setFormErrors({ ...formErrors, [field]: "" });
-  };
+  const handleChange = handleFieldChange(setFormData, setFormErrors);
 
   const handleLogin = async () => {
     setLoginLoading(true);
@@ -54,6 +52,9 @@ export default function Login() {
       const user = userCredential.user;
       if (from !== "order-tracking") {
         navigate("/shop");
+        toast("You have successfully logged in. Happy shopping!", {
+          type: "success",
+        });
         return;
       }
 
@@ -69,15 +70,34 @@ export default function Login() {
       }
     } catch (error) {
       signOut(auth).finally(() => {
-        setLoginError({
-          errorMessage: error.message,
-        });
+        const errorMessage = getFriendlyErrorMessage(error.code);
+        console.log(error.code)
+        setLoginError({ errorMessage });
       });
     } finally {
       setLoginLoading(false);
     }
   };
 
+  const getFriendlyErrorMessage = (errorCode) => {
+    switch (errorCode) {
+      case 'auth/invalid-email':
+        return 'The email address is not valid.';
+      case 'auth/user-disabled':
+        return 'This user has been disabled.';
+      case 'auth/user-not-found':
+        return 'There is no user corresponding to this email.';
+      case 'auth/wrong-password':
+        return 'The password is incorrect.';
+      case 'auth/network-request-failed':
+        return 'Network error. Please try again.';
+      case 'auth/too-many-requests':
+        return 'Too many attempts. Please try again later.';
+      default:
+        return 'An unexpected error occurred. Please try again.';
+    }
+  };
+  
   async function handleLoginWithState(state, user) {
     if (!user) {
       return { error: "User not provided" };

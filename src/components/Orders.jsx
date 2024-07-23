@@ -21,24 +21,30 @@ const Orders = () => {
       );
 
       if (!response.ok) {
-        throw new Error(response.statusText);
+        throw new Error(response.status);
       }
 
-      return await response.json();
+      const orderDataArray = await response.json()
+      return {orderDataArray:orderDataArray};
     } catch (e) {
       console.error("Failed to fetch orders:", e);
-      return null;
+      return {error:Number(e.message)}
     }
   };
 
   useEffect(() => {
     if (user && userToken) {
-      getOrders(userToken).then((orderDataArray) => {
-        console.log(orderDataArray);
+      getOrders(userToken).then(({orderDataArray, error}) => {
+        console.log(orderDataArray, typeof error);
         if (orderDataArray) {
           setOrders(orderDataArray);
         } else {
-          setError("Failed to load orders.");
+          if(error===404){
+            setError("No order has been placed yet")
+          }
+          else{
+            setError("Failed to load orders.");
+          }
         }
       });
     }
@@ -71,7 +77,7 @@ const Orders = () => {
           )
         ) : (
           <div className="py-4 px-5 text-center">
-            {error ? error : "You have not placed any orders yet."}
+            {error ? error : "Loading..."}
           </div>
         )}
       </div>

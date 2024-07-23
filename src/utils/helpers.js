@@ -24,7 +24,7 @@ export const calculatePrices = (products, shippingPrice) => {
   };
 };
 
-export const handleGetUserInfo = async (uid, user, userToken, setUserInfo) => {
+export const handleGetUserInfo = async (uid, user, userToken, setUserInfo, projection) => {
   try {
     if (user && uid && userToken) {
       const response = await fetch(
@@ -43,12 +43,11 @@ export const handleGetUserInfo = async (uid, user, userToken, setUserInfo) => {
       setUserInfo(result);
       return { data: result };
     } else {
-      setUserInfo(null);
       return { error: "Not authenticated" };
     }
   } catch (error) {
     console.log(error);
-    setUserInfo(null);
+    return { error: error.message };
   }
 };
 // File: utils.js
@@ -246,3 +245,12 @@ export function findDifferentKeys(dict1, dict2) {
 export function isEmptyObject(dict){
   return Object.keys(dict).length === 0;
 }
+
+export const handleFieldChange = (setProfileUpdates, setFormErrors) => (field, value) => {
+  setProfileUpdates((prev) => ({ ...prev, [field]: value }));
+  setFormErrors((prev) => ({ ...prev, [field]: "" }));
+};
+
+export const handleFieldErrors = (setErrors) => (field, error) => {
+  setErrors((prev) => ({ ...prev, [field]: error }));
+};

@@ -23,7 +23,7 @@ import {
 import { LuLoader2 } from "react-icons/lu";
 import GoogleButton from "./GoogleButton";
 import useQuery from "../hooks/useQuery";
-
+import { handleFieldChange } from "../utils/helpers";
 registerLocale("en-GB", enGB);
 
 export default function Signup() {
@@ -48,10 +48,7 @@ export default function Signup() {
     setLoginError(null);
   }, [formData.email, formData.password]);
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-    setFormErrors({ ...formErrors, [field]: "" });
-  };
+  const handleChange = handleFieldChange(setFormData, setFormErrors);
 
   const validateForm = () => {
     const fieldsToValidate = ["email", "name", "password", "birthday"];
@@ -69,10 +66,7 @@ export default function Signup() {
           formData.email,
           formData.password
         );
-        if (from !== "order-tracking") {
-          navigate("/shop");
-          return;
-        }
+
         const user = userCredential.user;
         const { error } = await handleAddingUser(
           user,
@@ -89,7 +83,13 @@ export default function Signup() {
           throw new Error(error);
         } else {
           toast("Sign up is successful!", { type: "success" });
-          navigate(`/orders/${orderId}`);
+
+          if (from !== "order-tracking") {
+            navigate("/shop");
+          }
+          else{
+            navigate(`/orders/${orderId}`);
+          }
         }
       } catch (error) {
         signOut(auth).then(() => {
