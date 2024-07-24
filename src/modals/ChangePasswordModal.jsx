@@ -2,10 +2,7 @@
 import React, { useContext, useState } from "react";
 import { RiLockPasswordLine } from "react-icons/ri";
 import { StateSharingContext } from "../contexts";
-import {
-  getAuth,
-  sendPasswordResetEmail,
-} from "firebase/auth";
+import { getAuth, sendPasswordResetEmail } from "firebase/auth";
 import Modal from "./Modal";
 import { toast } from "react-toastify";
 
@@ -13,8 +10,14 @@ export default function ChangePasswordModal({}) {
   const { showChangePasswordModal, setShowChangePasswordModal } =
     useContext(StateSharingContext);
 
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  if (!user) {
+    return null;
+  }
+
   async function handleChangePassword(email) {
-    const auth = getAuth()
     try {
       await sendPasswordResetEmail(auth, email);
       console.log("Password reset email sent!");
@@ -22,9 +25,8 @@ export default function ChangePasswordModal({}) {
     } catch (error) {
       console.error("Error sending password reset email:", error);
       toast.error("Error sending password reset email");
-    }
-    finally {
-        setShowChangePasswordModal({state:false})
+    } finally {
+      setShowChangePasswordModal({ state: false });
     }
   }
 
@@ -42,9 +44,7 @@ export default function ChangePasswordModal({}) {
   const content = (
     <div>
       <p className="text-sm text-slate-600 text-center">
-        {`A password reset email will be sent to ${
-          getAuth().currentUser.email
-        }`}
+        {`A password reset email will be sent to ${user?.email}`}
       </p>
     </div>
   );
@@ -54,7 +54,7 @@ export default function ChangePasswordModal({}) {
       label: "Send",
       className:
         "border-2 text-sm border-black bg-black text-white hover:bg-white hover:text-black",
-      onClick: ()=>handleChangePassword(getAuth().currentUser.email),
+      onClick: () => handleChangePassword(user?.email),
     },
     {
       label: "Cancel",

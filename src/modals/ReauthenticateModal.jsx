@@ -10,26 +10,30 @@ import {
 } from "firebase/auth";
 import Modal from "./Modal";
 import InputField from "../components/InputField";
-import { handleFieldChange } from "../utils/helpers";
+import { handleFieldChange, validateFields } from "../utils/helpers";
+import { toast } from "react-toastify";
 
-export default function ReauthenticateAndChangeEmailModal({ }) {
-    const [formData, setFormData] = useState({
-        newEmail: "",
-        password: "",
-      });
-      const [formErrors, setFormErrors] = useState({});
-      const [firebaseErrors, setFirebaseErrors] = useState({})
-  const {
-    showReauthenticateModal,
-    setShowReauthenticateModal,
-  } = useContext(StateSharingContext);
+export default function ReauthenticateAndChangeEmailModal({}) {
+  const [formData, setFormData] = useState({
+    newEmail: "",
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [firebaseErrors, setFirebaseErrors] = useState({});
+  const { showReauthenticateModal, setShowReauthenticateModal, userToken } =
+    useContext(StateSharingContext);
 
   const handleChange = handleFieldChange(setFormData, setFormErrors);
 
-  const handleReauthenticationAndEmailChange = async (
-    currentPassword,
-    newEmail
-  ) => {
+  const validateForm = () => {
+    const fieldsToValidate = ["newEmail"];
+    return validateFields(fieldsToValidate, setFormErrors, formData);
+  };
+
+  const handleEmailChange = async (newEmail) => {
+    if(!userToken){
+      toast.error("No user is currently signed in.");
+      return;
+    }
     const auth = getAuth();
     const user = auth.currentUser;
 
@@ -38,35 +42,38 @@ export default function ReauthenticateAndChangeEmailModal({ }) {
       return;
     }
 
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       // Reauthenticate the user
-      const credential = EmailAuthProvider.credential(
-        user.email,
-        currentPassword
-      );
-      await reauthenticateWithCredential(user, credential);
+      const response = await fetch("http://127.0.0.1:4242/update-email", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${userToken}`
+        },
+        body: JSON.stringify({ newEmail: newEmail, uid: user.uid }),
+      });
 
-      // Change the email
-      await updateEmail(user, newEmail);
+      if (!response.ok) {
+        const errorResult = await response.json()
+        throw new Error(errorResult.error || "Failed to update email")
+      }
+      const result = await response.json();
+
+      if (result.error) {
+        throw new Error(result.error);     
+      }
+
       console.log("Email updated successfully.");
-
+      toast.success("Email updated successfully.");
       // Optionally, update the state to close the modal
       setShowReauthenticateModal({ state: false });
     } catch (error) {
       console.error("Error during reauthentication or email update:", error);
-
-      // Optionally, handle specific error messages
-      if (error.code === "auth/wrong-password") {
-        console.error("Incorrect password.");
-      } else if (error.code === "auth/invalid-email") {
-        console.error("Invalid email format.");
-      } else if (error.code === "auth/email-already-in-use") {
-        console.error(
-          "The new email address is already in use by another account."
-        );
-      } else {
-        console.error("Unexpected error:", error.message);
-      }
+      toast.error(error.message);
     }
   };
 
@@ -87,22 +94,14 @@ export default function ReauthenticateAndChangeEmailModal({ }) {
         Please enter your password to change your email.
       </p>
       <div className="flex flex-col gap-5 mt-3 mb-2">
-      <InputField
-        data={formData.newEmail}
-        setData={(value) => handleChange("newEmail", value)}
-        error={formErrors.newEmail}
-        label={"New email"}
-        placeholder={"Create a new email"}
-        type={"email"}
-      />{" "}
-      <InputField
-        data={formData.password}
-        setData={(value) => handleChange("password", value)}
-        error={formErrors.password}
-        label={"Password"}
-        placeholder={"Create a secure password"}
-        type={"password"}
-      />{" "}
+        <InputField
+          data={formData.newEmail}
+          setData={(value) => handleChange("newEmail", value)}
+          error={formErrors.newEmail}
+          label={"New email"}
+          placeholder={"Create a new email"}
+          type={"email"}
+        />{" "}
       </div>
     </div>
   );
@@ -112,7 +111,10 @@ export default function ReauthenticateAndChangeEmailModal({ }) {
       label: "Authenticate",
       className:
         "border-2 text-sm border-black bg-black text-white hover:bg-white hover:text-black",
-      onClick: ()=>handleReauthenticationAndEmailChange(),
+      onClick: () =>
+        handleEmailChange(
+          formData.newEmail
+        ),
     },
     {
       label: "Cancel",

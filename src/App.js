@@ -34,6 +34,7 @@ import ProfileSettings from "./components/ProfileSettings";
 import AccountSettings from "./components/AccountSettings";
 import ReauthenticateAndChangeEmailModal from "./modals/ReauthenticateModal";
 import ChangePasswordModal from "./modals/ChangePasswordModal";
+import VerifyEmail from "./components/VerifyEmail";
 
 initializeApp(firebaseConfig);
 getAnalytics();
@@ -163,6 +164,7 @@ const App = () => {
                   <Route index element={<ProfileSettings />} />
                   <Route path="account" element={<AccountSettings />} />
                 </Route>
+                <Route path="verify-email" element={<VerifyEmail/>}/>
                 <Route path="*" element={<h1>Not found</h1>} />
               </Routes>
             </div>

@@ -28,7 +28,7 @@ export const handleGetUserInfo = async (uid, user, userToken, setUserInfo, proje
   try {
     if (user && uid && userToken) {
       const response = await fetch(
-        `http://127.0.0.1:4242/get-user?uid=${user.uid}`,
+        `http://127.0.0.1:4242/get-user?uid=${user.uid}&projection=${JSON.stringify(projection)}`,
         {
           method: "GET",
           headers: {
@@ -59,8 +59,9 @@ export const handleAddingUser = async (
   signUpClothingPreference,
   orderToken,
   orderId,
-  state
-) => {
+  state,
+  navigatedFrom
+  ) => {
   if (!user) {
     return { error: "User not provided" };
   }
@@ -84,13 +85,15 @@ export const handleAddingUser = async (
         orderNumber: orderId,
         orderToken,
         state,
+        navigatedFrom
       }),
     };
 
     const response = await fetch(url, options);
 
     if (!response.ok) {
-      throw new Error(`${data.error}`);
+      const errorData = await response.json();
+      throw new Error(`${errorData.error||"An unexpected error occurred."}`);
     }
 
     const data = await response.json();
@@ -150,6 +153,11 @@ export const validateFields = (fields, setErrors, data) => {
     email: () => {
       if (!validateEmail(data.email)) {
         errors.email = "Email is not valid";
+      }
+    },
+    newEmail: () => {
+      if (!validateEmail(data.newEmail)) {
+        errors.newEmail = "New email is not valid";
       }
     },
     name: () => {
@@ -247,6 +255,7 @@ export function isEmptyObject(dict){
 }
 
 export const handleFieldChange = (setProfileUpdates, setFormErrors) => (field, value) => {
+  console.log(field, value)
   setProfileUpdates((prev) => ({ ...prev, [field]: value }));
   setFormErrors((prev) => ({ ...prev, [field]: "" }));
 };

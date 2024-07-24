@@ -94,8 +94,9 @@ export default function ProfileSettings() {
   }
 
   useEffect(() => {
+    const projection = {"_id":0,"name":1,"email":1,"birthday":1,"clothingPreference":1}
     if (user) {
-      handleGetUserInfo(user?.uid, user, userToken, setProfileUpdates).then(
+      handleGetUserInfo(user?.uid, user, userToken, setProfileUpdates, projection).then(
         (res) => {
           console.log("profile data:", res);
 

@@ -13,7 +13,8 @@ const useFetch = (url, options) => {
       try {
         const response = await fetch(url, options || {});
         if (!response.ok) {
-          throw new Error(`Error: ${response.status}`);
+          const errorInfo = await response.json();
+          throw new Error(errorInfo.error||`Error: ${response.status}`);
         }
         const result = await response.json();
         //handle variety of data structures returned by backend
@@ -22,6 +23,7 @@ const useFetch = (url, options) => {
         if (result.error) {
           setError(result.error);
         } else if (returnedDictData) {
+          console.log(typeof returnedDictData)
           setData(
             typeof returnedDictData === "string"
               ? JSON.parse(returnedDictData)
@@ -31,6 +33,7 @@ const useFetch = (url, options) => {
           setData(result); // In case the result is the data itself
         }
       } catch (err) {
+        console.error(err)
         setError(err.message);
       } finally {
         setLoading(false);
