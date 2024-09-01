@@ -14,7 +14,7 @@ export default function InputField({
 }) {
   const handleChange = (e) => {
     if (setData) {
-      setData(e.target.value.trim());
+      setData(e.target.value);
     }
   };
 

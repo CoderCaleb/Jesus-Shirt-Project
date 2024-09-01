@@ -48,13 +48,17 @@ export default function ProfileSettings() {
 
   async function handleUpdateProfile() {
     console.log("validateform:", validateForm());
+    await user.reload();
+        
+    // Get the updated ID token
+    const idToken = await user.getIdToken(true); 
     if (validateForm()) {
       try {
         const response = await fetch("http://127.0.0.1:4242/update-profile", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userToken}`,
+            Authorization: `Bearer ${idToken}`,
           },
           body: JSON.stringify({
             profileChanges,
@@ -66,6 +70,7 @@ export default function ProfileSettings() {
         if (!response.ok) {
           const error = updatedProfileData.error;
           toast.error(error);
+          setProfileUpdates(fetchedProfileInfo.current)
           handleApiErrors("updateProfileError", error);
         } else {
           console.log("updatedProfileData.data:", updatedProfileData.data);
@@ -77,22 +82,13 @@ export default function ProfileSettings() {
           toast.success("Profile updated successfully");
         }
       } catch (e) {
-        toast.error(e);
+        setProfileUpdates(fetchedProfileInfo.current)
+        toast.error("An unexpected error occurred when updated profile data")
+        handleApiErrors("updateProfileError", e.message)
       }
     }
   }
-
-  async function handleChangePassword(email) {
-    try {
-      await sendPasswordResetEmail(auth, email);
-      console.log("Password reset email sent!");
-      toast.success(`Password reset email sent to ${email}!`);
-    } catch (error) {
-      console.error("Error sending password reset email:", error);
-      toast.error("Error sending password reset email");
-    }
-  }
-
+  
   useEffect(() => {
     const projection = {"_id":0,"name":1,"email":1,"birthday":1,"clothingPreference":1}
     if (user) {

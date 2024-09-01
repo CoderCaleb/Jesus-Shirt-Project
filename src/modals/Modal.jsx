@@ -5,7 +5,7 @@ const Modal = ({ title, content, actions, open }) => {
   const modalContainerStyle =
     "absolute w-full h-[calc(100vh-64px)] flex justify-center items-center bg-darkenBg z-50";
   const modalContentStyle =
-    "flex flex-col p-6 bg-background rounded-md shadow-md shadow-slate-600";
+    "flex flex-col p-6 w-96 bg-background rounded-md shadow-md shadow-slate-600";
   const buttonBaseStyle = "flex-1 h-10 font-semibold rounded-md";
 
   if(!open){
@@ -23,6 +23,7 @@ const Modal = ({ title, content, actions, open }) => {
               key={index}
               className={`${buttonBaseStyle} ${action.className}`}
               onClick={action.onClick}
+              disabled={action.disabled}
             >
               {action.label}
             </button>

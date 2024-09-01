@@ -263,3 +263,42 @@ export const handleFieldChange = (setProfileUpdates, setFormErrors) => (field, v
 export const handleFieldErrors = (setErrors) => (field, error) => {
   setErrors((prev) => ({ ...prev, [field]: error }));
 };
+
+export const getFriendlyErrorMessage = (errorCode) => {
+  const errorMessages = {
+    "auth/invalid-email": "The email address is not valid.",
+    "auth/user-disabled": "This user has been disabled.",
+    "auth/user-not-found": "There is no user corresponding to this email.",
+    "auth/invalid-credential": "Invalid credentials. Please check your email and password again",
+    "auth/network-request-failed": "Network error. Please try again.",
+    "auth/too-many-requests": "Too many attempts. Please try again later.",
+    default: "An unexpected error occurred. Please try again.",
+  };
+  return errorMessages[errorCode] || null;
+};
+
+export const sendVerificationEmail = async (email, navigatedFrom) => {
+  const response = await fetch(
+    "http://127.0.0.1:4242/resend-verification-email",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ email: email, navigatedFrom: navigatedFrom }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorResult = await response.json();
+    throw new Error(
+      errorResult.error || "Failed to send verification email"
+    );
+  }
+  const result = await response.json();
+
+  if (result.error) {
+    throw new Error(result.error);
+  }
+
+}

@@ -21,6 +21,7 @@ import { LuLoader2 } from "react-icons/lu";
 import GoogleButton from "./GoogleButton";
 import useQuery from "../hooks/useQuery";
 import { handleFieldChange, handleFieldErrors } from "../utils/helpers";
+
 registerLocale("en-GB", enGB);
 
 export default function Signup() {
@@ -83,7 +84,7 @@ export default function Signup() {
           throw new Error(error);
         } else {
           toast("Sign up is successful!", { type: "success" });
-
+          navigate(`/verification?email=${formData.email}`)
           setSignUpSuccess(true);
         }
       } catch (error) {
@@ -121,7 +122,7 @@ export default function Signup() {
         {!signUpSuccess ? (
           <div className="w-96 flex flex-col text-center my-10">
             <p className="text-3xl font-semibold mb-3">Join Us!</p>
-            <DisplayPromptFromState />
+            <DisplayPromptFromState/>
             <div className="bg-slate-300 w-full h-lineBreakHeight my-4" />
             <div className="flex flex-col gap-3 text-left">
               <InputField

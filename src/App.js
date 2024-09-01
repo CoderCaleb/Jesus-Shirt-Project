@@ -32,9 +32,10 @@ import {
 } from "./contexts";
 import ProfileSettings from "./components/ProfileSettings";
 import AccountSettings from "./components/AccountSettings";
-import ReauthenticateAndChangeEmailModal from "./modals/ReauthenticateModal";
+import ChangeEmailModal from "./modals/ChangeEmailModal";
 import ChangePasswordModal from "./modals/ChangePasswordModal";
-import VerifyEmail from "./components/VerifyEmail";
+import EmailChangeVerification from "./components/EmailChangeVerification";
+import SignUpVerification from "./components/SignUpVerification";
 
 initializeApp(firebaseConfig);
 getAnalytics();
@@ -57,7 +58,7 @@ const App = () => {
   });
   const [showChangePasswordModal, setShowChangePasswordModal] = useState({
     state: false,
-  });  
+  });
   const [emailAddress, setEmailAddress] = useState("");
   const [showItems, setShowItems] = useState(false);
   const [checkoutProgress, setCheckoutProgress] = useState(1);
@@ -136,8 +137,8 @@ const App = () => {
 
             <div className="w-screen h-[calc(100vh-64px)] bg-background flex z-[1]">
               <RemoveItemModal productData={showRemoveItem.productData} />
-              <ReauthenticateAndChangeEmailModal />
-              <ChangePasswordModal/>
+              <ChangeEmailModal />
+              <ChangePasswordModal />
               <Routes>
                 <Route index element={<Homepage />} />
                 <Route path="cart" element={<Cart />} />
@@ -164,7 +165,13 @@ const App = () => {
                   <Route index element={<ProfileSettings />} />
                   <Route path="account" element={<AccountSettings />} />
                 </Route>
-                <Route path="verify-email" element={<VerifyEmail/>}/>
+                <Route path="verification" element={<Outlet />}>
+                  <Route index element={<SignUpVerification />} />
+                  <Route
+                    path="email-change-verification"
+                    element={<EmailChangeVerification />}
+                  />
+                </Route>
                 <Route path="*" element={<h1>Not found</h1>} />
               </Routes>
             </div>

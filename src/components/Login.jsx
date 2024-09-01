@@ -13,7 +13,8 @@ import MessageBox from "./MessageBox";
 import GoogleButton from "./GoogleButton";
 import { toast } from "react-toastify";
 import useQuery from "../hooks/useQuery";
-import { handleFieldChange } from "../utils/helpers";
+import { handleFieldChange, getFriendlyErrorMessage, sendVerificationEmail } from "../utils/helpers";
+import DisplayPromptFromState from "./DisplayPromptFromState";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -29,7 +30,8 @@ export default function Login() {
   const state = query.get("state");
   const orderId = query.get("orderId");
   const orderToken = query.get("orderToken");
-  const linkedUserEmail = query.get("linkedUserEmail");
+  const email = query.get("email");
+  const linkedUserEmail = query.get("linkedUserEmail")
 
   const navigate = useNavigate();
 
@@ -39,39 +41,73 @@ export default function Login() {
 
   const handleChange = handleFieldChange(setFormData, setFormErrors);
 
+  const handleVerifyEmail = async (email, navigatedFrom)=>{
+    try{
+      await sendVerificationEmail(email, navigatedFrom)
+      toast.success("Email verification sent successfully!")
+      navigate(`/verification/login-verification?email=${formData.email}`)
+    }
+    catch(e){
+      toast.error(e.message);
+    }
+  }
+
   const handleLogin = async () => {
     setLoginLoading(true);
     const auth = getAuth();
 
     try {
+      if (from === "sign-up" || from === "change-email") {
+        if (email !== formData.email) {
+          throw new Error(`Please sign in to ${email} to continue`);
+        }
+      }
+
       const userCredential = await signInWithEmailAndPassword(
         auth,
         formData.email,
         formData.password
       );
+
       const user = userCredential.user;
-      if (from !== "order-tracking") {
-        navigate("/shop");
-        toast("You have successfully logged in. Happy shopping!", {
-          type: "success",
-        });
+
+      if (!user.emailVerified) {
+        setLoginError({errorMessage:"Email is not verified.", clickableTextJSX: (<p><span className="text-blue-600 cursor-pointer" onClick={()=>handleVerifyEmail(formData.email, "login")}>Click here</span> to verify</p>)})
         return;
       }
 
-      const { error } = await handleLoginWithState(state, user);
-      console.log("error:", error);
-      if (error) {
-        throw new Error(error);
+      if (from === "order-tracking") {
+        const { error } = await handleLoginWithState(state, user);
+        console.log("error:", error);
+        if (error) {
+          throw new Error(error);
+        } else {
+          navigateToPage(from, orderId);
+        }
+      } else if (from === "sign-up") {
+        const { error } = await handleVerification(formData.email, user);
+        console.log("error:", error);
+        if (error) {
+          throw new Error(error);
+        } else {
+          navigateToPage(from);
+        }
+      } else if (from === "change-email") {
+        const { error } = await handleVerification(formData.email, user);
+        console.log("error:", error);
+        if (error) {
+          throw new Error(error);
+        } else {
+          navigateToPage(from);
+        }
       } else {
-        toast("You have successfully logged in. Happy shopping!", {
-          type: "success",
-        });
-        navigate(`/orders/${orderId}`);
+        navigateToPage(from);
       }
     } catch (error) {
       signOut(auth).finally(() => {
-        const errorMessage = getFriendlyErrorMessage(error.code);
-        console.log(error.code)
+        let errorMessage = getFriendlyErrorMessage(error.code);
+        errorMessage = errorMessage ? errorMessage : error.message;
+        console.log(error);
         setLoginError({ errorMessage });
       });
     } finally {
@@ -79,25 +115,59 @@ export default function Login() {
     }
   };
 
-  const getFriendlyErrorMessage = (errorCode) => {
-    switch (errorCode) {
-      case 'auth/invalid-email':
-        return 'The email address is not valid.';
-      case 'auth/user-disabled':
-        return 'This user has been disabled.';
-      case 'auth/user-not-found':
-        return 'There is no user corresponding to this email.';
-      case 'auth/wrong-password':
-        return 'The password is incorrect.';
-      case 'auth/network-request-failed':
-        return 'Network error. Please try again.';
-      case 'auth/too-many-requests':
-        return 'Too many attempts. Please try again later.';
-      default:
-        return 'An unexpected error occurred. Please try again.';
+  const navigateToPage = (from, orderId) => {
+    if (from === "order-tracking") {
+      navigate(`/orders/${orderId}`);
+    } else if (from === "sign-up") {
+      navigate("/shop");
+    } else if (from === "change-email") {
+      navigate("/profile");
+    } else {
+      navigate("/shop");
+    }
+    toast("You have successfully logged in. Happy shopping!", {
+      type: "success",
+    });
+  };
+
+  //handle errors by returning errors object
+  const handleVerification = async (email, user) => {
+    try {
+      if(!user&&!email){
+        throw new Error("An unexpected error occurred.")
+      }
+      const idToken = await user.getIdToken(); 
+
+      // Make the POST request to your endpoint
+      const response = await fetch(
+        "http://127.0.0.1:4242/login-from-verify-email",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${idToken}`,
+          },
+          body: JSON.stringify({
+            uid: user.uid,
+          }),
+        }
+      );
+
+      // Check if the response is ok and parse the JSON
+      const data = await response.json();
+
+      // Handle the response data
+      if (data.error) {
+        console.log(data.error)
+        throw new Error("Failed to verify email");
+      } else {
+        return {data:"success"}
+      }
+    } catch (error) {
+      return { error: `${error.message}` };
     }
   };
-  
+
   async function handleLoginWithState(state, user) {
     if (!user) {
       return { error: "User not provided" };
@@ -135,46 +205,18 @@ export default function Login() {
     }
   }
 
-  const DisplayPromptFromState = () => {
-    const style = " text-sm text-slate-700 font-semibold";
-
-    if (state === "authenticated-order-not-in-user-linked-user-not-matched") {
-      return (
-        <p className={style}>
-          {`Please log in to the account associated with this order: ${linkedUserEmail}`}
-        </p>
-      );
-    } else if (state === "not-authenticated-has-linked-user") {
-      return (
-        <p className={style}>
-          {`Please log in to the account associated with this order: ${linkedUserEmail}`}
-        </p>
-      );
-    } else if (
-      state === "not-authenticated-no-linked-user" ||
-      state === "authenticated-no-linked-user"
-    ) {
-      return (
-        <p className={style}>
-          {`Log in to connect order ${orderId || ""} to your existing account.`}
-        </p>
-      );
-    } else if (
-      state === "authenticated-failed-no-order-token" ||
-      state === "authenticated-order-token-invalid"
-    ) {
-      return <p className={style}>{`Login to view your order.`}</p>;
-    } else {
-      return null;
-    }
-  };
-
   return (
     <div className="w-full h-full justify-center items-center flex">
       <div className="w-96 flex flex-col text-center">
         <p className="text-3xl font-semibold mb-3">Welcome Back!</p>
         <div className="">
-          <DisplayPromptFromState />
+          {from === "order-tracking" ? (
+            <DisplayPromptFromState state={state} linkedUserEmail={linkedUserEmail} orderId={orderId}/>
+          ) : from === "sign-up" || from === "change-email" ? (
+            <p className=" text-sm text-slate-700 font-semibold">{`Email verification successful. Please sign in to ${email} to proceed`}</p>
+          ) : (
+            <></>
+          )}
         </div>
         <div className="bg-slate-300 w-full h-lineBreakHeight my-4" />
         <div className="flex flex-col gap-3 text-left">
@@ -228,7 +270,7 @@ export default function Login() {
           </Link>
         </p>
         {logInError && (
-          <MessageBox type="error" message={logInError.errorMessage} />
+          <MessageBox type="error" message={logInError.errorMessage} clickableText={logInError.clickableTextJSX}/>
         )}
       </div>
     </div>
