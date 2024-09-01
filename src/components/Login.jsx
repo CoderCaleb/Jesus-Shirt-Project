@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import InputField from "./InputField";
 import { Link, useNavigate } from "react-router-dom";
 import {
@@ -13,8 +13,13 @@ import MessageBox from "./MessageBox";
 import GoogleButton from "./GoogleButton";
 import { toast } from "react-toastify";
 import useQuery from "../hooks/useQuery";
-import { handleFieldChange, getFriendlyErrorMessage, sendVerificationEmail } from "../utils/helpers";
+import {
+  handleFieldChange,
+  getFriendlyErrorMessage,
+  sendVerificationEmail,
+} from "../utils/helpers";
 import DisplayPromptFromState from "./DisplayPromptFromState";
+import { StateSharingContext } from "../contexts";
 
 export default function Login() {
   const [formData, setFormData] = useState({
@@ -31,7 +36,12 @@ export default function Login() {
   const orderId = query.get("orderId");
   const orderToken = query.get("orderToken");
   const email = query.get("email");
-  const linkedUserEmail = query.get("linkedUserEmail")
+  const linkedUserEmail = query.get("linkedUserEmail");
+
+  const latestLoginEmail = useRef(null)
+
+  const { setSendVerificationEmailModal } =
+  useContext(StateSharingContext); 
 
   const navigate = useNavigate();
 
@@ -41,19 +51,26 @@ export default function Login() {
 
   const handleChange = handleFieldChange(setFormData, setFormErrors);
 
-  const handleVerifyEmail = async (email, navigatedFrom)=>{
-    try{
-      await sendVerificationEmail(email, navigatedFrom)
-      toast.success("Email verification sent successfully!")
-      navigate(`/verification/login-verification?email=${formData.email}`)
+  const handleVerifyEmail = async (email, navigatedFrom) => {
+    setSendVerificationEmailModal({
+      state: true,
+      email: latestLoginEmail.current,
+    })
+  };
+
+  const verifyAndNavigate = async (user, from) => {
+    const { error } = await handleVerification(formData.email, user);
+    console.log("error:", error);
+    if (error) {
+      throw new Error(error);
+    } else {
+      navigateToPage(from);
     }
-    catch(e){
-      toast.error(e.message);
-    }
-  }
+  };
 
   const handleLogin = async () => {
     setLoginLoading(true);
+    latestLoginEmail.current = formData.email
     const auth = getAuth();
 
     try {
@@ -72,7 +89,20 @@ export default function Login() {
       const user = userCredential.user;
 
       if (!user.emailVerified) {
-        setLoginError({errorMessage:"Email is not verified.", clickableTextJSX: (<p><span className="text-blue-600 cursor-pointer" onClick={()=>handleVerifyEmail(formData.email, "login")}>Click here</span> to verify</p>)})
+        setLoginError({
+          errorMessage: "Email is not verified.",
+          clickableTextJSX: (
+            <p>
+              <span
+                className="text-blue-600 cursor-pointer"
+                onClick={() => handleVerifyEmail(formData.email, "login")}
+              >
+                Click here
+              </span>{" "}
+              to verify
+            </p>
+          ),
+        });
         return;
       }
 
@@ -85,21 +115,11 @@ export default function Login() {
           navigateToPage(from, orderId);
         }
       } else if (from === "sign-up") {
-        const { error } = await handleVerification(formData.email, user);
-        console.log("error:", error);
-        if (error) {
-          throw new Error(error);
-        } else {
-          navigateToPage(from);
-        }
+        await verifyAndNavigate(user, from);
       } else if (from === "change-email") {
-        const { error } = await handleVerification(formData.email, user);
-        console.log("error:", error);
-        if (error) {
-          throw new Error(error);
-        } else {
-          navigateToPage(from);
-        }
+        await verifyAndNavigate(user, from);
+      } else if (from === "login") {
+        await verifyAndNavigate(user, from);
       } else {
         navigateToPage(from);
       }
@@ -122,6 +142,8 @@ export default function Login() {
       navigate("/shop");
     } else if (from === "change-email") {
       navigate("/profile");
+    } else if (from === "login") {
+      navigate("/shop");
     } else {
       navigate("/shop");
     }
@@ -133,10 +155,10 @@ export default function Login() {
   //handle errors by returning errors object
   const handleVerification = async (email, user) => {
     try {
-      if(!user&&!email){
-        throw new Error("An unexpected error occurred.")
+      if (!user && !email) {
+        throw new Error("An unexpected error occurred.");
       }
-      const idToken = await user.getIdToken(); 
+      const idToken = await user.getIdToken();
 
       // Make the POST request to your endpoint
       const response = await fetch(
@@ -158,10 +180,10 @@ export default function Login() {
 
       // Handle the response data
       if (data.error) {
-        console.log(data.error)
+        console.log(data.error);
         throw new Error("Failed to verify email");
       } else {
-        return {data:"success"}
+        return { data: "success" };
       }
     } catch (error) {
       return { error: `${error.message}` };
@@ -211,7 +233,11 @@ export default function Login() {
         <p className="text-3xl font-semibold mb-3">Welcome Back!</p>
         <div className="">
           {from === "order-tracking" ? (
-            <DisplayPromptFromState state={state} linkedUserEmail={linkedUserEmail} orderId={orderId}/>
+            <DisplayPromptFromState
+              state={state}
+              linkedUserEmail={linkedUserEmail}
+              orderId={orderId}
+            />
           ) : from === "sign-up" || from === "change-email" ? (
             <p className=" text-sm text-slate-700 font-semibold">{`Email verification successful. Please sign in to ${email} to proceed`}</p>
           ) : (
@@ -270,7 +296,11 @@ export default function Login() {
           </Link>
         </p>
         {logInError && (
-          <MessageBox type="error" message={logInError.errorMessage} clickableText={logInError.clickableTextJSX}/>
+          <MessageBox
+            type="error"
+            message={logInError.errorMessage}
+            clickableText={logInError.clickableTextJSX}
+          />
         )}
       </div>
     </div>
