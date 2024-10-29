@@ -179,9 +179,9 @@ export default function Login() {
       const data = await response.json();
 
       // Handle the response data
-      if (data.error) {
-        console.log(data.error);
-        throw new Error("Failed to verify email");
+      if (!response.ok) {
+        const errorMessage = data.error
+        throw new Error(errorMessage);
       } else {
         return { data: "success" };
       }

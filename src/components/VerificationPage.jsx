@@ -38,9 +38,9 @@ export default function VerificationPage({
 
   const handleResendEmail = async () => {
     try {
-      setButtonCountdown(50);
-
       await sendVerificationEmail(email, navigatedFrom);
+
+      setButtonCountdown(50);
 
       const interval = setInterval(() => {
         setButtonCountdown((prev) => {
