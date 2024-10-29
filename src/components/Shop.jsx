@@ -1,16 +1,48 @@
-import React, { useEffect } from "react";
-import useFetch from "../hooks/useFetch";
+import React, { useState, useEffect } from "react";
 import ProductCard from "./ProductCard";
 
 const Shop = () => {
-  const {
-    data: shopData,
-    loading,
-    error,
-  } = useFetch("http://127.0.0.1:4242/get_store-products");
+  const [shopData, setShopData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await fetch("http://127.0.0.1:4242/get_store_products");
+        if (!response.ok) {
+          console.log("FETCHINT>>>")
+
+          const errorInfo = await response.json();
+          console.log("errorInfo",errorInfo)
+          throw new Error(errorInfo.error || `Error: ${response.status}`);
+        }
+
+        const result = await response.json();
+
+        if (result.error) {
+          throw new Error(result.error);
+        }
+
+        setShopData(result.result);
+      } catch (err) {
+        console.error("Error occurred while fetching data:", err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
+
   useEffect(() => {
     console.log("shopData: ", shopData);
   }, [shopData]);
+
   return (
     <div className="h-full overflow-y-scroll m-auto w-full pb-10 px-8">
       <div className="flex justify-center">

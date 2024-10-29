@@ -9,20 +9,18 @@ import {
   GoogleAuthProvider,
   signOut,
 } from "firebase/auth";
+import DropdownInput from "./DropdownInput";
 import enGB from "date-fns/locale/en-GB";
 import { toast } from "react-toastify";
 import InputField from "./InputField";
 import MessageBox from "./MessageBox";
-import {
-  validateEmail,
-  validateName,
-  validatePassword,
-  handleAddingUser,
-  validateBirthday,
-} from "../utils/helpers";
+import DateInput from "./DateInput";
+
+import { handleAddingUser, validateFields } from "../utils/helpers";
 import { LuLoader2 } from "react-icons/lu";
 import GoogleButton from "./GoogleButton";
 import useQuery from "../hooks/useQuery";
+import { handleFieldChange, handleFieldErrors } from "../utils/helpers";
 
 registerLocale("en-GB", enGB);
 
@@ -37,6 +35,7 @@ export default function Signup() {
   const [formErrors, setFormErrors] = useState({});
   const [logInError, setLoginError] = useState(null);
   const [signUpLoading, setSignUpLoading] = useState(false);
+  const [signUpSuccess, setSignUpSuccess] = useState(false);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
   const query = useQuery();
@@ -48,24 +47,11 @@ export default function Signup() {
     setLoginError(null);
   }, [formData.email, formData.password]);
 
-  const handleChange = (field, value) => {
-    setFormData({ ...formData, [field]: value });
-    setFormErrors({ ...formErrors, [field]: "" });
-  };
+  const handleChange = handleFieldChange(setFormData, setFormErrors);
 
   const validateForm = () => {
-    const errors = {};
-    if (!validateEmail(formData.email)) errors.email = "Email is not valid";
-    if (!validateName(formData.name)) errors.name = "Name is not valid";
-    if (!validatePassword(formData.password)) {
-      errors.password =
-        "Password needs to be at least 8 characters long and contains at least one uppercase letter, one lowercase letter, and one number.";
-    }
-    if (typeof validateBirthday(formData.birthday) === "string") {
-      errors.birthday = validateBirthday(formData.birthday);
-    }
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0;
+    const fieldsToValidate = ["email", "name", "password", "birthday"];
+    return validateFields(fieldsToValidate, setFormErrors, formData);
   };
 
   const handleSignUp = async () => {
@@ -79,11 +65,9 @@ export default function Signup() {
           formData.email,
           formData.password
         );
-        if (from !== "order-tracking") {
-          navigate("/shop");
-          return;
-        }
+
         const user = userCredential.user;
+        const navigatedFrom = from;
         const { error } = await handleAddingUser(
           user,
           formData.name,
@@ -92,14 +76,16 @@ export default function Signup() {
           formData.clothingPreference,
           orderToken,
           orderId,
-          state
+          state,
+          navigatedFrom
         );
 
         if (error) {
           throw new Error(error);
         } else {
           toast("Sign up is successful!", { type: "success" });
-          navigate(`/orders/${orderId}`);
+          navigate(`/verification?email=${formData.email}`)
+          setSignUpSuccess(true);
         }
       } catch (error) {
         signOut(auth).then(() => {
@@ -132,122 +118,93 @@ export default function Signup() {
 
   return (
     <div className="w-full h-full overflow-y-scroll">
-      <div className="justify-center items-center flex">
-        <div className="w-96 flex flex-col text-center my-10">
-          <p className="text-3xl font-semibold mb-3">Join Us!</p>
-          <DisplayPromptFromState />
-          <div className="bg-slate-300 w-full h-lineBreakHeight my-4" />
-          <div className="flex flex-col gap-3 text-left">
-            <InputField
-              data={formData.email}
-              setData={(value) => handleChange("email", value)}
-              error={formErrors.email}
-              label={"Email"}
-              placeholder={"larrytan@gmail.com"}
-              type="email"
-            />
-            <div className="flex gap-5 w-full">
+      <div className="justify-center items-center w-full h-full flex">
+        {!signUpSuccess ? (
+          <div className="w-96 flex flex-col text-center my-10">
+            <p className="text-3xl font-semibold mb-3">Join Us!</p>
+            <DisplayPromptFromState/>
+            <div className="bg-slate-300 w-full h-lineBreakHeight my-4" />
+            <div className="flex flex-col gap-3 text-left">
               <InputField
-                data={formData.name}
-                setData={(value) => handleChange("name", value)}
-                error={formErrors.name}
-                label={"Name"}
-                placeholder={"Caleb Tan"}
+                data={formData.email}
+                setData={(value) => handleChange("email", value)}
+                error={formErrors.email}
+                label={"Email"}
+                placeholder={"larrytan@gmail.com"}
+                type="email"
               />
-              <div className="w-full">
-                <p className="text-sm mb-2">Birthday</p>
-                <DatePicker
-                  selected={formData.birthday}
-                  onChange={(date) => handleChange("birthday", date)}
-                  className="w-full"
-                  customInput={
-                    <input
-                      placeholder={"Birthday"}
-                      className="w-full h-11 bg-transparent border-2 outline-none border-slate-300 pl-3 rounded-[10px] text-sm placeholder-slate-500 font-semibold"
-                      type="text"
-                    />
-                  }
-                  dateFormat="dd/MM/yyyy"
-                  wrapperClassName="w-full"
-                  locale={"en-GB"}
+              <div className="flex gap-5 w-full">
+                <InputField
+                  data={formData.name}
+                  setData={(value) => handleChange("name", value)}
+                  error={formErrors.name}
+                  label={"Name"}
+                  placeholder={"Caleb Tan"}
                 />
-                <p
-                  className={`text-sm text-red-600 ${
-                    formErrors.birthday === "" ? "hidden" : "block"
-                  }`}
-                >
-                  {formErrors.birthday}
-                </p>
+                <DateInput
+                  formData={formData}
+                  handleChange={handleChange}
+                  formErrors={formErrors}
+                />
               </div>
-            </div>
-            <InputField
-              data={formData.password}
-              setData={(value) => handleChange("password", value)}
-              error={formErrors.password}
-              label={"Password"}
-              placeholder={"Create a secure password"}
-              type={"password"}
-            />
-            <div className="relative">
               <InputField
+                data={formData.password}
+                setData={(value) => handleChange("password", value)}
+                error={formErrors.password}
+                label={"Password"}
+                placeholder={"Create a secure password"}
+                type={"password"}
+              />
+              <DropdownInput
+                choices={["Mens", "Womens", "No preference"]}
                 data={formData.clothingPreference}
-                setData={(value) => handleChange("clothingPreference", value)}
-                label={"Clothing preferences"}
+                setData={(value) => {
+                  handleChange("clothingPreference", value);
+                  console.log(value);
+                }}
+                label={"Clothing preference"}
                 placeholder={"Mens/Womans"}
-                type={"dropdown"}
-                dropdownFunc={() => setShowDropdown((prev) => !prev)}
               />
-              <div
-                className={`absolute shadow-md bg-white flex-col w-full rounded-lg h-20 overflow-y-scroll top-20 text-sm font-semibold ${
-                  showDropdown ? "flex" : "hidden"
-                }`}
-              >
-                {["Mens", "Womans"].map((choice) => (
-                  <div
-                    className="px-5 py-2 flex gap-3 cursor-pointer"
-                    onClick={() => handleChange("clothingPreference", choice)}
-                    key={choice}
-                  >
-                    <p>{choice}</p>
-                  </div>
-                ))}
-              </div>
             </div>
+            <div className="pt-5">
+              <button
+                className="border-2 w-full h-12 font-semibold rounded-[10px] border-black bg-black text-white hover:bg-white hover:text-black"
+                onClick={handleSignUp}
+              >
+                {!signUpLoading ? (
+                  "Sign up"
+                ) : (
+                  <LuLoader2
+                    className="m-auto animate-spin"
+                    size="25"
+                    color="white"
+                  />
+                )}
+              </button>
+            </div>
+            <p className="mt-5 text-sm text-slate-800 font-semibold">
+              Have an account?{" "}
+              <Link
+                to={
+                  from === "order-tracking" &&
+                  (state === "not-authenticated-no-linked-user" ||
+                    state === "authenticated-no-linked-user")
+                    ? `/login?from=order-tracking&state=${state}&orderId=${orderId}&orderToken=${orderToken}`
+                    : "/login"
+                }
+              >
+                <span className="cursor-pointer text-blue-600 mt-5">Login</span>
+              </Link>
+            </p>
+            {logInError && (
+              <MessageBox type="error" message={logInError.errorMessage} />
+            )}
           </div>
-          <div className="pt-5">
-            <button
-              className="border-2 w-full h-12 font-semibold rounded-[10px] border-black bg-black text-white hover:bg-white hover:text-black"
-              onClick={handleSignUp}
-            >
-              {!signUpLoading ? (
-                "Sign up"
-              ) : (
-                <LuLoader2
-                  className="m-auto animate-spin"
-                  size="25"
-                  color="white"
-                />
-              )}
-            </button>
+        ) : (
+          <div className="justify-center px-5 text-center flex items-center w-full h-full">
+            <p>{`A verification email has been sent to ${formData.email}. Please verify to proceed`}</p>
           </div>
-          <p className="mt-5 text-sm text-slate-800 font-semibold">
-            Have an account?{" "}
-            <Link
-              to={
-                from === "order-tracking" &&
-                (state === "not-authenticated-no-linked-user" ||
-                  state === "authenticated-no-linked-user")
-                  ? `/login?from=order-tracking&state=${state}&orderId=${orderId}&orderToken=${orderToken}`
-                  : "/login"
-              }
-            >
-              <span className="cursor-pointer text-blue-600 mt-5">Login</span>
-            </Link>
-          </p>
-          {logInError && (
-            <MessageBox type="error" message={logInError.errorMessage} />
-          )}
-        </div>
+        )}
       </div>
     </div>
   );
