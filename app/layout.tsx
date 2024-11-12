@@ -28,7 +28,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] pt-16 flex justify-center bg-white overflow-y-scroll text-black">
+          {children}
+        </div>
       </body>
     </html>
   );
