@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import "../styles/variables.css"
+import "../styles/carousel.css"
 import Navbar from "@/components/layout/Navbar";
 
 const geistSans = localFont({
@@ -27,11 +29,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased theme-light`}
       >
         <div className="text-black">
           <Navbar />
-          <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] pt-16 flex justify-center bg-white overflow-y-scroll">
+          <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex justify-center overflow-y-scroll">
             {children}
           </div>
         </div>

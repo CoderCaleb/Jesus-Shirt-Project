@@ -5,3 +5,10 @@ export type ProductData = {
     thumbnail: string;
     product_images: string[]
 };
+
+export type CartData = ProductData & {
+    size: SizeChoice;
+    quantity: number;
+}
+
+export type SizeChoice = "XS" | "S" | "M" | "L" | "XL" | "2XL"
