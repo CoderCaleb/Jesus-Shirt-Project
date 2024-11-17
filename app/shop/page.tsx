@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import ProductGrid from "@/components/features/shop/ProductGrid";
 import SkeletonLoader from "@/components/features/shop/SkeletonLoader";
 
-const Shop = async () => {
+const Shop = () => {
   return (
       <div className="h-full overflow-y-scroll m-auto w-full pb-10 px-8">
         <div className="flex justify-center">

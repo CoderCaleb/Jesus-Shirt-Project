@@ -4,6 +4,7 @@ import "./globals.css";
 import "../styles/variables.css"
 import "../styles/carousel.css"
 import Navbar from "@/components/layout/Navbar";
+import { ToastContainer } from "react-toastify";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -35,6 +36,7 @@ export default function RootLayout({
           <Navbar />
           <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex justify-center overflow-y-scroll">
             {children}
+            <ToastContainer position="top-center" theme="light" />
           </div>
         </div>
       </body>

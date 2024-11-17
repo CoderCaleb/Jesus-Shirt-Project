@@ -7,7 +7,7 @@ const ProductImages = ({ product }: { product: ProductData }) => {
     <>
       <div className="grid-cols-2 gap-4 w-1/2 max-w-maxImageGridWidth h-min hidden min-w-minPictureGrid lg:grid">
         {product.product_images.map((image, index) => (
-          <div className="relative w-full aspect-square">
+          <div className="relative w-full aspect-square" key={index}>
             <Image
               src={image}
               alt={`product image ${index}`}

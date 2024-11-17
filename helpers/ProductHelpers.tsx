@@ -1,6 +1,6 @@
 import { CartData, ProductData, SizeChoice } from "@/types/product";
 import { toast } from "react-toastify";
-import {useRouter} from "next/navigation"
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 export const handleAddToCart = (productInfo:ProductData, sizeChoice:SizeChoice) => {
     const updatedProductInfo = { ...productInfo, size: sizeChoice, quantity: 1 };
@@ -21,9 +21,8 @@ export const handleAddToCart = (productInfo:ProductData, sizeChoice:SizeChoice) 
   };
   
 
-export const handleBuyNow = (productInfo:ProductData,sizeChoice:string) => {
+export const handleBuyNow = (productInfo:ProductData,sizeChoice:string,router:AppRouterInstance) => {
   const productArr = [{ ...productInfo, size: sizeChoice, quantity: 1 }];
   localStorage.setItem("checkoutItems",JSON.stringify(productArr))
-  const router = useRouter()
   router.push("/checkout")
 };

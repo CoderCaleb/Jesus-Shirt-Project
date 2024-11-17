@@ -4,8 +4,10 @@ import { ProductData, SizeChoice } from "@/types/product";
 import { useState } from "react";
 import SizeSelector from "./SizeSelector";
 import Button from "@/components/ui/Button";
+import { useRouter } from "next/navigation";
 
 const ProductDetails = ({ product }: { product: ProductData }) => {
+  const router = useRouter();
   const [sizeChoice, setSizeChoice] = useState<SizeChoice>("S");
 
   return (
@@ -23,8 +25,9 @@ const ProductDetails = ({ product }: { product: ProductData }) => {
 
         <Button
           buttonText="Buy Now"
-          onClick={() => handleBuyNow(product, sizeChoice)}
+          onClick={() => handleBuyNow(product, sizeChoice, router)}
           buttonType="black"
+          additionalStyles="md:mb-0 mb-10"
         />
       </div>
     </div>

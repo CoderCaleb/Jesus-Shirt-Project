@@ -24,6 +24,7 @@ export default async function Product({
     const productData = await fetchHelper<ProductData>(
       `http://127.0.0.1:4242/fetch_product?productID=${id}`
     );
+
     return (
         <div className="flex flex-col md:flex-row md:justify-center pb-10 gap-10 lg:gap-16 items-center h-full w-full p-5 sm:p-10">
           <ProductImages product={productData} />
