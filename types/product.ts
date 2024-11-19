@@ -1,14 +1,20 @@
 export type ProductData = {
-    id: string;
-    name: string;
-    price: string;
-    thumbnail: string;
-    product_images: string[]
+  id: string;
+  name: string;
+  price: string;
+  thumbnail: string;
+  product_images: string[];
 };
 
 export type CartData = ProductData & {
-    size: SizeChoice;
-    quantity: number;
-}
+  size: SizeChoice;
+  quantity: number;
+};
 
-export type SizeChoice = "XS" | "S" | "M" | "L" | "XL" | "2XL"
+export type Prices = {
+  productPrice: number;
+  totalPrice: number;
+  shippingPrice: number;
+};
+
+export type SizeChoice = "XS" | "S" | "M" | "L" | "XL" | "2XL";

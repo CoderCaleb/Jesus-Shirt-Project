@@ -14,7 +14,6 @@ import MessageBox from "@/components/ui/MessageBox";
 import { checkCheckoutComplete } from "@/helpers/generalHelpers";
 import { CartData } from "@/types/product";
 import { StripePaymentElementOptions } from "@stripe/stripe-js";
-import { useParams } from "next/navigation";
 
 export default function CheckoutPayment({
   checkoutItems,
@@ -32,8 +31,6 @@ export default function CheckoutPayment({
   const [isLoading, setIsLoading] = useState(false);
   const stripe = useStripe();
   const elements = useElements();
-  const params = useParams();
-  const { fromCart } = params;
 
   const paymentElementOptions = {
     layout: "tabs",
@@ -47,9 +44,7 @@ export default function CheckoutPayment({
       const { error } = await stripe.confirmPayment({
         elements,
         confirmParams: {
-          return_url: `http://localhost:3000/checkout-complete?fromCart=${
-            fromCart ? "true" : "false"
-          }`,
+          return_url: `http://localhost:3000/checkout-complete`,
         },
       });
 

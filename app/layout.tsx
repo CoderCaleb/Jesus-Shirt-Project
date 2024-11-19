@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import "../styles/variables.css"
-import "../styles/carousel.css"
+import "../styles/variables.css";
+import "../styles/carousel.css";
 import Navbar from "@/components/layout/Navbar";
-import { ToastContainer } from "react-toastify";
+import ToastProvider from "@/components/ui/ToastProvider";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -32,13 +32,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased theme-light`}
       >
-        <div className="text-black">
-          <Navbar />
-          <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex justify-center overflow-y-scroll">
-            {children}
-            <ToastContainer position="top-center" theme="light" />
+        <ToastProvider>
+          <div className="text-black">
+            <Navbar />
+            <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex overflow-y-scroll">
+              {children}
+            </div>
           </div>
-        </div>
+        </ToastProvider>
       </body>
     </html>
   );

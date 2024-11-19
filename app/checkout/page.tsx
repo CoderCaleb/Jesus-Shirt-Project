@@ -34,7 +34,7 @@ export default function CheckoutShipping() {
     if (typeof window !== "undefined") {
       const storedItems = localStorage.getItem("checkoutItems");
       if (storedItems) {
-        setCheckoutItems(JSON.parse(storedItems));
+        setCheckoutItems(JSON.parse(storedItems).checkoutItems);
       }
       setLoading(false); // Set loading to false once localStorage is processed
     }

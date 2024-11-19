@@ -23,6 +23,6 @@ export const handleAddToCart = (productInfo:ProductData, sizeChoice:SizeChoice) 
 
 export const handleBuyNow = (productInfo:ProductData,sizeChoice:string,router:AppRouterInstance) => {
   const productArr = [{ ...productInfo, size: sizeChoice, quantity: 1 }];
-  localStorage.setItem("checkoutItems",JSON.stringify(productArr))
+  localStorage.setItem("checkoutItems",JSON.stringify({"checkoutItems":productArr,"fromCart":false}))
   router.push("/checkout")
 };

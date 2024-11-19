@@ -12,6 +12,8 @@ export class ApiError extends Error {
   }
 }
 
+export type ApiErrorType = InstanceType<typeof ApiError>
+
 type FetchOptions = {
   cache?: RequestCache;
   revalidate?: number | false;
