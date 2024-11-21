@@ -1,28 +1,46 @@
-"use client"
+"use client";
+
 import { ButtonProps } from "./ButtonProps";
-  
-  const Button: React.FC<ButtonProps> = ({
-    buttonText,
-    additionalStyles = "",
-    onClick = ()=>{},
-    buttonType = "black",
-  }) => {
-    const baseStyles = "w-full h-12 font-semibold rounded-md";
-    const blackButtonStyles = "border-2 border-none text-white bg-black hover:shadow-xl shadow-indigo-800";
-    const transparentButtonStyles = "border-2 border-black hover:bg-black hover:text-white border";
-  
-    const computedClassName =
-      buttonType === "black" ? blackButtonStyles : transparentButtonStyles;
-  
-    return (
-      <button
-        className={`${baseStyles} ${computedClassName} ${additionalStyles}`}
-        onClick={onClick}
-      >
-        {buttonText}
-      </button>
-    );
-  };
-  
-  export default Button;
-  
+import { BiLoaderAlt } from "react-icons/bi";
+
+const Button: React.FC<ButtonProps> = ({
+  buttonText,
+  additionalStyles = "",
+  onClick = () => {},
+  buttonType = "black",
+  isDisabled = false,
+  type="button"
+}) => {
+  const baseStyles =
+    "w-full h-12 font-semibold rounded-md transition-all duration-300";
+
+  const blackButtonStyles =
+    "border-none text-white bg-black hover:shadow-md hover:shadow-slate-400 disabled:bg-gray-400 disabled:text-gray-600 disabled:opacity-50 disabled:cursor-not-allowed";
+  const transparentButtonStyles =
+    "border-2 border-black hover:bg-black hover:text-white disabled:bg-gray-100 disabled:text-gray-400 disabled:opacity-50 disabled:cursor-not-allowed";
+
+  const computedClassName = `${baseStyles} ${
+    buttonType === "black" ? blackButtonStyles : transparentButtonStyles
+  } ${additionalStyles}`;
+
+  return (
+    <button
+      className={computedClassName}
+      onClick={onClick}
+      disabled={isDisabled}
+      type={type}
+    >
+      {!isDisabled ? (
+        buttonText
+      ) : (
+        <BiLoaderAlt
+          className="m-auto animate-spin"
+          size="25"
+          color={buttonType === "black" ? "white" : "gray"}
+        />
+      )}
+    </button>
+  );
+};
+
+export default Button;

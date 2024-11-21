@@ -14,6 +14,8 @@ import MessageBox from "@/components/ui/MessageBox";
 import { checkCheckoutComplete } from "@/helpers/generalHelpers";
 import { CartData } from "@/types/product";
 import { StripePaymentElementOptions } from "@stripe/stripe-js";
+import LoadingOverlay from "./LoadingOverlay";
+import Button from "@/components/ui/Button";
 
 export default function CheckoutPayment({
   checkoutItems,
@@ -64,6 +66,8 @@ export default function CheckoutPayment({
 
   return (
     <div className="w-full h-full md:w-1/2">
+    {isLoading&&<LoadingOverlay/>}  
+    <div className="w-full h-full">
       <div className="w-full h-full flex items-center relative justify-center flex-col px-3 sm:px-10 sm:min-w-[400px] py-5">
         {showItems && (
           <div
@@ -110,13 +114,13 @@ export default function CheckoutPayment({
           </div>
           {paymentError && <MessageBox type="error" message={paymentError} />}
           <div className="flex flex-col gap-3 w-full">
-            <button
-              className="border-2 w-full mt-5 h-12 font-semibold rounded-xl border-black bg-black text-white hover:bg-white hover:text-black"
-              disabled={isLoading || !stripe || !elements}
+            <Button
+              buttonText="Checkout"
+              buttonType="black"
+              additionalStyles="mt-5"
+              isDisabled={isLoading || !stripe || !elements}
               onClick={handlePayment}
-            >
-              Checkout
-            </button>
+            />
           </div>
           <div className="flex gap-5 w-full px-5 mt-7">
             <div className="flex-col flex-1 flex">
@@ -158,6 +162,7 @@ export default function CheckoutPayment({
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

@@ -29,6 +29,10 @@ export default function CheckoutCompleteClient({
               setMessage("Order is processing");
             } else {
               toast.success("Payment succeeded!");
+              if(fromCart){
+                localStorage.setItem("cartItems","[]")
+              }
+              localStorage.setItem("checkoutItems","[]")
             }
             break;
           case "processing":
@@ -45,10 +49,6 @@ export default function CheckoutCompleteClient({
             break;
         }
       };
-      if(fromCart){
-        localStorage.setItem("cartItems","[]")
-      }
-      localStorage.setItem("checkoutItems","[]")
       handlePaymentIntentInfo(paymentIntent);
     }
   }, []);

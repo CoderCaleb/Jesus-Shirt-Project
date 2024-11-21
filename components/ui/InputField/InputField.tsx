@@ -1,11 +1,11 @@
-import React, { ChangeEvent } from "react";
+import React from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
+import { useFormContext } from "react-hook-form"; // Get the context of RHF
+import { z } from "zod"; // Import Zod
 
 interface InputFieldProps {
   Icon?: React.ReactNode;
-  setData?: (value: string) => void;
-  data: string;
-  error?: string;
+  name: string; // Add name to associate input with RHF
   label: string;
   placeholder: string;
   type?: "text" | "password" | "info" | "dropdown";
@@ -15,20 +15,17 @@ interface InputFieldProps {
 
 const InputField: React.FC<InputFieldProps> = ({
   Icon,
-  setData,
-  data,
-  error,
+  name,
   label,
   placeholder,
   type = "text",
   dropdownFunc,
   additionalStyles = "",
 }) => {
-  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
-    if (setData) {
-      setData(e.target.value);
-    }
-  };
+  const {
+    register,
+    formState: { errors },
+  } = useFormContext(); // Get register and errors from RHF context
 
   return (
     <div className={additionalStyles}>
@@ -42,12 +39,11 @@ const InputField: React.FC<InputFieldProps> = ({
       >
         {Icon && Icon}
         <input
+          {...register(name)} // Register input field with RHF
           placeholder={placeholder}
           className={`bg-transparent h-full outline-none flex-1 ${
             type === "info" ? "cursor-not-allowed" : ""
           }`}
-          onChange={handleChange}
-          value={data}
           type={type}
           readOnly={type === "dropdown" || type === "info"}
         />
@@ -60,7 +56,11 @@ const InputField: React.FC<InputFieldProps> = ({
           />
         )}
       </div>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {errors[name] && (
+        <p className="text-sm text-red-600">
+          <>{errors[name]?.message}</>
+        </p> // Show error message if any
+      )}
     </div>
   );
 };

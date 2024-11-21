@@ -5,6 +5,7 @@ import "../styles/variables.css";
 import "../styles/carousel.css";
 import Navbar from "@/components/layout/Navbar";
 import ToastProvider from "@/components/ui/ToastProvider";
+import { SuperTokensInit } from "@/components/utility/supertokensinit";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,18 +30,20 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased theme-light`}
-      >
-        <ToastProvider>
-          <div className="text-black">
-            <Navbar />
-            <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex overflow-y-scroll">
-              {children}
+      <SuperTokensInit>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased theme-light`}
+        >
+          <ToastProvider>
+            <div className="text-black">
+              <Navbar />
+              <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex overflow-y-scroll">
+                {children}
+              </div>
             </div>
-          </div>
-        </ToastProvider>
-      </body>
+          </ToastProvider>
+        </body>
+      </SuperTokensInit>
     </html>
   );
 }

@@ -3,4 +3,6 @@ export type ButtonProps = {
     additionalStyles?: string;
     onClick?: () => void;
     buttonType?: "black" | "transparent";
+    isDisabled?: boolean;
+    type?:"button"|"submit"|"reset";
   };

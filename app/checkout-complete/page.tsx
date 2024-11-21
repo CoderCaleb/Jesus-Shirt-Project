@@ -6,6 +6,7 @@ import { CartData } from "@/types/product";
 import ClientNavigationButton from "@/components/ui/ClientNavigationButton";
 import CheckoutCompleteClient from "@/components/features/checkout-complete/CheckoutCompleteClient";
 import { fetchOrderItemsData } from "@/helpers/dataFetchHelpers";
+import PaymentStatus from "@/components/features/checkout-complete/PaymentStatus";
 
 interface PaymentIntentResponse {
   paymentIntent?: { [key: string]: any };
@@ -29,7 +30,7 @@ const OrderConfirmationPage = async ({
     return <div>{error}</div>;
   }
 
-  const {fetchOrderItemsError, orderItemsData} = await fetchOrderItemsData(
+  const { fetchOrderItemsError, orderItemsData } = await fetchOrderItemsData(
     paymentIntent.metadata.order_items
   );
 
@@ -37,61 +38,16 @@ const OrderConfirmationPage = async ({
     return <div>Error fetching order items</div>;
   }
 
+  console.log("paymentIntent status:",paymentIntent.status)
+
   return (
     <div className="w-full h-full flex items-center md:w-1/2">
       <div className="w-full flex h-full px-5 sm:px-10 flex-col sm:min-w-[400px] py-5">
         <div className="overflow-y-scroll w-full h-full">
           <p className="text-3xl font-bold my-7">Checkout</p>
-          <CheckoutCompleteClient paymentIntent={paymentIntent}/>
+          <CheckoutCompleteClient paymentIntent={paymentIntent} />
           <div className="flex-1">
-            {paymentIntent.metadata.orderStatus === "processing" ? (
-              <div className="h-72 flex flex-col gap-3 text-center justify-center items-center">
-                <p>Your Payment Intent ID: {payment_intent}</p>
-                <p>
-                  Your order is still being processed. Please try reloading the
-                  page.
-                </p>
-              </div>
-            ) : (
-              <div className="rounded-lg border-slate-300 border-1 text-sm mt-7 w-full">
-                <div className="p-3 gap-7 flex">
-                  <p className="text-slate-500 font-semibold">Order Number</p>
-                  <p className="text-black">
-                    {paymentIntent.metadata.order_id ||
-                      "Payment failed, no order placed"}
-                  </p>
-                </div>
-                <div className="p-3 gap-7 flex">
-                  <p className="text-slate-500 font-semibold">Contact</p>
-                  <p className="text-black">{paymentIntent.receipt_email}</p>
-                </div>
-                <div className="bg-slate-300 w-full h-lineBreakHeight" />
-                <div className="p-3 gap-7 flex">
-                  <p className="text-slate-500 font-semibold">Address</p>
-                  <div className="flex flex-col gap-2">
-                    <DisplayShippingAddress
-                      address={paymentIntent.shipping?.address}
-                      textStyle="text-black"
-                    />
-                  </div>
-                </div>
-                <div className="bg-slate-300 w-full h-lineBreakHeight" />
-                <div className="flex pl-3 pt-3">
-                  <p className="text-slate-500 font-semibold">Items</p>
-                  <div className="w-full overflow-y-scroll max-h-60">
-                    {orderItemsData.order_data.map(
-                      (product: CartData, index: number) => (
-                        <ItemCard
-                          productInfo={product}
-                          index={index}
-                          key={index}
-                        />
-                      )
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
+            <PaymentStatus paymentIntent={paymentIntent} orderItemsData={orderItemsData.order_data}/>
           </div>
           <div className="w-full">
             <ClientNavigationButton
@@ -118,6 +74,5 @@ async function fetchPaymentIntent(paymentIntentId: string) {
     return { error: "Failed to fetch payment intent" };
   }
 }
-
 
 export default OrderConfirmationPage;

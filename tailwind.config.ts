@@ -18,7 +18,7 @@ const config: Config = {
         cardColorTwo:"#CEEDC7",
         cardColorThree:"#FFF6BD",
         cardColorFour:"#C0DEFF",
-        darkenBg:"rgba(0, 0, 0, 0.6)",
+        darkenBg:"rgba(0, 0, 0, 0.7)",
         google: {
           'text-gray': '#3c4043',
           'button-blue': '#1a73e8',

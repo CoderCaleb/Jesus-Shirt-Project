@@ -3,7 +3,7 @@ import { CartData } from "@/types/product";
 import { useEffect, useState } from "react";
 import CheckoutShipping from "./CheckoutShipping";
 import OrderSummaryPanel from "./OrderSummaryPanel";
-import CheckoutPayment from "./CheckoutPayment/CheckoutPayment";
+import CheckoutPayment from "./CheckoutPayment";
 const CheckoutContent = ({ checkoutItems, paymentIntentId }: { checkoutItems: CartData[], paymentIntentId:string }) => {
   const [checkoutProgress, setCheckoutProgress] = useState(1);
   const [prices, setPrices] = useState({
