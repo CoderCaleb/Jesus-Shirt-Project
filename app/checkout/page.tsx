@@ -31,13 +31,12 @@ export default function CheckoutShipping() {
 
   useEffect(() => {
     // Only run on client-side and fetch checkout items from localStorage
-    if (typeof window !== "undefined") {
       const storedItems = localStorage.getItem("checkoutItems");
       if (storedItems) {
         setCheckoutItems(JSON.parse(storedItems).checkoutItems);
       }
       setLoading(false); // Set loading to false once localStorage is processed
-    }
+    
   }, []); // This runs only once when the component mounts
 
   useEffect(() => {

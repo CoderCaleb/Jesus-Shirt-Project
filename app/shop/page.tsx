@@ -1,6 +1,7 @@
 import React, { Suspense } from "react";
 import ProductGrid from "@/components/features/shop/ProductGrid";
 import SkeletonLoader from "@/components/features/shop/SkeletonLoader";
+import ToastNotification from "@/components/features/shop/ToastContainer";
 
 const Shop = () => {
   return (
@@ -11,6 +12,7 @@ const Shop = () => {
         <Suspense fallback={<SkeletonLoader />}>
           <ProductGrid />
         </Suspense>
+        <ToastNotification/>
       </div>
   );
 };

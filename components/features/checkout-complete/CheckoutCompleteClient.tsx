@@ -13,7 +13,6 @@ export default function CheckoutCompleteClient({
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
       const fromCart = JSON.parse(localStorage.getItem("checkoutItems") || "{}")?.fromCart
 
       const handlePaymentIntentInfo = (paymentIntent: { [key: string]: any }) => {
@@ -50,7 +49,7 @@ export default function CheckoutCompleteClient({
         }
       };
       handlePaymentIntentInfo(paymentIntent);
-    }
+    
   }, []);
 
   return (
