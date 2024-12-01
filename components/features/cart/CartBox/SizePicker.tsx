@@ -6,11 +6,11 @@ import { useCartContext } from "@/context/CartContextProvider";
 
 interface SizePickerProps {
   size: string;
-  productData: CartData
+  productData: CartData;
 }
 
 const SizePicker: React.FC<SizePickerProps> = ({ size, productData }) => {
-  const { setCartItems } = useCartContext()
+  const { setCartItems } = useCartContext();
   const elementSize = 10;
   const sizeStyle = `w-${elementSize} h-${elementSize}`;
 

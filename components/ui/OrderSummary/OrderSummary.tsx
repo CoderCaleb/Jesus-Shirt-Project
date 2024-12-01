@@ -7,8 +7,11 @@ interface OrderSummaryProps {
   shippingPrice: number;
 }
 
-export default function OrderSummary({ orderItems, shippingPrice }: OrderSummaryProps) {
-  const prices = calculatePrices(orderItems, shippingPrice)
+export default function OrderSummary({
+  orderItems,
+  shippingPrice,
+}: OrderSummaryProps) {
+  const prices = calculatePrices(orderItems, shippingPrice);
 
   return (
     <div>

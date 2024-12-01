@@ -47,8 +47,8 @@ export const handleMagicLinkClicked = async (
   >,
   setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
   orderToken?: string,
-  orderNumber?:string,
-  state?:string
+  orderNumber?: string,
+  state?: string,
 ) => {
   setStatus("loading");
 
@@ -57,7 +57,9 @@ export const handleMagicLinkClicked = async (
       options: {
         preAPIHook: async (input) => {
           let { url, requestInit } = input;
-          const existingBody = requestInit.body?JSON.parse(requestInit.body as string):{}
+          const existingBody = requestInit.body
+            ? JSON.parse(requestInit.body as string)
+            : {};
           if (orderToken) {
             requestInit = {
               ...requestInit,
@@ -65,11 +67,11 @@ export const handleMagicLinkClicked = async (
                 ...requestInit.headers,
                 OrderToken: orderToken,
               },
-              body:JSON.stringify({
+              body: JSON.stringify({
                 ...existingBody,
-                orderNumber:orderNumber,
-                state:state
-              })
+                orderNumber: orderNumber,
+                state: state,
+              }),
             };
           }
           return { url, requestInit };
@@ -92,7 +94,7 @@ export const handleMagicLinkClicked = async (
     } else {
       setStatus("error");
       setErrorMessage(
-        "Sorry, this link is either expired or invalid. Please try again."
+        "Sorry, this link is either expired or invalid. Please try again.",
       );
     }
   } catch (err: any) {

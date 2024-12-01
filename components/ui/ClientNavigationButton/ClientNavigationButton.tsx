@@ -1,11 +1,11 @@
-'use client';
+"use client";
 
 import { useRouter } from "next/navigation";
 import Button from "../Button";
 import { ButtonProps } from "../Button/ButtonProps";
 
 type ClientNavigationButtonProps = ButtonProps & {
-  route: string;  // Route to navigate to when the button is clicked
+  route: string; // Route to navigate to when the button is clicked
 };
 
 const ClientNavigationButton: React.FC<ClientNavigationButtonProps> = ({
@@ -20,8 +20,8 @@ const ClientNavigationButton: React.FC<ClientNavigationButtonProps> = ({
 
   return (
     <Button
-      {...buttonProps}  // Spread Button props like buttonText, additionalStyles, etc.
-      onClick={handleNavigation}  // Override onClick to use navigation
+      {...buttonProps} // Spread Button props like buttonText, additionalStyles, etc.
+      onClick={handleNavigation} // Override onClick to use navigation
     />
   );
 };

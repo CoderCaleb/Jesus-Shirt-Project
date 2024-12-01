@@ -12,7 +12,7 @@ export interface CartContextType {
 }
 
 export const CartContext = createContext<CartContextType | undefined>(
-  undefined
+  undefined,
 );
 
 interface CartProviderProps {
@@ -21,7 +21,7 @@ interface CartProviderProps {
 
 const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
   const [cartItems, setCartItems] = useState<CartData[]>(
-    JSON.parse(localStorage.getItem("cartItems") || "[]")
+    JSON.parse(localStorage.getItem("cartItems") || "[]"),
   );
   const [isRemoveItemModalOpen, setIsRemoveItemModalOpen] = useState<{
     state: boolean;

@@ -1,18 +1,18 @@
 // lib/fetch-helper.ts
-import { notFound } from 'next/navigation';
+import { notFound } from "next/navigation";
 
 export class ApiError extends Error {
   constructor(
     public status: number,
     public statusText: string,
-    public data: any
+    public data: any,
   ) {
-    super(`${data?.error?.message||data}`);
-    this.name = 'ApiError';
+    super(`${data?.error?.message || data}`);
+    this.name = "ApiError";
   }
 }
 
-export type ApiErrorType = InstanceType<typeof ApiError>
+export type ApiErrorType = InstanceType<typeof ApiError>;
 
 type FetchOptions = {
   cache?: RequestCache;
@@ -30,15 +30,15 @@ type ErrorHandlers = {
 export async function fetchHelper<T>(
   url: string,
   options: {
-    method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+    method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     body?: object;
     headers?: Record<string, string>;
     customConfig?: FetchOptions;
     errorHandlers?: ErrorHandlers;
-  } = {}
+  } = {},
 ): Promise<T> {
   const {
-    method = 'GET',
+    method = "GET",
     body,
     headers = {},
     customConfig = {},
@@ -49,7 +49,7 @@ export async function fetchHelper<T>(
     const response = await fetch(url, {
       method,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         ...headers,
       },
       credentials: "include",
@@ -87,25 +87,21 @@ export async function fetchHelper<T>(
         }
       }
 
-      throw new ApiError(
-        response.status,
-        response.statusText,
-        errorData
-      );
+      throw new ApiError(response.status, response.statusText, errorData);
     }
 
     const data = await response.json();
     return data as T;
   } catch (error) {
-    console.log(error)
+    console.log(error);
     if (error instanceof ApiError) {
       throw error;
     }
 
     throw new ApiError(
       500,
-      'Network Error',
-      error instanceof Error ? error.message : 'Unknown error occurred'
+      "Network Error",
+      error instanceof Error ? error.message : "Unknown error occurred",
     );
   }
 }

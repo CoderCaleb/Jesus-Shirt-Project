@@ -18,7 +18,7 @@ const CartBox: React.FC<CartBoxProps> = ({ productData }) => {
     setCartItems((prev) => {
       const cartData = [...prev];
       const itemInCartIndex = cartData.findIndex(
-        (item) => item.id === productData.id && item.size === productData.size
+        (item) => item.id === productData.id && item.size === productData.size,
       );
       cartData[itemInCartIndex] = {
         ...cartData[itemInCartIndex],
@@ -32,7 +32,7 @@ const CartBox: React.FC<CartBoxProps> = ({ productData }) => {
     setCartItems((prev) => {
       const cartData = [...prev];
       const itemInCartIndex = cartData.findIndex(
-        (item) => item.id === productData.id && item.size === productData.size
+        (item) => item.id === productData.id && item.size === productData.size,
       );
       if (cartData[itemInCartIndex].quantity > 1) {
         cartData[itemInCartIndex] = {

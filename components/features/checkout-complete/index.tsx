@@ -1,1 +1,1 @@
-export {default} from "./CheckoutCompleteClient"
+export { default } from "./CheckoutCompleteClient";

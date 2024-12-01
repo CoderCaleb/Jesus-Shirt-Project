@@ -54,7 +54,7 @@ export default function CheckoutShipping({
   };
 
   const handleContinueToPayment = async (
-    emailData: FormData
+    emailData: FormData,
   ): Promise<void> => {
     const addressElement = elements?.getElement("address");
     if (!addressElement) {
@@ -74,23 +74,23 @@ export default function CheckoutShipping({
               receipt_email: emailData.email,
             },
           });
-          new Promise(resolve => setTimeout(resolve, 2000));
+          new Promise((resolve) => setTimeout(resolve, 2000));
           setCheckoutProgress(2);
         } catch (err) {
           toast.error(
-            "Failed to update shipping info to order. Please try again"
+            "Failed to update shipping info to order. Please try again",
           );
           console.error(err);
         } finally {
           setIsUpdateShippingInfoLoading(false);
         }
       } else {
-        setIsUpdateShippingInfoLoading(false)
+        setIsUpdateShippingInfoLoading(false);
         toast(
           "Please double-check your inputs. Make sure all fields are filled out and correctly formatted.",
           {
             type: "error",
-          }
+          },
         );
       }
     });
@@ -106,7 +106,7 @@ export default function CheckoutShipping({
         <form
           onSubmit={methods.handleSubmit(
             handleContinueToPayment,
-            handleEmailError
+            handleEmailError,
           )}
         >
           <div className="w-full h-full flex items-center relative justify-center flex-col px-3 sm:px-10 sm:min-w-[400px] py-5">

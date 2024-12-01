@@ -2,19 +2,22 @@ import { fetchHelper } from "@/helpers/fetchHelper";
 import { OrderRow } from "./OrderRow";
 import { OrderData } from "@/types/order";
 import { TryRefreshComponent } from "@/components/utility/tryRefreshClientComponent";
-import { getAccessToken, getSSRSessionHelper } from "@/helpers/serverAuthHelpers";
+import {
+  getAccessToken,
+  getSSRSessionHelper,
+} from "@/helpers/serverAuthHelpers";
 import { redirect } from "next/navigation";
 
-type OrdersResponse = {orders:OrderData[]};
+type OrdersResponse = { orders: OrderData[] };
 
 async function fetchOrders(): Promise<OrdersResponse> {
   const url = `http://127.0.0.1:4242/get-orders-summary`;
-  const accessToken = await getAccessToken()
+  const accessToken = await getAccessToken();
   return fetchHelper<OrdersResponse>(url, {
     customConfig: { cache: "no-cache" },
     headers: {
-        Authorization: 'Bearer ' + accessToken
-    }
+      Authorization: "Bearer " + accessToken,
+    },
   });
 }
 
@@ -40,14 +43,10 @@ export default async function OrdersContent() {
 
   try {
     const ordersResponse = await fetchOrders();
-    console.log("ORDERS RESPONSE:",ordersResponse)
+    console.log("ORDERS RESPONSE:", ordersResponse);
 
     if (ordersResponse.orders.length === 0) {
-      return (
-        <p>
-          No orders have been placed yet.
-        </p>
-      );
+      return <p>No orders have been placed yet.</p>;
     }
 
     return (

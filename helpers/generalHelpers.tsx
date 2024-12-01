@@ -1,36 +1,42 @@
 import { CartData } from "@/types/product";
 
-export const calculatePrices = (products:CartData[], shippingPrice:number) => {
-    const productPrice = products
-      .reduce((total, item) => total + Number(item.price) * Number(item.quantity), 0)
-      .toFixed(2);
-    const totalPrice = (
-      parseFloat(productPrice) + shippingPrice
-    ).toFixed(2);
-    return {
-      productPrice: Number(productPrice),
-      totalPrice: Number(totalPrice),
-      shippingPrice: Number(shippingPrice),
-    };
+export const calculatePrices = (
+  products: CartData[],
+  shippingPrice: number,
+) => {
+  const productPrice = products
+    .reduce(
+      (total, item) => total + Number(item.price) * Number(item.quantity),
+      0,
+    )
+    .toFixed(2);
+  const totalPrice = (parseFloat(productPrice) + shippingPrice).toFixed(2);
+  return {
+    productPrice: Number(productPrice),
+    totalPrice: Number(totalPrice),
+    shippingPrice: Number(shippingPrice),
   };
+};
 
-  export const validateEmail = (email:string) => {
-    return String(email)
-      .toLowerCase()
-      .match(
-        /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-      );
-  };
+export const validateEmail = (email: string) => {
+  return String(email)
+    .toLowerCase()
+    .match(
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+    );
+};
 
-  export const formatCurrency = (amount:number) => {
-    return new Intl.NumberFormat("en-US", {
-      style: "currency",
-      currency: "USD",
-    }).format(amount);
-  };
-  
-export const checkCheckoutComplete = (number:number, checkoutProgress:number) =>
-checkoutProgress >= number;
+export const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+  }).format(amount);
+};
+
+export const checkCheckoutComplete = (
+  number: number,
+  checkoutProgress: number,
+) => checkoutProgress >= number;
 
 import { fetchHelper } from "./fetchHelper";
 
@@ -44,20 +50,20 @@ interface AddUserRequestBody {
 interface AddUserResponse {
   success: boolean;
   message: string;
-  data?: any; 
+  data?: any;
 }
 
 export const handleAddingUser = async (
   orderToken?: string,
   orderId?: string,
-  state?: string
+  state?: string,
 ): Promise<{ data?: AddUserResponse; error?: string }> => {
   try {
     const url = "http://localhost:4242/add-user";
     const data = await fetchHelper<AddUserResponse>(url, {
       method: "POST",
       headers: {
-        "Order-Token": orderToken?orderToken:"null",
+        "Order-Token": orderToken ? orderToken : "null",
       },
       body: {
         orderNumber: orderId,
@@ -69,15 +75,16 @@ export const handleAddingUser = async (
     return { data };
   } catch (error) {
     return {
-      error: "We couldn’t complete your sign-up at the moment. Please try again or reach out to us for assistance—we’re here to help!",
+      error:
+        "We couldn’t complete your sign-up at the moment. Please try again or reach out to us for assistance—we’re here to help!",
     };
   }
 };
 
-export function capitalizeFirstLetter(str:string) {
-    if (str.length === 0) {
-      return str;
-    }
-  
-    return str.charAt(0).toUpperCase() + str.slice(1);
+export function capitalizeFirstLetter(str: string) {
+  if (str.length === 0) {
+    return str;
   }
+
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}

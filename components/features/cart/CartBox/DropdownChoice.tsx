@@ -8,14 +8,23 @@ interface DropdownChoiceProps {
   productData: { id: string; size?: string };
 }
 
-const DropdownChoice: React.FC<DropdownChoiceProps> = ({ size, setCartItems, productData }) => {
-  
+const DropdownChoice: React.FC<DropdownChoiceProps> = ({
+  size,
+  setCartItems,
+  productData,
+}) => {
   const handleSizeChange = () => {
     setCartItems((prev) => {
       const cartData = [...prev];
-      const itemInCartIndex = cartData.findIndex((item) => item.id === productData.id);
+      const itemInCartIndex = cartData.findIndex(
+        (item) => item.id === productData.id,
+      );
 
-      if (!cartData.find((item) => item.id === productData.id && item.size === size)) {
+      if (
+        !cartData.find(
+          (item) => item.id === productData.id && item.size === size,
+        )
+      ) {
         if (itemInCartIndex !== -1) {
           cartData[itemInCartIndex] = {
             ...cartData[itemInCartIndex],
@@ -24,7 +33,9 @@ const DropdownChoice: React.FC<DropdownChoiceProps> = ({ size, setCartItems, pro
         }
         return cartData;
       } else {
-        toast("The size for that shirt is already in the cart", { type: "error" });
+        toast("The size for that shirt is already in the cart", {
+          type: "error",
+        });
         return prev;
       }
     });

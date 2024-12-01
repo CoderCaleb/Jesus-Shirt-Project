@@ -31,14 +31,14 @@ const OrderConfirmationPage = async ({
   }
 
   const { fetchOrderItemsError, orderItemsData } = await fetchOrderItemsData(
-    paymentIntent.metadata.order_items
+    paymentIntent.metadata.order_items,
   );
 
   if (fetchOrderItemsError || !orderItemsData?.order_data) {
     return <div>Error fetching order items</div>;
   }
 
-  console.log("paymentIntent status:",paymentIntent.status)
+  console.log("paymentIntent status:", paymentIntent.status);
 
   return (
     <div className="w-full h-full flex items-center md:w-1/2">
@@ -47,7 +47,10 @@ const OrderConfirmationPage = async ({
           <p className="text-3xl font-bold my-7">Checkout</p>
           <CheckoutCompleteClient paymentIntent={paymentIntent} />
           <div className="flex-1">
-            <PaymentStatus paymentIntent={paymentIntent} orderItemsData={orderItemsData.order_data}/>
+            <PaymentStatus
+              paymentIntent={paymentIntent}
+              orderItemsData={orderItemsData.order_data}
+            />
           </div>
           <div className="w-full">
             <ClientNavigationButton
@@ -66,7 +69,7 @@ const OrderConfirmationPage = async ({
 async function fetchPaymentIntent(paymentIntentId: string) {
   try {
     const data = await fetchHelper<PaymentIntentResponse>(
-      `http://127.0.0.1:4242/retrieve-payment-intent?payment_intent_id=${paymentIntentId}`
+      `http://127.0.0.1:4242/retrieve-payment-intent?payment_intent_id=${paymentIntentId}`,
     );
     return data;
   } catch (error) {

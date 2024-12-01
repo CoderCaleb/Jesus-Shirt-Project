@@ -1,1 +1,1 @@
-export {default} from "./ClientNavigationButton"
+export { default } from "./ClientNavigationButton";

@@ -1,1 +1,1 @@
-export {default} from "./SubText"
+export { default } from "./SubText";

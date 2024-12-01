@@ -1,18 +1,19 @@
 // app/orders/OrderRow.tsx
-'use client';
+"use client";
 
-import React from 'react';
-import { useRouter } from 'next/navigation';
-import { OrderData } from '@/types/order';
-import { formatCurrency, capitalizeFirstLetter } from '@/helpers/generalHelpers';
+import React from "react";
+import { useRouter } from "next/navigation";
+import { OrderData } from "@/types/order";
+import {
+  formatCurrency,
+  capitalizeFirstLetter,
+} from "@/helpers/generalHelpers";
 
 type OrderRowProps = {
-  order: OrderData
+  order: OrderData;
 };
 
-export const OrderRow: React.FC<OrderRowProps> = ({
-  order,
-}) => {
+export const OrderRow: React.FC<OrderRowProps> = ({ order }) => {
   const router = useRouter();
 
   return (
@@ -22,18 +23,18 @@ export const OrderRow: React.FC<OrderRowProps> = ({
     >
       <p>{order.order_number}</p>
       <div>
-        <OrderStatusBox
-          status={order.status}
-        />
+        <OrderStatusBox status={order.status} />
       </div>
       <p className="text-center text-sm">
-        {new Date(order.order_date).toLocaleDateString('en-US', {
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
+        {new Date(order.order_date).toLocaleDateString("en-US", {
+          year: "numeric",
+          month: "long",
+          day: "numeric",
         })}
       </p>
-      <p className="text-right text-sm">{formatCurrency(Number(order.total_price) / 100)}</p>
+      <p className="text-right text-sm">
+        {formatCurrency(Number(order.total_price) / 100)}
+      </p>
     </div>
   );
 };

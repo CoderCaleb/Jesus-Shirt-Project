@@ -19,7 +19,7 @@ const Cart: React.FC = () => {
 
   useEffect(() => {
     setPrices(calculatePrices(cartItems, 2));
-    localStorage.setItem("cartItems",JSON.stringify(cartItems))
+    localStorage.setItem("cartItems", JSON.stringify(cartItems));
   }, [cartItems, calculatePrices]);
 
   const CartSummary = ({
@@ -51,7 +51,7 @@ const Cart: React.FC = () => {
           onClick={() => {
             localStorage.setItem(
               "checkoutItems",
-              JSON.stringify({ checkoutItems: cartItems, fromCart: true })
+              JSON.stringify({ checkoutItems: cartItems, fromCart: true }),
             );
             router.push("/checkout");
           }}
@@ -89,7 +89,7 @@ const Cart: React.FC = () => {
           onClick={() => {
             localStorage.setItem(
               "checkoutItems",
-              JSON.stringify({ checkoutItems: cartItems, fromCart: true })
+              JSON.stringify({ checkoutItems: cartItems, fromCart: true }),
             );
             router.push("/checkout");
           }}
@@ -116,7 +116,7 @@ const Cart: React.FC = () => {
 
   return (
     <div className="w-full h-full relative">
-      <RemoveItemModal productData={isRemoveItemModalOpen.productData}/>
+      <RemoveItemModal productData={isRemoveItemModalOpen.productData} />
       <div className="w-full h-full px-10 pt-5 overflow-x-hidden overflow-y-scroll">
         {cartItems.length !== 0 ? (
           <div className="flex w-full">

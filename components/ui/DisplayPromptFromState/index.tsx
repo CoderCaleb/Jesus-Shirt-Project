@@ -1,1 +1,1 @@
-export {default} from "./DisplayPromptFromState"
+export { default } from "./DisplayPromptFromState";

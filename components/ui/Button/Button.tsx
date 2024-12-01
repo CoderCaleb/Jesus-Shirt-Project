@@ -9,7 +9,7 @@ const Button: React.FC<ButtonProps> = ({
   onClick = () => {},
   buttonType = "black",
   isDisabled = false,
-  type="button"
+  type = "button",
 }) => {
   const baseStyles =
     "w-full h-12 font-semibold rounded-md transition-all duration-300";

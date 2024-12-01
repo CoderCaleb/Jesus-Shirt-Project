@@ -8,7 +8,7 @@ export default function PaymentStatus({
   orderItemsData,
 }: {
   paymentIntent: { [key: string]: any };
-  orderItemsData: CartData[] ;
+  orderItemsData: CartData[];
 }) {
   return (
     <div>
@@ -59,11 +59,9 @@ export default function PaymentStatus({
             <div className="flex pl-3 pt-3">
               <p className="text-slate-500 font-semibold">Items</p>
               <div className="w-full overflow-y-scroll max-h-60">
-                {orderItemsData.map(
-                  (product: CartData, index: number) => (
-                    <ItemCard productInfo={product} index={index} key={index} />
-                  )
-                )}
+                {orderItemsData.map((product: CartData, index: number) => (
+                  <ItemCard productInfo={product} index={index} key={index} />
+                ))}
               </div>
             </div>
           </div>
@@ -93,8 +91,8 @@ export default function PaymentStatus({
         <div className="h-72 flex flex-col gap-3 text-center justify-center items-center">
           <p>It looks like you didn’t complete the checkout process.</p>
           <p>
-            Kindly try again and complete the required action
-            to finish the checkout.
+            Kindly try again and complete the required action to finish the
+            checkout.
           </p>
           <p>
             If you're unsure about the next steps, please contact support for

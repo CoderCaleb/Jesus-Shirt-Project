@@ -1,1 +1,1 @@
-export {default} from "./DisplayShippingAddress"
+export { default } from "./DisplayShippingAddress";

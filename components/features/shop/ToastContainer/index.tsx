@@ -2,11 +2,11 @@
 
 import { useEffect } from "react";
 import { toast } from "react-toastify";
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams } from "next/navigation";
 const ToastNotification = () => {
-  const searchParams = useSearchParams()
-  const authStatus = searchParams.get("authStatus")
-  const authType = searchParams.get("authType")
+  const searchParams = useSearchParams();
+  const authStatus = searchParams.get("authStatus");
+  const authType = searchParams.get("authType");
 
   useEffect(() => {
     // Check if there are query params indicating success and authType

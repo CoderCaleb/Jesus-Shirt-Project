@@ -8,7 +8,10 @@ import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import Button from "@/components/ui/Button";
-import { hasInitialMagicLinkBeenSent, sendMagicLink } from "@/helpers/authHelpers";
+import {
+  hasInitialMagicLinkBeenSent,
+  sendMagicLink,
+} from "@/helpers/authHelpers";
 import { toast } from "react-toastify";
 import Loader from "@/components/ui/Loader";
 
@@ -45,19 +48,19 @@ export default function SignUpClient({
   const [sendMagicLinkError, setSendMagicLinkError] = useState({ error: null });
   const [authStep, setAuthStep] = useState<null | number>(null);
 
-  useEffect(()=>{
-    const updateInitialMagicLinkBeenSentState = async ()=>{
-        setAuthStep(await hasInitialMagicLinkBeenSent()?2:1)
-    }
-    updateInitialMagicLinkBeenSentState()
-  },[])
+  useEffect(() => {
+    const updateInitialMagicLinkBeenSentState = async () => {
+      setAuthStep((await hasInitialMagicLinkBeenSent()) ? 2 : 1);
+    };
+    updateInitialMagicLinkBeenSentState();
+  }, []);
 
   const onSubmit = async (data: FormData) => {
     setSendMagicLinkLoading(true);
     try {
       await sendMagicLink(data.email);
       setAuthStep(2);
-      methods.reset()
+      methods.reset();
     } catch (error: any) {
       setSendMagicLinkError({ error: error.message });
     } finally {
@@ -65,8 +68,8 @@ export default function SignUpClient({
     }
   };
 
-  if(!authStep){
-    return <Loader/>
+  if (!authStep) {
+    return <Loader />;
   }
 
   return (
@@ -99,16 +102,20 @@ export default function SignUpClient({
         </FormProvider>
       ) : (
         <>
-        <MessageBox
-          type="success"
-          message={
-            "We’ve sent you an email to sign in. Messages can take a few minutes to arrive in your inbox."
-          }
-        />
-        <Button buttonText="Use a different email" buttonType="black" onClick={()=>setAuthStep(1)} additionalStyles="mt-5"/>
+          <MessageBox
+            type="success"
+            message={
+              "We’ve sent you an email to sign in. Messages can take a few minutes to arrive in your inbox."
+            }
+          />
+          <Button
+            buttonText="Use a different email"
+            buttonType="black"
+            onClick={() => setAuthStep(1)}
+            additionalStyles="mt-5"
+          />
         </>
       )}
-
     </>
   );
 }

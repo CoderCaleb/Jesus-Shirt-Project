@@ -1,1 +1,1 @@
-export {default} from "./OrderSummaryPanel"
+export { default } from "./OrderSummaryPanel";

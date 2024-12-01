@@ -13,9 +13,9 @@ interface SearchParams {
 }
 
 const page = async ({ searchParams }: { searchParams: SearchParams }) => {
-  const searchParamsObject =
-    {...await searchParams}
-    const {from, state, orderId, orderToken, email, linkedUserEmail} = searchParamsObject
+  const searchParamsObject = { ...(await searchParams) };
+  const { from, state, orderId, orderToken, email, linkedUserEmail } =
+    searchParamsObject;
   return (
     <div className="w-full h-full justify-center items-center flex">
       <div className="w-96 flex flex-col text-center">
@@ -34,7 +34,7 @@ const page = async ({ searchParams }: { searchParams: SearchParams }) => {
           )}
         </div>
         <div className="bg-slate-300 w-full h-lineBreakHeight my-4" />
-        <SignUpClient {...searchParamsObject}/>
+        <SignUpClient {...searchParamsObject} />
       </div>
     </div>
   );

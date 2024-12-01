@@ -9,11 +9,12 @@ interface RemoveItemModalProps {
 }
 
 const RemoveItemModal: React.FC<RemoveItemModalProps> = ({ productData }) => {
-  if(!productData){
-    return null
+  if (!productData) {
+    return null;
   }
   const { name } = productData;
-  const { setCartItems, setIsRemoveItemModalOpen, isRemoveItemModalOpen } = useCartContext();
+  const { setCartItems, setIsRemoveItemModalOpen, isRemoveItemModalOpen } =
+    useCartContext();
 
   const handleRemoveItem = () => {
     setCartItems((prev) => prev.filter((item) => item !== productData));
@@ -33,14 +34,16 @@ const RemoveItemModal: React.FC<RemoveItemModalProps> = ({ productData }) => {
 
   const content = (
     <p className="text-sm text-slate-600 text-center">
-      Do you want to remove <span className="font-semibold">{name}</span> from cart?
+      Do you want to remove <span className="font-semibold">{name}</span> from
+      cart?
     </p>
   );
 
   const actions = [
     {
       label: "Remove",
-      className: "border-2 text-sm border-black bg-black text-white hover:bg-white hover:text-black",
+      className:
+        "border-2 text-sm border-black bg-black text-white hover:bg-white hover:text-black",
       onClick: handleRemoveItem,
     },
     {

@@ -11,13 +11,14 @@ const TransactionFailedError = async ({
 }) => {
   const { orderErrorId } = await searchParams;
 
-  const { fetchErrorDataError, errorData } = await fetchOrderErrorData(orderErrorId);
+  const { fetchErrorDataError, errorData } =
+    await fetchOrderErrorData(orderErrorId);
   if (fetchErrorDataError || !errorData?.orderErrorInfo) {
     return <div>{fetchErrorDataError || "Order error data not found."}</div>;
   }
 
   const { fetchOrderItemsError, orderItemsData } = await fetchOrderItemsData(
-    errorData.orderErrorInfo.order_items
+    errorData.orderErrorInfo.order_items,
   );
   if (fetchOrderItemsError || !orderItemsData?.order_data) {
     return <div>{fetchOrderItemsError || "Failed to load order items."}</div>;
@@ -46,14 +47,15 @@ const fetchOrderErrorData = async (orderErrorId: string) => {
     return { errorData: data };
   } catch (error: unknown) {
     if (error instanceof ApiError) {
-       console.log(error.data)
-      return { fetchErrorDataError: error.data.error || "Order error data not found." };
+      console.log(error.data);
+      return {
+        fetchErrorDataError: error.data.error || "Order error data not found.",
+      };
     } else {
       return { fetchErrorDataError: "An unexpected error occurred." };
     }
   }
 };
-
 
 const ErrorInfo = ({ orderErrorId }: { orderErrorId: string }) => (
   <div>

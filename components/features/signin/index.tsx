@@ -1,1 +1,1 @@
-export {default} from "./SignUpClient"
+export { default } from "./SignUpClient";

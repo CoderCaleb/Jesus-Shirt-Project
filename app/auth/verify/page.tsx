@@ -13,9 +13,8 @@ const VerifyPage = () => {
     "loading" | "error" | "success" | "idle"
   >("idle");
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [requiresConfirmation, setRequiresConfirmation] = useState<boolean>(
-    true
-  );
+  const [requiresConfirmation, setRequiresConfirmation] =
+    useState<boolean>(true);
 
   const divStyles =
     "text-center flex flex-col justify-center items-center gap-5";
