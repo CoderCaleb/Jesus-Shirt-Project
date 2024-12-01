@@ -5,6 +5,9 @@ import {
   createCode,
 } from "supertokens-web-js/recipe/passwordless";
 
+import Session from "supertokens-web-js/recipe/session";
+import { handleAddingUser } from "./generalHelpers";
+
 export async function sendMagicLink(email: string) {
   try {
     let response = await createCode({
@@ -42,12 +45,37 @@ export const handleMagicLinkClicked = async (
   setStatus: React.Dispatch<
     React.SetStateAction<"loading" | "error" | "success" | "idle">
   >,
-  setErrorMessage: React.Dispatch<React.SetStateAction<string>>
+  setErrorMessage: React.Dispatch<React.SetStateAction<string>>,
+  orderToken?: string,
+  orderNumber?:string,
+  state?:string
 ) => {
   setStatus("loading");
 
   try {
-    const response: MagicLinkResponse = await consumeCode();
+    const response: MagicLinkResponse = await consumeCode({
+      options: {
+        preAPIHook: async (input) => {
+          let { url, requestInit } = input;
+          const existingBody = requestInit.body?JSON.parse(requestInit.body as string):{}
+          if (orderToken) {
+            requestInit = {
+              ...requestInit,
+              headers: {
+                ...requestInit.headers,
+                OrderToken: orderToken,
+              },
+              body:JSON.stringify({
+                ...existingBody,
+                orderNumber:orderNumber,
+                state:state
+              })
+            };
+          }
+          return { url, requestInit };
+        },
+      },
+    });
 
     if (response.status === "OK") {
       // Clear login attempt info
@@ -57,11 +85,9 @@ export const handleMagicLinkClicked = async (
         response.createdNewRecipeUser &&
         response.user?.loginMethods.length === 1
       ) {
-        // user sign up success
-        router.push("/shop?authStatus=success&authType=signup");
+        window.location.href = "/shop?authStatus=success&authType=signup";
       } else {
-        // user sign in success
-        router.push("/shop?authStatus=success&authType=signin");
+        window.location.href = "/shop?authStatus=success&authType=signin";
       }
     } else {
       setStatus("error");
@@ -81,11 +107,9 @@ export const handleMagicLinkClicked = async (
 };
 
 export async function isThisSameBrowserAndDevice() {
-    return await getLoginAttemptInfo() !== undefined;
+  return (await getLoginAttemptInfo()) !== undefined;
 }
 
-import Session from 'supertokens-web-js/recipe/session';
-
 export async function doesSessionExist() {
-    return await Session.doesSessionExist()
+  return await Session.doesSessionExist();
 }

@@ -85,6 +85,7 @@ export default function CheckoutShipping({
           setIsUpdateShippingInfoLoading(false);
         }
       } else {
+        setIsUpdateShippingInfoLoading(false)
         toast(
           "Please double-check your inputs. Make sure all fields are filled out and correctly formatted.",
           {

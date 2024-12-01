@@ -3,6 +3,4 @@ export type OrderData = {
     status: string;
     order_date: string;
     total_price: string;
-    _id: string;
   };
-  

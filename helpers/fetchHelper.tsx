@@ -52,6 +52,7 @@ export async function fetchHelper<T>(
         'Content-Type': 'application/json',
         ...headers,
       },
+      credentials: "include",
       body: body ? JSON.stringify(body) : undefined,
       // Next.js 13+ specific options
       cache: customConfig.cache,
@@ -96,6 +97,7 @@ export async function fetchHelper<T>(
     const data = await response.json();
     return data as T;
   } catch (error) {
+    console.log(error)
     if (error instanceof ApiError) {
       throw error;
     }

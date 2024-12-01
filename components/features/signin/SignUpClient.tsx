@@ -91,22 +91,6 @@ export default function SignUpClient({
                   additionalStyles="rounded-[10px]"
                 />
               </div>
-              <p className="mt-5 text-sm text-slate-800 font-semibold">
-                Don't have an account yet?{" "}
-                <Link
-                  href={
-                    from === "order-tracking" &&
-                    (state === "not-authenticated-no-linked-user" ||
-                      state === "authenticated-no-linked-user")
-                      ? `/signup?from=order-tracking&state=${state}&orderId=${orderId}&orderToken=${orderToken}`
-                      : "/signup"
-                  }
-                >
-                  <span className="cursor-pointer text-blue-600 mt-5">
-                    Sign up now
-                  </span>
-                </Link>
-              </p>
               {sendMagicLinkError.error && (
                 <MessageBox type="error" message={sendMagicLinkError?.error} />
               )}

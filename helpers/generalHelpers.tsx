@@ -31,3 +31,53 @@ export const calculatePrices = (products:CartData[], shippingPrice:number) => {
   
 export const checkCheckoutComplete = (number:number, checkoutProgress:number) =>
 checkoutProgress >= number;
+
+import { fetchHelper } from "./fetchHelper";
+
+interface AddUserRequestBody {
+  email: string;
+  orderNumber: string;
+  orderToken: string;
+  state: string;
+}
+
+interface AddUserResponse {
+  success: boolean;
+  message: string;
+  data?: any; 
+}
+
+export const handleAddingUser = async (
+  orderToken?: string,
+  orderId?: string,
+  state?: string
+): Promise<{ data?: AddUserResponse; error?: string }> => {
+  try {
+    const url = "http://localhost:4242/add-user";
+    const data = await fetchHelper<AddUserResponse>(url, {
+      method: "POST",
+      headers: {
+        "Order-Token": orderToken?orderToken:"null",
+      },
+      body: {
+        orderNumber: orderId,
+        orderToken,
+        state,
+      } as AddUserRequestBody,
+    });
+
+    return { data };
+  } catch (error) {
+    return {
+      error: "We couldn’t complete your sign-up at the moment. Please try again or reach out to us for assistance—we’re here to help!",
+    };
+  }
+};
+
+export function capitalizeFirstLetter(str:string) {
+    if (str.length === 0) {
+      return str;
+    }
+  
+    return str.charAt(0).toUpperCase() + str.slice(1);
+  }

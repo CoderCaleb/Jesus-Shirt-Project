@@ -70,7 +70,7 @@ const VerifyPage = () => {
           <Button
             buttonText="Get a new link"
             buttonType="black"
-            additionalStyles="w-32"
+            additionalStyles="w-40"
             onClick={() => {
               router.push("/auth");
             }}

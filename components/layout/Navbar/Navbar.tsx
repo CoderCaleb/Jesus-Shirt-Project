@@ -5,10 +5,7 @@ import { FiShoppingCart, FiUser } from "react-icons/fi";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import Image from "next/image";
-import {
-  useSessionContext,
-  signOut,
-} from "supertokens-auth-react/recipe/session";
+import Session from "supertokens-web-js/recipe/session";
 import SkeletonLoader from "./SkeletonLoader";
 import { doesSessionExist } from "@/helpers/authHelpers";
 
@@ -19,12 +16,13 @@ const Navbar: React.FC = () => {
   const [pageStatus, setPageStatus] = useState<string>("");
   const [sessionExist, setSessionExist] = useState<null | boolean>(null);
 
+  async function checkSessionExist() {
+    const isSessionExist = await doesSessionExist();
+    setSessionExist(isSessionExist);
+    console.log({ isSessionExist });
+  }
+
   useEffect(() => {
-    async function checkSessionExist() {
-      const isSessionExist = await doesSessionExist();
-      setSessionExist(isSessionExist);
-      console.log({isSessionExist})
-    }
     checkSessionExist();
   }, []);
 
@@ -40,8 +38,15 @@ const Navbar: React.FC = () => {
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    toast("You have successfully logged out", { type: "success" });
+    try {
+      await Session.signOut();
+
+      await checkSessionExist();
+      toast.success("You have successfully logged out");
+    } catch (e) {
+      console.error(e);
+      toast.error("Sign out failed. Please try again");
+    }
   };
 
   const toggleSidebar = () => {
@@ -50,8 +55,8 @@ const Navbar: React.FC = () => {
 
   const checkIconActive = (iconPage: string) => iconPage === pageStatus;
 
-  if(sessionExist===null){
-    return <SkeletonLoader/>
+  if (sessionExist === null) {
+    return <SkeletonLoader />;
   }
 
   return (
@@ -95,13 +100,8 @@ const Navbar: React.FC = () => {
         {sessionExist === false && (
           <>
             <Navlink
-              content="Login"
-              clickedFunc={() => handleNavigation("login")}
-              dontHide
-            />
-            <Navlink
-              content="Sign up"
-              clickedFunc={() => handleNavigation("signup")}
+              content="Sign in / up"
+              clickedFunc={() => handleNavigation("auth")}
               dontHide
             />
           </>
@@ -197,7 +197,7 @@ const UserDropdown: React.FC<UserDropdownProps> = ({ handleSignOut }) => {
           link="Orders"
           clickedFunc={() => router.push("/orders")}
         />
-        <DropdownChoice link="Logout" clickedFunc={() => {}} />
+        <DropdownChoice link="Logout" clickedFunc={handleSignOut} />
       </div>
     </div>
   );

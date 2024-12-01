@@ -40,7 +40,7 @@ export default function CheckoutShipping() {
   }, []); // This runs only once when the component mounts
 
   useEffect(() => {
-    if (checkoutItems.length > 0) {
+    if (checkoutItems&&checkoutItems.length > 0) {
       createPaymentIntent(checkoutItems, userToken, user?.uid);
     }
   }, [checkoutItems, userToken]);
@@ -62,7 +62,7 @@ export default function CheckoutShipping() {
     try {
       console.log("creating payment intent");
       const data = await fetchHelper<RequestData>(
-        "http://127.0.0.1:4242/create-payment-intent",
+        "http://localhost:4242/create-payment-intent",
         {
           method: "POST",
           headers: {
@@ -80,16 +80,16 @@ export default function CheckoutShipping() {
     }
   };
 
+  if (checkoutItems&&!checkoutItems.length) {
+    return <p>Checkout items are null</p>;
+  }
+
   if (createPIError) {
     return <p className="text-center mt-10">{createPIError}</p>;
   }
 
   if (loading || !clientSecret || !paymentIntentId) {
     return <Loader />; // Show loader while the state is being initialized
-  }
-
-  if (!checkoutItems.length) {
-    return <p>Checkout items are null</p>;
   }
 
   const options = {
