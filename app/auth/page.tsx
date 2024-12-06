@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
-import DisplayPromptFromState from "@/components/ui/DisplayPromptFromState";
 import SignUpClient from "@/components/features/signin/SignUpClient";
+import DisplayPromptFromState from "@/components/features/auth/DisplayPromptFromState";
 
 interface SearchParams {
   from: string | undefined;
@@ -21,11 +21,10 @@ const page = async ({ searchParams }: { searchParams: SearchParams }) => {
       <div className="w-96 flex flex-col text-center">
         <p className="text-3xl font-semibold mb-3">Get Started!</p>
         <div className="">
-          {from === "order-tracking" ? (
+          {from === "order-tracking" && state ? (
             <DisplayPromptFromState
               state={state}
               linkedUserEmail={linkedUserEmail}
-              orderId={orderId}
             />
           ) : from === "sign-up" || from === "change-email" ? (
             <p className="text-sm text-slate-700 font-semibold">{`Email verification successful. Please sign in to ${email} to proceed`}</p>
@@ -34,7 +33,7 @@ const page = async ({ searchParams }: { searchParams: SearchParams }) => {
           )}
         </div>
         <div className="bg-slate-300 w-full h-lineBreakHeight my-4" />
-        <SignUpClient {...searchParamsObject} />
+        <SignUpClient orderToken={orderToken} state={state} orderId={orderId} />
       </div>
     </div>
   );

@@ -8,10 +8,42 @@ import {
 import Session from "supertokens-web-js/recipe/session";
 import { handleAddingUser } from "./generalHelpers";
 
-export async function sendMagicLink(email: string) {
+function attachOrderHeaders(
+  input: any,
+  orderToken?: string,
+  orderNumber?: string,
+  state?: string,
+) {
+  let { url, requestInit } = input;
+  console.log("Attach headers", orderToken, orderNumber, state);
+  if (orderToken && orderNumber && state) {
+    requestInit = {
+      ...requestInit,
+      headers: {
+        ...requestInit.headers,
+        "Order-Token": orderToken,
+        orderNumber: orderNumber,
+        state: state,
+      },
+    };
+  }
+  return { url, requestInit };
+}
+
+export async function sendMagicLink(
+  email: string,
+  orderToken?: string,
+  orderNumber?: string,
+  state?: string,
+) {
   try {
     let response = await createCode({
       email,
+      options: {
+        preAPIHook: async (input) => {
+          return attachOrderHeaders(input, orderToken, orderNumber, state);
+        },
+      },
     });
 
     if (response.status === "SIGN_IN_UP_NOT_ALLOWED") {
@@ -41,7 +73,6 @@ type MagicLinkResponse = {
 };
 
 export const handleMagicLinkClicked = async (
-  router: AppRouterInstance,
   setStatus: React.Dispatch<
     React.SetStateAction<"loading" | "error" | "success" | "idle">
   >,
@@ -56,32 +87,15 @@ export const handleMagicLinkClicked = async (
     const response: MagicLinkResponse = await consumeCode({
       options: {
         preAPIHook: async (input) => {
-          let { url, requestInit } = input;
-          const existingBody = requestInit.body
-            ? JSON.parse(requestInit.body as string)
-            : {};
-          if (orderToken) {
-            requestInit = {
-              ...requestInit,
-              headers: {
-                ...requestInit.headers,
-                OrderToken: orderToken,
-              },
-              body: JSON.stringify({
-                ...existingBody,
-                orderNumber: orderNumber,
-                state: state,
-              }),
-            };
-          }
-          return { url, requestInit };
+          return attachOrderHeaders(input, orderToken, orderNumber, state);
         },
       },
     });
+    console.log("Magic link response:", response);
+    await clearLoginAttemptInfo();
 
     if (response.status === "OK") {
       // Clear login attempt info
-      await clearLoginAttemptInfo();
 
       if (
         response.createdNewRecipeUser &&
@@ -98,11 +112,14 @@ export const handleMagicLinkClicked = async (
       );
     }
   } catch (err: any) {
+    console.log("Magic link error", err);
     setStatus("error");
     if (err.isSuperTokensGeneralError) {
       setErrorMessage(`Error: ${err.message}`);
     } else {
-      setErrorMessage("Oops! Something went wrong. Please try again later.");
+      setErrorMessage(
+        err.message || "Oops! Something went wrong. Please try again later.",
+      );
     }
     console.error("Error verifying magic link:", err);
   }

@@ -1,5 +1,5 @@
 import { calculatePrices } from "@/helpers/generalHelpers";
-import { CartData } from "@/types/product";
+import { CartData, Prices } from "@/types/product";
 import { useEffect, useState } from "react";
 import CheckoutShipping from "./CheckoutShipping";
 import OrderSummaryPanel from "./OrderSummaryPanel";
@@ -12,10 +12,10 @@ const CheckoutContent = ({
   paymentIntentId: string;
 }) => {
   const [checkoutProgress, setCheckoutProgress] = useState(1);
-  const [prices, setPrices] = useState({
-    productPrice: 0,
-    totalPrice: 0,
-    shippingPrice: 0,
+  const [prices, setPrices] = useState<Prices>({
+    productPrice: "0",
+    totalPrice: "0",
+    shippingPrice: "0",
   });
   useEffect(() => {
     setPrices(calculatePrices(checkoutItems, 2));

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import ItemCard from "@/components/ui/ItemCard";
 import { calculatePrices, formatCurrency } from "@/helpers/generalHelpers";
-import { CartData } from "@/types/product";
+import { CartData, Prices } from "@/types/product";
 
 interface OrderSummaryPanelProps {
   checkoutItems: CartData[];
@@ -12,10 +12,10 @@ const OrderSummaryPanel: React.FC<OrderSummaryPanelProps> = ({
   checkoutItems,
   shippingPrice,
 }) => {
-  const [prices, setPrices] = useState({
-    productPrice: 0,
-    totalPrice: 0,
-    shippingPrice: 0,
+  const [prices, setPrices] = useState<Prices>({
+    productPrice: "0",
+    totalPrice: "0",
+    shippingPrice: "0",
   });
   useEffect(() => {
     setPrices(calculatePrices(checkoutItems, shippingPrice));
@@ -38,7 +38,7 @@ const OrderSummaryPanel: React.FC<OrderSummaryPanelProps> = ({
 };
 interface PriceDetailProps {
   label: string;
-  amount: number;
+  amount: number | string;
 }
 
 const PriceDetail: React.FC<PriceDetailProps> = ({ label, amount }) => (
@@ -49,7 +49,7 @@ const PriceDetail: React.FC<PriceDetailProps> = ({ label, amount }) => (
 );
 
 interface TotalPriceProps {
-  amount: number;
+  amount: number | string;
 }
 
 const TotalPrice: React.FC<TotalPriceProps> = ({ amount }) => (

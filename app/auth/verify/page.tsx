@@ -4,11 +4,12 @@ import SubText from "@/components/ui/SubText";
 import TitleText from "@/components/ui/TitleText";
 import { handleMagicLinkClicked } from "@/helpers/authHelpers";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
 
 const VerifyPage = () => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [status, setStatus] = useState<
     "loading" | "error" | "success" | "idle"
   >("idle");
@@ -18,12 +19,23 @@ const VerifyPage = () => {
 
   const divStyles =
     "text-center flex flex-col justify-center items-center gap-5";
+  const orderToken = searchParams.get("order_token") ?? undefined;
+  const orderNumber = searchParams.get("order_id") ?? undefined;
+  const state = searchParams.get("state") ?? undefined;
 
   useEffect(() => {
+    console.log(searchParams.get("orderToken"), orderToken);
+
     if (!requiresConfirmation) {
-      handleMagicLinkClicked(router, setStatus, setErrorMessage);
+      handleMagicLinkClicked(
+        setStatus,
+        setErrorMessage,
+        orderToken,
+        orderNumber,
+        state,
+      );
     }
-  }, [router, requiresConfirmation]);
+  }, [requiresConfirmation]);
 
   const handleConfirmation = () => {
     setRequiresConfirmation(false);
@@ -71,7 +83,11 @@ const VerifyPage = () => {
             buttonType="black"
             additionalStyles="w-40"
             onClick={() => {
-              router.push("/auth");
+              router.push(
+                orderToken && orderNumber
+                  ? `/orders/${orderNumber}?order_token=${orderToken}`
+                  : "/auth",
+              );
             }}
           />
         </div>

@@ -4,17 +4,19 @@ export const calculatePrices = (
   products: CartData[],
   shippingPrice: number,
 ) => {
+  const shippingPriceNumber = Number(shippingPrice);
   const productPrice = products
     .reduce(
       (total, item) => total + Number(item.price) * Number(item.quantity),
       0,
     )
     .toFixed(2);
-  const totalPrice = (parseFloat(productPrice) + shippingPrice).toFixed(2);
+  const totalPrice = (Number(productPrice) + shippingPriceNumber).toFixed(2);
+  const formattedShippingPrice = shippingPriceNumber.toFixed(2);
   return {
-    productPrice: Number(productPrice),
-    totalPrice: Number(totalPrice),
-    shippingPrice: Number(shippingPrice),
+    productPrice,
+    totalPrice,
+    shippingPrice: formattedShippingPrice,
   };
 };
 
@@ -26,11 +28,11 @@ export const validateEmail = (email: string) => {
     );
 };
 
-export const formatCurrency = (amount: number) => {
+export const formatCurrency = (amount: number | string) => {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
-  }).format(amount);
+  }).format(Number(amount));
 };
 
 export const checkCheckoutComplete = (
@@ -87,4 +89,10 @@ export function capitalizeFirstLetter(str: string) {
   }
 
   return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+export function addDaysToDate(date: string, days: number) {
+  const result = new Date(date); // Create a new Date object to avoid modifying the original date
+  result.setDate(result.getDate() + days); // Add the specified number of days to the date
+  return result; // Return the new date
 }

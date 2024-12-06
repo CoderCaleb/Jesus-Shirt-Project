@@ -12,9 +12,9 @@ export type CartData = ProductData & {
 };
 
 export type Prices = {
-  productPrice: number;
-  totalPrice: number;
-  shippingPrice: number;
+  productPrice: number | string;
+  totalPrice: number | string;
+  shippingPrice: number | string;
 };
 
 export type SizeChoice = "XS" | "S" | "M" | "L" | "XL" | "2XL";

@@ -26,7 +26,7 @@ export const OrderRow: React.FC<OrderRowProps> = ({ order }) => {
         <OrderStatusBox status={order.status} />
       </div>
       <p className="text-center text-sm">
-        {new Date(order.order_date).toLocaleDateString("en-US", {
+        {new Date(order.order_date * 1000).toLocaleDateString("en-US", {
           year: "numeric",
           month: "long",
           day: "numeric",

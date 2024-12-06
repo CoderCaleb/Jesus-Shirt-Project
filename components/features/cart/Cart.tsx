@@ -12,9 +12,9 @@ const Cart: React.FC = () => {
   const router = useRouter();
   const { cartItems, isRemoveItemModalOpen } = useCartContext();
   const [prices, setPrices] = useState<Prices>({
-    productPrice: 0,
-    totalPrice: 0,
-    shippingPrice: 0,
+    productPrice: "0",
+    totalPrice: "0",
+    shippingPrice: "0",
   });
 
   useEffect(() => {

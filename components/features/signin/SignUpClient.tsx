@@ -16,12 +16,9 @@ import { toast } from "react-toastify";
 import Loader from "@/components/ui/Loader";
 
 interface SignUpClientProps {
-  from: string | undefined;
   state: string | undefined;
   orderId: string | undefined;
   orderToken: string | undefined;
-  email: string | undefined;
-  linkedUserEmail: string | undefined;
 }
 
 type FormData = {
@@ -36,12 +33,9 @@ const emailSchema = z.object({
 });
 
 export default function SignUpClient({
-  from,
   state,
   orderId,
   orderToken,
-  email,
-  linkedUserEmail,
 }: SignUpClientProps) {
   const methods = useForm<FormData>({ resolver: zodResolver(emailSchema) });
   const [sendMagicLinkLoading, setSendMagicLinkLoading] = useState(false);
@@ -58,7 +52,7 @@ export default function SignUpClient({
   const onSubmit = async (data: FormData) => {
     setSendMagicLinkLoading(true);
     try {
-      await sendMagicLink(data.email);
+      await sendMagicLink(data.email, orderToken, orderId, state);
       setAuthStep(2);
       methods.reset();
     } catch (error: any) {
