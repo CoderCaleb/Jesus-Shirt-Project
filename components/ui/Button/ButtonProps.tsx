@@ -5,4 +5,5 @@ export type ButtonProps = {
   buttonType?: "black" | "transparent";
   isDisabled?: boolean;
   type?: "button" | "submit" | "reset";
+  disabledLoader?: boolean
 };

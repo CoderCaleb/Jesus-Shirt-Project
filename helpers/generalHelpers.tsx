@@ -2,13 +2,13 @@ import { CartData } from "@/types/product";
 
 export const calculatePrices = (
   products: CartData[],
-  shippingPrice: number,
+  shippingPrice: number
 ) => {
   const shippingPriceNumber = Number(shippingPrice);
   const productPrice = products
     .reduce(
       (total, item) => total + Number(item.price) * Number(item.quantity),
-      0,
+      0
     )
     .toFixed(2);
   const totalPrice = (Number(productPrice) + shippingPriceNumber).toFixed(2);
@@ -24,7 +24,7 @@ export const validateEmail = (email: string) => {
   return String(email)
     .toLowerCase()
     .match(
-      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/,
+      /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
     );
 };
 
@@ -37,7 +37,7 @@ export const formatCurrency = (amount: number | string) => {
 
 export const checkCheckoutComplete = (
   number: number,
-  checkoutProgress: number,
+  checkoutProgress: number
 ) => checkoutProgress >= number;
 
 import { fetchHelper } from "./fetchHelper";
@@ -58,7 +58,7 @@ interface AddUserResponse {
 export const handleAddingUser = async (
   orderToken?: string,
   orderId?: string,
-  state?: string,
+  state?: string
 ): Promise<{ data?: AddUserResponse; error?: string }> => {
   try {
     const url = "http://localhost:4242/add-user";
@@ -95,4 +95,18 @@ export function addDaysToDate(date: string, days: number) {
   const result = new Date(date); // Create a new Date object to avoid modifying the original date
   result.setDate(result.getDate() + days); // Add the specified number of days to the date
   return result; // Return the new date
+}
+
+type SendOrderLinkResponse = {
+  message: string;
+};
+
+export async function sendOrderLink(email: string, orderNumber: string) {
+  await fetchHelper<SendOrderLinkResponse>(
+    "http://localhost:4242/send-order-link",
+    {
+      method: "POST",
+      body: { email, orderNumber },
+    }
+  );
 }

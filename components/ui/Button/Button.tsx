@@ -10,6 +10,7 @@ const Button: React.FC<ButtonProps> = ({
   buttonType = "black",
   isDisabled = false,
   type = "button",
+  disabledLoader = true,
 }) => {
   const baseStyles =
     "w-full h-12 font-semibold rounded-md transition-all duration-300";
@@ -31,6 +32,8 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
     >
       {!isDisabled ? (
+        buttonText
+      ) : !disabledLoader ? (
         buttonText
       ) : (
         <BiLoaderAlt

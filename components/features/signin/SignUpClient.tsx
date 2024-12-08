@@ -1,9 +1,7 @@
 "use client";
 import InputField from "@/components/ui/InputField";
 import MessageBox from "@/components/ui/MessageBox";
-import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { BiLoaderAlt } from "react-icons/bi";
 import { z } from "zod";
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -12,7 +10,6 @@ import {
   hasInitialMagicLinkBeenSent,
   sendMagicLink,
 } from "@/helpers/authHelpers";
-import { toast } from "react-toastify";
 import Loader from "@/components/ui/Loader";
 
 interface SignUpClientProps {
@@ -56,6 +53,7 @@ export default function SignUpClient({
       setAuthStep(2);
       methods.reset();
     } catch (error: any) {
+      console.error(error)
       setSendMagicLinkError({ error: error.message });
     } finally {
       setSendMagicLinkLoading(false);

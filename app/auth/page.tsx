@@ -1,5 +1,4 @@
 import React from "react";
-import Link from "next/link";
 import SignUpClient from "@/components/features/signin/SignUpClient";
 import DisplayPromptFromState from "@/components/features/auth/DisplayPromptFromState";
 
