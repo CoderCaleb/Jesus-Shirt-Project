@@ -1,5 +1,5 @@
 // File: SizePicker.tsx
-import React, { useContext } from "react";
+import React from "react";
 import DropdownChoice from "./DropdownChoice";
 import { CartData } from "@/types/product";
 import { useCartContext } from "@/context/CartContextProvider";

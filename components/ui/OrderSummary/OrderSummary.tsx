@@ -26,7 +26,7 @@ export default function OrderSummary({
       </div>
       <div>
         <div className="flex justify-between px-5">
-          <p className="text-sm text-slate-700 mb-3">Product's price</p>
+          <p className="text-sm text-slate-700 mb-3">Product&apos;s price</p>
           <p className="text-sm font-semibold">{`${formatCurrency(prices.productPrice)} SGD`}</p>
         </div>
         <div className="flex justify-between px-5">

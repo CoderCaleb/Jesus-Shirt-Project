@@ -12,6 +12,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, FormProvider } from "react-hook-form";
 import Image from "next/image";
 import { z } from "zod";
+import { ApiError } from "@/helpers/fetchHelper";
 
 const emailSchema = z.object({
   email: z
@@ -69,11 +70,16 @@ const handleResendOrderLink = async (data: FormData) => {
 
     await sendOrderLink(email, orderId as string);
     toast.success("Order link sent successfully!");
-  } catch (error: any) {
-    console.error("ERROR DATA", error.data);
-    toast.error(
-      error.data?.error || "Failed to resend order link. Please try again."
-    );
+  } catch (error: unknown) {
+    if(error instanceof ApiError){
+      console.error("ERROR DATA", error.data);
+      toast.error(
+        error.data?.error || "Failed to resend order link. Please try again."
+      );
+    }
+    else{
+      toast.error("An unknown error occurred. Please try again.");
+    }
   } finally {
     setLoading(false);
   }

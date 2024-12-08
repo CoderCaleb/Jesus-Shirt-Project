@@ -9,10 +9,7 @@ interface RemoveItemModalProps {
 }
 
 const RemoveItemModal: React.FC<RemoveItemModalProps> = ({ productData }) => {
-  if (!productData) {
-    return null;
-  }
-  const { name } = productData;
+  const { name = "" } = productData!;
   const { setCartItems, setIsRemoveItemModalOpen, isRemoveItemModalOpen } =
     useCartContext();
 
@@ -52,6 +49,9 @@ const RemoveItemModal: React.FC<RemoveItemModalProps> = ({ productData }) => {
       onClick: handleCloseModal,
     },
   ];
+  if (!productData) {
+    return null;
+  }
 
   return (
     <Modal

@@ -95,7 +95,7 @@ export default function PaymentStatus({
             checkout.
           </p>
           <p>
-            If you're unsure about the next steps, please contact support for
+            If you&apos;re unsure about the next steps, please contact support for
             assistance.
           </p>
         </div>

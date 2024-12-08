@@ -1,6 +1,5 @@
-import React, { useState, useContext, Dispatch, SetStateAction } from "react";
-import { MdOutlineMail } from "react-icons/md";
-import { FaChevronDown, FaLinesLeaning } from "react-icons/fa6";
+import React, { useState, Dispatch, SetStateAction } from "react";
+import { FaChevronDown } from "react-icons/fa6";
 import { AiOutlineCloseCircle } from "react-icons/ai";
 import { AddressElement, useElements } from "@stripe/react-stripe-js";
 import { toast } from "react-toastify";

@@ -17,7 +17,7 @@ const ToastNotification = () => {
         toast.success("Sign in successful! Welcome back!");
       }
     }
-  }, []);
+  });
 
   return null; // This component doesn't need to render anything itself
 };

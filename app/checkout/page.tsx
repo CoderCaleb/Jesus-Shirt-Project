@@ -1,6 +1,4 @@
 "use client";
-import { calculatePrices } from "@/helpers/generalHelpers";
-import { User } from "@/types/user";
 import React, { useEffect, useState } from "react";
 import { StripeElementsOptions, loadStripe } from "@stripe/stripe-js";
 import { CartData } from "@/types/product";
@@ -18,9 +16,6 @@ type RequestData = {
   id: string;
   clientSecret: string;
 };
-
-const user: User | null = null;
-const userToken = null;
 
 export default function CheckoutShipping() {
   const [createPIError, setCreatePIError] = useState<string>("");
@@ -40,9 +35,9 @@ export default function CheckoutShipping() {
 
   useEffect(() => {
     if (checkoutItems && checkoutItems.length > 0) {
-      createPaymentIntent(checkoutItems, userToken, user?.uid);
+      createPaymentIntent(checkoutItems);
     }
-  }, [checkoutItems, userToken]);
+  }, [checkoutItems]);
   useEffect(() => {
     console.log({
       createPIError,
@@ -55,8 +50,6 @@ export default function CheckoutShipping() {
 
   const createPaymentIntent = async (
     checkoutItems: CartData[],
-    userToken: string | null,
-    uid: string | undefined,
   ) => {
     try {
       console.log("creating payment intent");
@@ -66,9 +59,8 @@ export default function CheckoutShipping() {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${userToken}`,
           },
-          body: { checkoutItems, uid },
+          body: { checkoutItems },
         },
       );
       setClientSecret(data.clientSecret);

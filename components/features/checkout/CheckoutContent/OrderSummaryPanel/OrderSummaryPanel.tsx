@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import ItemCard from "@/components/ui/ItemCard";
-import { calculatePrices, formatCurrency } from "@/helpers/generalHelpers";
+import { calculatePrices } from "@/helpers/generalHelpers";
 import { CartData, Prices } from "@/types/product";
 
 interface OrderSummaryPanelProps {
@@ -19,7 +19,7 @@ const OrderSummaryPanel: React.FC<OrderSummaryPanelProps> = ({
   });
   useEffect(() => {
     setPrices(calculatePrices(checkoutItems, shippingPrice));
-  }, [checkoutItems, calculatePrices]);
+  }, [checkoutItems, shippingPrice]);
   return (
     <div className="w-1/2 h-full px-5 py-5 bg-slate-100 flex-col justify-center hidden md:flex">
       <div className="overflow-y-scroll">

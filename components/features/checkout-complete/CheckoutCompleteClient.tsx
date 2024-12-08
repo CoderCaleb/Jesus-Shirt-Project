@@ -51,7 +51,7 @@ export default function CheckoutCompleteClient({
       }
     };
     handlePaymentIntentInfo(paymentIntent);
-  }, []);
+  });
 
   return (
     <div className="flex items-center gap-2">

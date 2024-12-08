@@ -1,5 +1,5 @@
 // File: CartBox.tsx
-import React, { useContext } from "react";
+import React from "react";
 import { IoIosArrowUp, IoIosArrowDown } from "react-icons/io";
 import SizePicker from "./SizePicker";
 import { CartData } from "@/types/product";

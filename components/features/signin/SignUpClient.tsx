@@ -36,7 +36,7 @@ export default function SignUpClient({
 }: SignUpClientProps) {
   const methods = useForm<FormData>({ resolver: zodResolver(emailSchema) });
   const [sendMagicLinkLoading, setSendMagicLinkLoading] = useState(false);
-  const [sendMagicLinkError, setSendMagicLinkError] = useState({ error: null });
+  const [sendMagicLinkError, setSendMagicLinkError] = useState({ error: "" });
   const [authStep, setAuthStep] = useState<null | number>(null);
 
   useEffect(() => {
@@ -52,10 +52,16 @@ export default function SignUpClient({
       await sendMagicLink(data.email, orderToken, orderId, state);
       setAuthStep(2);
       methods.reset();
-    } catch (error: any) {
-      console.error(error)
-      setSendMagicLinkError({ error: error.message });
-    } finally {
+    } catch (error:unknown) {
+      if(error instanceof Error){
+        console.error(error)
+        setSendMagicLinkError({ error: error.message! });
+      }
+      else {
+        setSendMagicLinkError({error:"An unknown error occurred. Please try again."});
+      }
+    }
+    finally {
       setSendMagicLinkLoading(false);
     }
   };

@@ -24,8 +24,6 @@ const VerifyPage = () => {
   const state = searchParams.get("state") ?? undefined;
 
   useEffect(() => {
-    console.log(searchParams.get("orderToken"), orderToken);
-
     if (!requiresConfirmation) {
       handleMagicLinkClicked(
         setStatus,
@@ -35,7 +33,7 @@ const VerifyPage = () => {
         state,
       );
     }
-  }, [requiresConfirmation]);
+  }, [orderNumber, orderToken, requiresConfirmation, state]);
 
   const handleConfirmation = () => {
     setRequiresConfirmation(false);

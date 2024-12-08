@@ -34,7 +34,7 @@ const LinkOrder = () => {
 
     try {
       console.log("order token", orderToken);
-      const response = await fetchHelper<{ message: string }>(
+      await fetchHelper<{ message: string }>(
         "http://localhost:4242/link-order",
         {
           method: "POST",

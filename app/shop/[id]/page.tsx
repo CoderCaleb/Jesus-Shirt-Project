@@ -38,7 +38,8 @@ export default async function Product({
         <ProductDetails product={productData} />
       </div>
     );
-  } catch (err) {
+  } catch (error:unknown) {
+    console.error("Error occurred:", error); 
     return (
       <div className="flex justify-center items-center h-full w-full p-10">
         <div className="text-center">
@@ -46,7 +47,7 @@ export default async function Product({
             An error occurred
           </p>
           <p className="mt-2 text-gray-700">
-            We couldn't load the product details. Please try again later.
+            We couldn&apos;t load the product details. Please try again later.
           </p>
         </div>
       </div>

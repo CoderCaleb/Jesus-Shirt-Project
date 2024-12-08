@@ -63,7 +63,8 @@ export default async function OrdersContent() {
         ))}
       </div>
     );
-  } catch (e) {
+  } catch (e:unknown) {
+    console.error(e)
     return (
       <p>
         Something went wrong when fetching order data. Please try again later

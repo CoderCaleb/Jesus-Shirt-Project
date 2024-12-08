@@ -1,8 +1,5 @@
 // app/order-confirmation/page.tsx (Server Component)
 import { fetchHelper } from "@/helpers/fetchHelper";
-import ItemCard from "@/components/ui/ItemCard";
-import DisplayShippingAddress from "@/components/ui/DisplayShippingAddress";
-import { CartData } from "@/types/product";
 import ClientNavigationButton from "@/components/ui/ClientNavigationButton";
 import CheckoutCompleteClient from "@/components/features/checkout-complete/CheckoutCompleteClient";
 import { fetchOrderItemsData } from "@/helpers/dataFetchHelpers";
@@ -16,7 +13,7 @@ interface PaymentIntentResponse {
 const OrderConfirmationPage = async ({
   searchParams,
 }: {
-  searchParams: { payment_intent: string; fromCart: string };
+  searchParams: Promise<{ payment_intent: string; fromCart: string }>;
 }) => {
   const { payment_intent } = await searchParams;
 

@@ -75,7 +75,8 @@ export const handleAddingUser = async (
     });
 
     return { data };
-  } catch (error) {
+  } catch (error:unknown) {
+    console.error(error)
     return {
       error:
         "We couldn’t complete your sign-up at the moment. Please try again or reach out to us for assistance—we’re here to help!",

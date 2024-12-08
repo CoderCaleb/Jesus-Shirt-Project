@@ -1,4 +1,3 @@
-import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 import {
   clearLoginAttemptInfo,
   consumeCode,
@@ -6,10 +5,15 @@ import {
 } from "supertokens-web-js/recipe/passwordless";
 
 import Session from "supertokens-web-js/recipe/session";
-import { handleAddingUser } from "./generalHelpers";
+
+type preApiHookInputType = {
+  url: string;
+  requestInit: RequestInit;
+  userContext: unknown;
+}
 
 function attachOrderHeaders(
-  input: any,
+  input: preApiHookInputType,
   orderToken?: string,
   orderNumber?: string,
   state?: string,
@@ -37,7 +41,7 @@ export async function sendMagicLink(
   state?: string,
 ) {
   try {
-    let response = await createCode({
+    const response = await createCode({
       email,
       options: {
         preAPIHook: async (input) => {

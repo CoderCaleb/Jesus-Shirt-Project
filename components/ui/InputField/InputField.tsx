@@ -1,7 +1,6 @@
 import React from "react";
 import { RiArrowDropDownLine } from "react-icons/ri";
 import { useFormContext } from "react-hook-form"; // Get the context of RHF
-import { z } from "zod"; // Import Zod
 
 interface InputFieldProps {
   Icon?: React.ReactNode;

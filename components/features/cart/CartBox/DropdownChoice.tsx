@@ -1,10 +1,11 @@
 // File: DropdownChoice.tsx
+import { CartData, SizeChoice } from "@/types/product";
 import React from "react";
 import { toast } from "react-toastify";
 
 interface DropdownChoiceProps {
   size: string;
-  setCartItems: React.Dispatch<React.SetStateAction<any[]>>;
+  setCartItems: React.Dispatch<React.SetStateAction<CartData[]>>;
   productData: { id: string; size?: string };
 }
 
@@ -28,7 +29,7 @@ const DropdownChoice: React.FC<DropdownChoiceProps> = ({
         if (itemInCartIndex !== -1) {
           cartData[itemInCartIndex] = {
             ...cartData[itemInCartIndex],
-            size: size,
+            size: size as SizeChoice,
           };
         }
         return cartData;

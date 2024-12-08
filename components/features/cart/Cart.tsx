@@ -20,7 +20,7 @@ const Cart: React.FC = () => {
   useEffect(() => {
     setPrices(calculatePrices(cartItems, 2));
     localStorage.setItem("cartItems", JSON.stringify(cartItems));
-  }, [cartItems, calculatePrices]);
+  }, [cartItems]);
 
   const CartSummary = ({
     prices,
@@ -33,7 +33,7 @@ const Cart: React.FC = () => {
       <p className="text-lg font-semibold px-5">Cart Summary</p>
       <div className=" bg-slate-400 w-full h-lineBreakHeight my-4" />
       <div className="flex justify-between px-5">
-        <p className="text-sm text-slate-600 mb-3">Product's price</p>
+        <p className="text-sm text-slate-600 mb-3">Product&apos;s price</p>
         <p className="text-sm font-semibold">{`$${prices.productPrice} SGD`}</p>
       </div>
       <div className="flex justify-between px-5">
@@ -71,7 +71,7 @@ const Cart: React.FC = () => {
   }) => (
     <div className="w-full py-5 bg-white shadow-sm shadow-slate-900 rounded-tl-2xl rounded-tr-2xl">
       <div className="px-5 flex justify-between mb-3">
-        <p className="text-sm text-slate-600 mb-3">Product's price</p>
+        <p className="text-sm text-slate-600 mb-3">Product&apos;s price</p>
         <p className="text-sm font-semibold">{`$${prices.productPrice} SGD`}</p>
       </div>
       <div className="px-5 flex justify-between">

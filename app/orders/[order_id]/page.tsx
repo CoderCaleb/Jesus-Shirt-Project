@@ -9,8 +9,8 @@ import { CartData } from "@/types/product";
 import { redirect } from "next/navigation";
 
 interface OrderTrackingPageProps {
-  params: { order_id: string };
-  searchParams: { order_token?: string };
+  params: Promise<{ order_id: string }>;
+  searchParams: Promise<{ order_token?: string }>;
 }
 
 export default async function OrderTrackingPage({

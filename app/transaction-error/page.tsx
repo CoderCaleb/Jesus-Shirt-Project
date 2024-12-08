@@ -1,13 +1,12 @@
 import { fetchOrderItemsData } from "@/helpers/dataFetchHelpers";
 import { ApiError, fetchHelper } from "@/helpers/fetchHelper";
-import { CartData } from "@/types/product";
 import OrderSummary from "@/components/ui/OrderSummary/OrderSummary";
 import Image from "next/image";
 
 const TransactionFailedError = async ({
   searchParams,
 }: {
-  searchParams: { orderErrorId: string };
+  searchParams: Promise<{ orderErrorId: string }>;
 }) => {
   const { orderErrorId } = await searchParams;
 
@@ -71,7 +70,7 @@ const ErrorInfo = ({ orderErrorId }: { orderErrorId: string }) => (
       <p className="text-4xl font-bold">Oops!</p>
       <p className="font-semibold">Something went wrong with your order.</p>
       <p className="text-slate-600 font-semibold">
-        Don't worry, your payment has been received and your order has already
+        Don&apos;t worry, your payment has been received and your order has already
         been logged in our database. Our team is looking into the issue and will
         email you promptly once the issue is resolved.
       </p>

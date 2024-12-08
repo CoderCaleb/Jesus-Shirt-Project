@@ -11,7 +11,7 @@ interface SearchParams {
   linkedUserEmail: string | undefined;
 }
 
-const page = async ({ searchParams }: { searchParams: SearchParams }) => {
+const page = async ({ searchParams }: { searchParams: Promise<SearchParams> }) => {
   const searchParamsObject = { ...(await searchParams) };
   const { from, state, orderId, orderToken, email, linkedUserEmail } =
     searchParamsObject;
