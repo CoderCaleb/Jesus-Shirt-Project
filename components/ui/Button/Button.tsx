@@ -11,6 +11,7 @@ const Button: React.FC<ButtonProps> = ({
   isDisabled = false,
   type = "button",
   disabledLoader = true,
+  buttonIcon,
 }) => {
   const baseStyles =
     "w-full h-12 font-semibold rounded-md transition-all duration-300";
@@ -32,9 +33,9 @@ const Button: React.FC<ButtonProps> = ({
       type={type}
     >
       {!isDisabled ? (
-        buttonText
+        buttonIcon?buttonIcon:buttonText
       ) : !disabledLoader ? (
-        buttonText
+        buttonIcon?buttonIcon:buttonText
       ) : (
         <BiLoaderAlt
           className="m-auto animate-spin"

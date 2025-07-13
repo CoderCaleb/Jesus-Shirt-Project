@@ -5,11 +5,12 @@ import { useFormContext } from "react-hook-form"; // Get the context of RHF
 interface InputFieldProps {
   Icon?: React.ReactNode;
   name: string; // Add name to associate input with RHF
-  label: string;
+  label?: string;
   placeholder: string;
   type?: "text" | "password" | "info" | "dropdown";
   dropdownFunc?: () => void;
   additionalStyles?: string;
+  buttonInInput?: JSX.Element
 }
 
 const InputField: React.FC<InputFieldProps> = ({
@@ -20,6 +21,7 @@ const InputField: React.FC<InputFieldProps> = ({
   type = "text",
   dropdownFunc,
   additionalStyles = "",
+  buttonInInput = null,
 }) => {
   const {
     register,
@@ -28,7 +30,9 @@ const InputField: React.FC<InputFieldProps> = ({
 
   return (
     <div className={additionalStyles}>
-      <label className="font-sans text-[14px] mb-2 block">{label}</label>
+      {label && (
+        <label className="font-sans text-[14px] mb-2 block">{label}</label>
+      )}
       <div
         className={`flex px-3 gap-2 items-center justify-between py-3 w-full min-h-[2.5rem] h-11 border-2 rounded-[10px] text-sm font-semibold ${
           type === "info"
@@ -40,7 +44,7 @@ const InputField: React.FC<InputFieldProps> = ({
         <input
           {...register(name)} // Register input field with RHF
           placeholder={placeholder}
-          className={`bg-transparent h-full outline-none flex-1 ${
+          className={`bg-transparent h-full outline-none flex-1 text-black ${
             type === "info" ? "cursor-not-allowed" : ""
           }`}
           type={type}
@@ -53,6 +57,9 @@ const InputField: React.FC<InputFieldProps> = ({
             className="cursor-pointer"
             onClick={dropdownFunc}
           />
+        )}
+        {buttonInInput && (
+          buttonInInput
         )}
       </div>
       {errors[name] && (

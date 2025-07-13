@@ -2,9 +2,19 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    domains: ["imgur.com", "files.cdn.printful.com"],
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'imgur.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'files.cdn.printful.com',
+        pathname: '/**',
+      },
+    ],
   },
-  /* other config options here */
 };
 
 export default nextConfig;

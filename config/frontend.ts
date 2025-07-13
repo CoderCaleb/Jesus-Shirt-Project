@@ -12,6 +12,5 @@ export const frontendConfig = (): SuperTokensConfig => {
       PasswordlessWebJs.init(),
       SessionWebJs.init(),
     ],
-    enableDebugLogs: true,
   };
 };

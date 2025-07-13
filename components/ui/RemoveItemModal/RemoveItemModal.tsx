@@ -8,8 +8,8 @@ interface RemoveItemModalProps {
   productData?: CartData;
 }
 
-const RemoveItemModal: React.FC<RemoveItemModalProps> = ({ productData }) => {
-  const { name = "" } = productData!;
+const RemoveItemModal: React.FC<RemoveItemModalProps> = ({ productData = {name:""} }) => {
+  const { name } = productData
   const { setCartItems, setIsRemoveItemModalOpen, isRemoveItemModalOpen } =
     useCartContext();
 

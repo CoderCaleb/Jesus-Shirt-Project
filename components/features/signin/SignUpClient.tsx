@@ -11,6 +11,7 @@ import {
   sendMagicLink,
 } from "@/helpers/authHelpers";
 import Loader from "@/components/ui/Loader";
+import { clearLoginAttemptInfo } from "supertokens-web-js/recipe/passwordless";
 
 interface SignUpClientProps {
   state: string | undefined;

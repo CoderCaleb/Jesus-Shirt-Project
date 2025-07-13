@@ -1,0 +1,98 @@
+{
+  "hash": "8b12f9057397d94b970fc74c53df8d32b33c2186",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Sun Dec 8 20:56:33 2024 +0800",
+  "message": "Fixed-eslint-errors"
+},
+{
+  "hash": "27803391dcd65137eb0af73796c3e5a9471eebf8",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Sun Dec 8 18:58:44 2024 +0800",
+  "message": "Added-resend_order_link-when-order-token-is-missing-or-expired"
+},
+{
+  "hash": "677c806450757a2bc7a33aa358b927064ac1da98",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Fri Dec 6 20:20:54 2024 +0800",
+  "message": "Migrated-orders-and-orders-orderId-and-added-link-order-for-linking-order-to-account"
+},
+{
+  "hash": "3d97242ad68c36ea83efd2b4c911f27ccbec97a0",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Sun Dec 1 09:52:48 2024 +0800",
+  "message": "Format-files-with-prettier"
+},
+{
+  "hash": "8e0f2c0660fcb48b4b5b01b34e1663c2b28d73ca",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Sun Dec 1 09:41:03 2024 +0800",
+  "message": "Finished-up-auth-and-migrated-orders-page"
+},
+{
+  "hash": "25b3bc2aa765a2e58a83b1bbc27e5fef7cf01cf0",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Sun Nov 24 20:14:00 2024 +0800",
+  "message": "Implemented-passwordless-login-on-auth-added-user-ui-to-navbar"
+},
+{
+  "hash": "fe41f5303a95b18dfc32f42725cc07fd8546e6a5",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Thu Nov 21 15:19:41 2024 +0800",
+  "message": "Added-input-error-ui-for-checkout-shipping-added-more-descriptive-status-for-checkout-complete-refactored-input-to-use-zod-started-alittle-for-passwordless-auth"
+},
+{
+  "hash": "be28a6800f2c67eb95e4c50faabfc0ce0336fe2b",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Tue Nov 19 15:49:42 2024 +0800",
+  "message": "Migrated-checkout-complete-transaction-error-and-cart-pages"
+},
+{
+  "hash": "b2fa8ef0a0d2d96f80a3810adccc2ac682d5c8c3",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Sun Nov 17 13:02:55 2024 +0800",
+  "message": "Migrated-checkout"
+},
+{
+  "hash": "71e1e6f8b6a90cbcca3d4589fbf8e165092cecf7",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Wed Nov 13 23:18:21 2024 +0800",
+  "message": "Migrated-Product.tsx"
+},
+{
+  "hash": "74f1dbe908cc4d15c61fafc869e68f0873203597",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Wed Nov 13 13:34:09 2024 +0800",
+  "message": "Migrated-Navbar-in-layout.tsx"
+},
+{
+  "hash": "74327a389386d3bb2703e4b710f6ffbb1e46afb0",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Tue Nov 12 18:22:21 2024 +0800",
+  "message": "Migrated-shop-route"
+},
+{
+  "hash": "d6d78eb290f5e9ea691fadebd590883dc960bc69",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Tue Oct 29 18:47:53 2024 +0800",
+  "message": "Initial-commit"
+},
+{
+  "hash": "1d10c3bb3275527a3a98fd6063b09034c54712d1",
+  "author": "Caleb",
+  "email": "xxgoldenprozxx@gmail.com",
+  "date": "Tue Oct 29 18:29:06 2024 +0800",
+  "message": "Initial-commit-from-Create-Next-App"
+},

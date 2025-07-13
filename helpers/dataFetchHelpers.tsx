@@ -1,5 +1,4 @@
 import { OrderResponse } from "@/types/order";
-import { cookies } from "next/headers";
 import { ApiError, fetchHelper } from "./fetchHelper";
 import { CartData } from "@/types/product";
 import { getAccessToken } from "./serverAuthHelpers";

@@ -6,6 +6,7 @@ import "../styles/carousel.css";
 import Navbar from "@/components/layout/Navbar";
 import ToastProvider from "@/components/ui/ToastProvider";
 import { SuperTokensInit } from "@/components/utility/supertokensinit";
+import ChatBot from "@/components/features/Chatbot";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,6 +41,7 @@ export default function RootLayout({
               <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex overflow-y-scroll">
                 {children}
               </div>
+              <ChatBot/>
             </div>
           </ToastProvider>
         </body>

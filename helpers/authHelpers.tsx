@@ -119,7 +119,7 @@ export const handleMagicLinkClicked = async (
     console.log("Magic link error", err);
     setStatus("error");
     if (err.isSuperTokensGeneralError) {
-      setErrorMessage(`Error: ${err.message}`);
+      setErrorMessage(`${err.message}`);
     } else {
       setErrorMessage(
         err.message || "Oops! Something went wrong. Please try again later.",

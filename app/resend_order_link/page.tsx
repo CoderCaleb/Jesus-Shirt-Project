@@ -112,7 +112,7 @@ const handleResendOrderLink = async (data: FormData) => {
             text="That link doesn’t seem to work"
             additionalStyles="!font-semibold"
           />
-          <SubText text="Sorry, this link is either expired or invalid. Please try again." />
+          <SubText text="Sorry, the order token is either expired or not provided." />
           <Button
             buttonText="Get a new link"
             buttonType="black"

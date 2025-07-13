@@ -6,6 +6,7 @@ import { handleMagicLinkClicked } from "@/helpers/authHelpers";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect } from "react";
+import { clearLoginAttemptInfo } from "supertokens-web-js/recipe/passwordless";
 
 const VerifyPage = () => {
   const router = useRouter();
@@ -34,6 +35,10 @@ const VerifyPage = () => {
       );
     }
   }, [orderNumber, orderToken, requiresConfirmation, state]);
+
+  useEffect(()=>{
+    clearLoginAttemptInfo()
+  },[])
 
   const handleConfirmation = () => {
     setRequiresConfirmation(false);
