@@ -28,6 +28,7 @@ module.exports = {
           'logo-yellow': '#fbbc05',
           'logo-red': '#ea4335',
         },
+        successGreen:"#00b66d"
       },
       height:{
         lineBreakHeight: '1px',

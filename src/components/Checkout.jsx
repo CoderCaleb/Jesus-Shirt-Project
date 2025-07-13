@@ -1,15 +1,18 @@
 import React, { useEffect, useContext, useState } from "react";
 import { useLocation } from "react-router";
-import "/node_modules/flag-icons/css/flag-icons.min.css";
+import "flag-icons/css/flag-icons.min.css";
 import CheckoutShipping from "./CheckoutShipping";
 import CheckoutPayment from "./CheckoutPayment";
-import OrderConfirmationPage from "./OrderComfirmation";
+import OrderConfirmationPage from "./CheckoutComplete";
 import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import ItemCard from "./ItemCard";
-import { CheckoutContext } from "../App";
-import TransactionFailedError from "./TransactionFailedError";
-import { HelperFunctionContext } from "../App";
+import {
+  StateSharingContext,
+  CheckoutContext,
+  HelperFunctionContext,
+} from "../contexts";
+
 const stripePromise = loadStripe(
   "pk_test_51OOBnGEvVCl2vla10CIfwh6ItUYeeZO4o3haVa9xFHyxwT6ekU8D8wAuA75GsRfGOhMLmU0Znf9dZKJPLNc5xrdq00PVRX8neU"
 );
@@ -21,48 +24,59 @@ export default function Checkout() {
     isLoading,
     cartItems,
     setClientSecret,
-    paymentIntentId,
     setPaymentIntentId,
   } = useContext(CheckoutContext);
-
+  const { user, userToken } = useContext(StateSharingContext);
   const { calculatePrices } = useContext(HelperFunctionContext);
+
   const [prices, setPrices] = useState({
     productPrice: 0,
     totalPrice: 0,
     shippingPrice: 0,
   });
+  const [createPIError, setCreatePIError] = useState(null);
 
   const location = useLocation();
   const { state } = location;
-  let checkoutItems;
+  const checkoutItems = state?.checkoutItems || cartItems;
 
-  if (state) {
-    checkoutItems = state.checkoutItems;
-  }
   useEffect(() => {
     setPrices(calculatePrices(checkoutItems, 2));
   }, [checkoutItems, calculatePrices]);
 
   useEffect(() => {
-    if (checkoutItems) {
-      fetch("/create-payment-intent", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          checkoutItems,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setClientSecret(data.clientSecret);
-          setPaymentIntentId(data.id);
-          console.log(data);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    console.log(userToken, user?.uid);
+
+    if (checkoutItems && user !== null) {
+      createPaymentIntent(checkoutItems, userToken, user?.uid);
     }
-  }, []);
+  }, [userToken]);
+
+  const createPaymentIntent = async (checkoutItems, userToken, uid) => {
+    try {
+      const response = await fetch("/create-payment-intent", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userToken}`,
+        },
+        body: JSON.stringify({ checkoutItems, uid }),
+      });
+
+      if (!response.ok) {
+        setCreatePIError(
+          "Failed to checkout your products. Please try again..."
+        );
+        return;
+      }
+      const data = await response.json();
+      setClientSecret(data.clientSecret);
+      setPaymentIntentId(data.id);
+    } catch (error) {
+      setCreatePIError(error);
+      console.error(error);
+    }
+  };
 
   const appearance = {
     theme: "flat",
@@ -113,70 +127,89 @@ export default function Checkout() {
       },
     },
   };
-  const options = {
-    clientSecret,
-    appearance,
-  };
 
-  if (checkoutItems) {
-    return (
-      <div className="w-full h-full relative">
-        {stripePromise && clientSecret && (
+  const options = { clientSecret, appearance };
+
+  if (!checkoutItems) {
+    return <p>Checkout items are null</p>;
+  }
+
+  return (
+    <div className="w-full h-full relative">
+      {!createPIError ? (
+        stripePromise && clientSecret ? (
           <Elements stripe={stripePromise} options={options} key={clientSecret}>
-            {isLoading && (
-              <div className="flex flex-col gap-5 absolute w-full h-full justify-center items-center bg-darkenBg z-50">
-                <img
-                  src={require("../images/payment-loading.gif")}
-                  alt={"payment-loading"}
-                  className=" w-48"
-                />
-                <p className="font-semibold text-lg text-white">
-                  Processing payment. Please wait...
-                </p>
-              </div>
-            )}
-            <div className=" w-full h-full overflow-y-scroll flex">
-              {checkoutProgress === 1 ? (
-                <CheckoutShipping checkoutItems={checkoutItems} />
-              ) : checkoutProgress === 2 ? (
-                <CheckoutPayment checkoutItems={checkoutItems} />
-              ) : (
-                <OrderConfirmationPage cartData={checkoutItems} />
-              )}
-              <div className="w-1/2 h-full px-5 py-5 bg-slate-100 flex-col justify-center hidden md:flex">
-                <div className="overflow-y-scroll">
-                  {checkoutItems.map((product, index) => {
-                    return <ItemCard productInfo={product} key={index} />;
-                  })}
-                </div>
-                <div className=" bg-slate-400 w-full h-lineBreakHeight my-3" />
-                <div>
-                  <div className="flex justify-between px-5">
-                    <p className="text-sm text-slate-600 mb-3">
-                      Product's price
-                    </p>
-                    <p className="text-sm font-semibold">{`$${prices.productPrice} SGD`}</p>
-                  </div>
-                  <div className="flex justify-between px-5">
-                    <p className="text-sm text-slate-600">Shipping</p>
-                    <p className="text-sm font-semibold">{`$${prices.shippingPrice} SGD`}</p>
-                  </div>
-                  <div className="flex justify-between px-5 py-3">
-                    <p className="text-sm font-semibold">Total</p>
-                    <p className="text-sm font-semibold">{`$${prices.totalPrice} SGD`}</p>
-                  </div>
-                </div>
-              </div>{" "}
+            {isLoading && <LoadingOverlay />}
+            <div className="w-full h-full overflow-y-scroll flex">
+              <CheckoutContent
+                checkoutProgress={checkoutProgress}
+                checkoutItems={checkoutItems}
+                prices={prices}
+              />
             </div>
           </Elements>
-        )}
-      </div>
-    );
-  } else {
-    return (
-      <>
-        <p>Cart is Null</p>
-      </>
-    );
-  }
+        ) : (
+          <p className="text-center mt-10">Loading...</p>
+        )
+      ) : (
+        <p className="text-center mt-10">{createPIError}</p>
+      )}
+    </div>
+  );
 }
+
+const LoadingOverlay = () => (
+  <div className="flex flex-col gap-5 absolute w-full h-full justify-center items-center bg-darkenBg z-50">
+    <img
+      src={require("../images/payment-loading.gif")}
+      alt={"payment-loading"}
+      className="w-48"
+    />
+    <p className="font-semibold text-lg text-white">
+      Processing payment. Please wait...
+    </p>
+  </div>
+);
+
+const CheckoutContent = ({ checkoutProgress, checkoutItems, prices }) => (
+  <>
+    {checkoutProgress === 1 ? (
+      <CheckoutShipping checkoutItems={checkoutItems} />
+    ) : checkoutProgress === 2 ? (
+      <CheckoutPayment checkoutItems={checkoutItems} />
+    ) : (
+      <OrderConfirmationPage cartData={checkoutItems} />
+    )}
+    <OrderSummaryPanel checkoutItems={checkoutItems} prices={prices} />
+  </>
+);
+
+const OrderSummaryPanel = ({ checkoutItems, prices }) => (
+  <div className="w-1/2 h-full px-5 py-5 bg-slate-100 flex-col justify-center hidden md:flex">
+    <div className="overflow-y-scroll">
+      {checkoutItems.map((product, index) => (
+        <ItemCard productInfo={product} key={index} />
+      ))}
+    </div>
+    <div className="bg-slate-400 w-full h-lineBreakHeight my-3" />
+    <div>
+      <PriceDetail label="Product's price" amount={prices.productPrice} />
+      <PriceDetail label="Shipping" amount={prices.shippingPrice} />
+      <TotalPrice amount={prices.totalPrice} />
+    </div>
+  </div>
+);
+
+const PriceDetail = ({ label, amount }) => (
+  <div className="flex justify-between px-5">
+    <p className="text-sm text-slate-600 mb-3">{label}</p>
+    <p className="text-sm font-semibold">{`$${amount} SGD`}</p>
+  </div>
+);
+
+const TotalPrice = ({ amount }) => (
+  <div className="flex justify-between px-5 py-3">
+    <p className="text-sm font-semibold">Total</p>
+    <p className="text-sm font-semibold">{`$${amount} SGD`}</p>
+  </div>
+);

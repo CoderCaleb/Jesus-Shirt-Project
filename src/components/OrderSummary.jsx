@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import ItemCard from "./ItemCard";
-import { HelperFunctionContext } from "../App";
+import { HelperFunctionContext } from "../contexts";
+import { formatCurrency } from "../utils/helpers";
 
 export default function OrderSummary({ orderItems, shippingPrice }) {
   const { calculatePrices } = useContext(HelperFunctionContext);
@@ -26,16 +27,16 @@ export default function OrderSummary({ orderItems, shippingPrice }) {
       </div>
       <div>
         <div className="flex justify-between px-5">
-          <p className="text-sm text-slate-600 mb-3">Product's price</p>
-          <p className="text-sm font-semibold">{`$${prices.productPrice} SGD`}</p>
+          <p className="text-sm text-slate-700 mb-3">Product's price</p>
+          <p className="text-sm font-semibold">{`${formatCurrency(prices.productPrice)} SGD`}</p>
         </div>
         <div className="flex justify-between px-5">
-          <p className="text-sm text-slate-600">Shipping</p>
-          <p className="text-sm font-semibold">{`$${prices.shippingPrice} SGD`}</p>
+          <p className="text-sm text-slate-700">Shipping</p>
+          <p className="text-sm font-semibold">{`${formatCurrency(prices.shippingPrice)} SGD`}</p>
         </div>
         <div className="flex justify-between px-5 py-3">
           <p className="text-sm font-semibold">Total</p>
-          <p className="text-sm font-semibold">{`$${prices.totalPrice} SGD`}</p>
+          <p className="text-sm font-semibold">{`${formatCurrency(prices.totalPrice)} SGD`}</p>
         </div>
       </div>
     </div>
