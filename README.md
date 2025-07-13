@@ -15,10 +15,8 @@ This is an e-commerce platform built to sell Christian-themed t-shirts that carr
 - 🧾 **Clean and minimal shirt catalog**
 - 📦 **Order system with status tracking**
 - 🧑‍💻 **User authentication & order history**
-- 🔗 **Optional QR code generation on purchase**
 - 💳 **Stripe payment integration**
 - 🌐 **Responsive UI with smooth UX**
-- 🔍 **Admin dashboard for managing inventory & orders**
 
 ---
 
@@ -26,8 +24,6 @@ This is an e-commerce platform built to sell Christian-themed t-shirts that carr
 
 - **Frontend:** Next.js, Tailwind CSS
 - **Backend:** Flask (Python), MongoDB
-- **Auth:** Firebase / Supertokens (WIP)
+- **Auth:** Supertokens
 - **Payments:** Stripe API
-- **Hosting:** Vercel (Frontend), Render/Backend-as-a-Service
-
 ---
