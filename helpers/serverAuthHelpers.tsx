@@ -1,5 +1,4 @@
 import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
 import jwksClient from "jwks-rsa";
 import JsonWebToken from "jsonwebtoken";
 import type { JwtHeader, JwtPayload, SigningKeyCallback } from "jsonwebtoken";
@@ -59,6 +58,7 @@ export async function getSSRSessionHelper(): Promise<{
     }
     return { accessTokenPayload: undefined, hasToken, error: undefined };
   } catch (error) {
+    console.log(error)
     return { accessTokenPayload: undefined, hasToken, error: undefined };
   }
 }

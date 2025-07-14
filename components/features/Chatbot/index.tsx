@@ -58,12 +58,12 @@ type ChatMessage = {
   text: string;
   id?: string;
   isSelf?: boolean;
-  timestamp?: number;
+  timestamp: number;
 };
 
 const ChatBot = () => {
   const [messages, setMessages] = useState<ChatMessage[]>([
-    { sender: "AI", text: "Hi, how can I help you today?" },
+    { sender: "AI", text: "Hi, how can I help you today?", timestamp: Date.now() },
   ]);
   const [chatBotOpen, setChatBotOpen] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -101,7 +101,7 @@ const ChatBot = () => {
 
   const onCloseButtonClicked = () => {
     setConversationId(null);
-    setMessages([{ sender: "AI", text: "Hi, how can I help you today?" }]);
+    setMessages([{ sender: "AI", text: "Hi, how can I help you today?", timestamp: Date.now() }]);
   };
   const handleSendMessage = async (data: InputData) => {
     const { message } = data;
@@ -109,7 +109,7 @@ const ChatBot = () => {
     if (message.trim()) {
       try {
         setLoading(true);
-        setMessages((prev) => [...prev, { sender: "USER", text: message }]);
+        setMessages((prev) => [...prev, { sender: "USER", text: message, timestamp: Date.now() }]);
         const response = await fetchHelper<ChatResponse>(
           "http://localhost:4242/send-dify-chat-message",
           {
@@ -124,7 +124,7 @@ const ChatBot = () => {
         setConversationId(response.conversation_id);
         setMessages((prev) => [
           ...prev,
-          { sender: "AI", text: response.answer },
+          { sender: "AI", text: response.answer, timestamp: Date.now() },
         ]);
       } catch (e: unknown) {
         setMessages((prev) => [
@@ -133,6 +133,7 @@ const ChatBot = () => {
             sender: "SYSTEM",
             text: "An error occurred. Please try again",
             type: "error",
+            timestamp: Date.now()
           },
         ]);
         console.log(e);
@@ -220,7 +221,7 @@ const ChatBot = () => {
                     onClick={() => {
                       setConversationId(null);
                       setMessages([
-                        { sender: "AI", text: "Hi, how can I help you today?" },
+                        { sender: "AI", text: "Hi, how can I help you today?", timestamp: Date.now() },
                       ]);
                       updateConnectionDetails(undefined);
                     }}
