@@ -69,7 +69,7 @@ const ChatBot = () => {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [voiceConnecting, setVoiceConnecting] = useState(false);
-  const [transcripts, setTranscripts] = useState<Map<string, ChatMessage>>(
+  const [transcripts] = useState<Map<string, ChatMessage>>(
     new Map()
   );
 
