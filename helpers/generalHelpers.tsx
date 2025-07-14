@@ -61,7 +61,7 @@ export const handleAddingUser = async (
   state?: string
 ): Promise<{ data?: AddUserResponse; error?: string }> => {
   try {
-    const url = "http://localhost:4242/add-user";
+    const url = `${process.env.NEXT_PUBLIC_CLIENT_API_URL}/add-user`;
     const data = await fetchHelper<AddUserResponse>(url, {
       method: "POST",
       headers: {
@@ -104,7 +104,7 @@ type SendOrderLinkResponse = {
 
 export async function sendOrderLink(email: string, orderNumber: string) {
   await fetchHelper<SendOrderLinkResponse>(
-    "http://localhost:4242/send-order-link",
+    `${process.env.NEXT_PUBLIC_CLIENT_API_URL}/send-order-link`,
     {
       method: "POST",
       body: { email, orderNumber },

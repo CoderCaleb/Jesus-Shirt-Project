@@ -66,7 +66,8 @@ const OrderConfirmationPage = async ({
 async function fetchPaymentIntent(paymentIntentId: string) {
   try {
     const data = await fetchHelper<PaymentIntentResponse>(
-      `http://127.0.0.1:4242/retrieve-payment-intent?payment_intent_id=${paymentIntentId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_API_URL}
+/retrieve-payment-intent?payment_intent_id=${paymentIntentId}`,
     );
     return data;
   } catch (error) {

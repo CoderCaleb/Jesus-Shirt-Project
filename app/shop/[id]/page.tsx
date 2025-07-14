@@ -8,7 +8,8 @@ export const dynamicParams = true;
 export async function generateStaticParams() {
   try {
     const shopData = await fetchHelper<ProductData[]>(
-      "http://127.0.0.1:4242/get_store_products",
+      `${process.env.NEXT_PUBLIC_SERVER_API_URL}
+/get_store_products`,
     );
     if (!shopData || shopData.length === 0) {
       return [];
@@ -30,7 +31,8 @@ export default async function Product({
   const { id } = await params;
   try {
     const productData = await fetchHelper<ProductData>(
-      `http://127.0.0.1:4242/fetch_product?productID=${id}`,
+      `${process.env.NEXT_PUBLIC_SERVER_API_URL}
+/fetch_product?productID=${id}`,
     );
     return (
       <div className="flex flex-col md:flex-row md:justify-center pb-10 gap-10 lg:gap-16 items-center h-full w-full p-5 sm:p-10">

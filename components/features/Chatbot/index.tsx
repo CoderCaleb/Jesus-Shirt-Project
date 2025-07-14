@@ -89,7 +89,7 @@ const ChatBot = () => {
     setVoiceConnecting(true);
     try {
       const response = await fetchHelper<ConnectionDetails>(
-        "http://localhost:4242/get_connection_details"
+        `${process.env.NEXT_PUBLIC_CLIENT_API_URL}/get_connection_details`
       );
       updateConnectionDetails(response);
       setConversationId(null);
@@ -111,7 +111,7 @@ const ChatBot = () => {
         setLoading(true);
         setMessages((prev) => [...prev, { sender: "USER", text: message, timestamp: Date.now() }]);
         const response = await fetchHelper<ChatResponse>(
-          "http://localhost:4242/send-dify-chat-message",
+          `${process.env.NEXT_PUBLIC_CLIENT_API_URL}/send-dify-chat-message`,
           {
             method: "POST",
             body: {

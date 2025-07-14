@@ -35,7 +35,7 @@ const LinkOrder = () => {
     try {
       console.log("order token", orderToken);
       await fetchHelper<{ message: string }>(
-        "http://localhost:4242/link-order",
+        `${process.env.NEXT_PUBLIC_CLIENT_API_URL}/link-order`,
         {
           method: "POST",
           body: { orderNumber },

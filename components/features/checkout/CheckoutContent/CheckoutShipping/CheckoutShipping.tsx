@@ -65,7 +65,8 @@ export default function CheckoutShipping({
     addressElement.getValue().then(async function (shippingData) {
       if (shippingData.complete) {
         try {
-          await fetchHelper("http://127.0.0.1:4242/update-payment-intent", {
+          await fetchHelper(`${process.env.NEXT_PUBLIC_SERVER_API_URL}
+/update-payment-intent`, {
             method: "PUT",
             body: {
               payment_intent_id: paymentIntentId,

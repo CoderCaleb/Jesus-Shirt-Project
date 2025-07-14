@@ -6,7 +6,8 @@ import ProductCard from "../ProductCard";
 export default async function ProductGrid() {
   try {
     const shopData = await fetchHelper<ProductData[]>(
-      "http://127.0.0.1:4242/get_store_products",
+      `${process.env.NEXT_PUBLIC_SERVER_API_URL}
+/get_store_products`,
       { customConfig: { cache: "force-cache" } },
     );
     console.log("SHOP DATA", shopData);

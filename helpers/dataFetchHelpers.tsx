@@ -5,7 +5,8 @@ import { getAccessToken } from "./serverAuthHelpers";
 export async function fetchOrderItemsData(orderItems: string) {
   try {
     const data = await fetchHelper<{ order_data?: CartData[]; error?: string }>(
-      "http://127.0.0.1:4242/get-orders",
+      `${process.env.NEXT_PUBLIC_SERVER_API_URL}
+/get-orders`,
       {
         method: "POST",
         headers: {

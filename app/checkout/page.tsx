@@ -56,7 +56,7 @@ export default function CheckoutShipping() {
     try {
       console.log("creating payment intent");
       const data = await fetchHelper<RequestData>(
-        "http://localhost:4242/create-payment-intent",
+        `${process.env.NEXT_PUBLIC_CLIENT_API_URL}/create-payment-intent`,
         {
           method: "POST",
           headers: {

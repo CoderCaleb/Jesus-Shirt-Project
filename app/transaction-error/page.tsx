@@ -42,7 +42,8 @@ const fetchOrderErrorData = async (orderErrorId: string) => {
     const data = await fetchHelper<{
       orderErrorInfo?: { order_items: string; shipping_cost: string };
       error?: string;
-    }>(`http://127.0.0.1:4242/get-order-error?order-error-id=${orderErrorId}`);
+    }>(`${process.env.NEXT_PUBLIC_SERVER_API_URL}
+/get-order-error?order-error-id=${orderErrorId}`);
     return { errorData: data };
   } catch (error: unknown) {
     if (error instanceof ApiError) {
