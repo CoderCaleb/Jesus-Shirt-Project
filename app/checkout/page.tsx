@@ -8,9 +8,11 @@ import { fetchHelper } from "@/helpers/fetchHelper";
 import CheckoutContent from "@/components/features/checkout/CheckoutContent";
 import Loader from "@/components/ui/Loader";
 
-const stripePromise = loadStripe(
-  "pk_test_51OOBnGEvVCl2vla10CIfwh6ItUYeeZO4o3haVa9xFHyxwT6ekU8D8wAuA75GsRfGOhMLmU0Znf9dZKJPLNc5xrdq00PVRX8neU",
-);
+const stripe_pk = process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY
+
+const stripePromise = stripe_pk ? loadStripe(
+  stripe_pk,
+) : null
 
 type RequestData = {
   id: string;
