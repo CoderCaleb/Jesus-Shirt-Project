@@ -6,3 +6,4 @@ export const appInfo = {
   apiBasePath: "/auth",
   websiteBasePath: "/auth",
 };
+console.log(process.env.NEXT_PUBLIC_WEBSITE_DOMAIN)
