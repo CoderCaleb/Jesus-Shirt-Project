@@ -27,7 +27,7 @@ export default function CheckoutCompleteClient({
               );
             }
           } else if (paymentIntent.metadata.orderStatus === "processing") {
-            setMessage("Order is processing");
+            //setMessage("Order is processing");
           } else {
             toast.success("Payment succeeded!");
             if (fromCart) {

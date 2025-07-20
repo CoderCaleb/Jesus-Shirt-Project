@@ -17,10 +17,9 @@ export default function PaymentStatus({
           <div className="h-72 flex flex-col gap-3 text-center justify-center items-center">
             <p>Oops! Something went wrong with your order.</p>
             <p>Error ID: {paymentIntent.metadata.error_number}</p>
-            <p>We encountered an issue while processing your payment.</p>
+            <p>Your payment went through but your order has failed to be added to the database</p>
             <p>
-              Please check your payment details or contact support if the
-              problem persists.
+              Please contact customer support
             </p>
           </div>
         ) : paymentIntent.metadata.orderStatus === "processing" ? (
@@ -28,8 +27,11 @@ export default function PaymentStatus({
             <p>Your payment was successful!</p>
             <p>Your order is currently being processed.</p>
             <p>
-              Thank you for your patience. Please check back shortly for an
+              Thank you for your patience. Please reload the page shortly for an
               update.
+            </p>
+            <p>
+              If you do not see any change after a while, please contact customer support
             </p>
           </div>
         ) : (
