@@ -6,6 +6,7 @@ import { SuperTokensConfig } from "supertokens-web-js/types";
 
 export const frontendConfig = (): SuperTokensConfig => {
   return {
+    enableDebugLogs: true,
     appInfo,
     recipeList: [
       ThirdPartyWebJs.init(),
