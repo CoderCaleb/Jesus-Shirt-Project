@@ -36,7 +36,7 @@ export async function fetchOrderData(
 
   try {
     const orderResponse = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/get-order?orderNumber=${orderId}`,
+      `${process.env.NEXT_PUBLIC_SERVER_API_URL}/get-order?orderNumber=${orderId}`,
       {
         method: "GET",
         headers: {

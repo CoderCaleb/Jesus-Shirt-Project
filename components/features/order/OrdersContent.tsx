@@ -11,9 +11,7 @@ import { redirect } from "next/navigation";
 type OrdersResponse = { orders: OrderData[] };
 
 async function fetchOrders(): Promise<OrdersResponse> {
-  const url = `${process.env.NEXT_PUBLIC_SERVER_API_URL}
-BLIC_SERVER_API_URL}
-/get-orders-summary`;
+  const url = `${process.env.NEXT_PUBLIC_SERVER_API_URL}/get-orders-summary`;
   const accessToken = await getAccessToken();
   return fetchHelper<OrdersResponse>(url, {
     customConfig: { cache: "no-cache" },

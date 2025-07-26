@@ -13,6 +13,12 @@ const nextConfig: NextConfig = {
         hostname: 'files.cdn.printful.com',
         pathname: '/**',
       },
+      {
+        
+        protocol: 'https',
+        hostname: 'i.imgur.com',
+        pathname: '/**',
+      }
     ],
   },
 };
