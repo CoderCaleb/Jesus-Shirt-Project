@@ -10,7 +10,8 @@ const client = jwksClient({
 
 export async function getAccessToken(): Promise<string | undefined> {
   const cookiesStore = await cookies();
-  return cookiesStore.get("sAccessToken")?.value;
+  console.log(cookiesStore)
+  return cookiesStore.get("st-access-token")?.value;
 }
 
 function getPublicKey(header: JwtHeader, callback: SigningKeyCallback) {

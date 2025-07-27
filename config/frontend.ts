@@ -11,7 +11,9 @@ export const frontendConfig = (): SuperTokensConfig => {
     recipeList: [
       ThirdPartyWebJs.init(),
       PasswordlessWebJs.init(),
-      SessionWebJs.init(),
+      SessionWebJs.init({
+        tokenTransferMethod: "header",
+      }),
     ],
   };
 };
