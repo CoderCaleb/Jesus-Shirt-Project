@@ -16,7 +16,10 @@ const OrderConfirmationPage = async ({
   searchParams: Promise<{ payment_intent: string; fromCart: string }>;
 }) => {
   const { payment_intent } = await searchParams;
-
+  console.log("paymentIntent",payment_intent)
+  if (payment_intent == undefined) {
+    return <div>Please go back to the previous tab to see your payment status</div>
+  }
   const paymentIntentData = await fetchPaymentIntent(payment_intent);
   if (!paymentIntentData) {
     return <div>Error fetching payment data</div>;
