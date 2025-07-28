@@ -377,11 +377,11 @@ function SimpleVoiceAssistant({
     console.log("state:", state);
   }, [onStateChange, state]);
   return (
-    <div className="flex w-full h-full items-center justify-center">
+    <div className="flex w-full h-full items-center justify-center text-center">
       {state === "initializing" ||
       state === "connecting" ||
       state === "disconnected" ? (
-        "Connecting..."
+        "Connecting... Please reload the page if agent is not connected after a minute"
       ) : (
         <ControlBar setAgentState={onStateChange} />
       )}
