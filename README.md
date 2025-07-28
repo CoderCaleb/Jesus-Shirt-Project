@@ -7,6 +7,8 @@
 - 🧑‍💻 **User authentication & order history**
 - 💳 **Stripe payment integration**
 - 🌐 **Responsive UI with smooth UX**
+- 📧 **Email sending after order is placed**
+- 🔗 **Order linkage to account for order tracking**
 
 ---
 
@@ -16,6 +18,7 @@
 - **Backend:** Flask (Python), MongoDB
 - **Auth:** Supertokens
 - **Payments:** Stripe API
+- **SMTP** SMTP2GO
 ---
 
 <h2>🛍️ Jesus Shirt Project UI Preview</h2>
