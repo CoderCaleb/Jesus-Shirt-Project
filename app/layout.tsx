@@ -41,7 +41,7 @@ export default function RootLayout({
               <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex overflow-y-scroll">
                 {children}
               </div>
-              <ChatBot/>
+              <ChatBot chatbotStyle="pop-up"/>
             </div>
           </ToastProvider>
         </body>

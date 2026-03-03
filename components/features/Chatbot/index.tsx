@@ -6,7 +6,7 @@ import InputField from "@/components/ui/InputField";
 import { fetchHelper } from "@/helpers/fetchHelper";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState, useRef, useEffect, Dispatch, SetStateAction } from "react";
-import { FormProvider, useForm } from "react-hook-form";
+import { FormProvider, useForm, UseFormReturn } from "react-hook-form";
 import { FaUser } from "react-icons/fa";
 import { z } from "zod";
 import { VscDebugRestart } from "react-icons/vsc";
@@ -32,6 +32,7 @@ import {
 } from "livekit-client";
 import { BiLoaderAlt } from "react-icons/bi";
 import "@livekit/components-styles";
+import { usePathname } from "next/navigation";
 
 const schema = z.object({
   message: z.string().max(400, "Message is too long"),
@@ -44,6 +45,7 @@ type InputData = {
 type ChatResponse = {
   answer: string;
   conversation_id: string;
+  user_id: string
 };
 
 type ConnectionDetails = {
@@ -61,25 +63,37 @@ type ChatMessage = {
   timestamp: number;
 };
 
-const ChatBot = () => {
+type ChatbotProps = {
+  chatbotStyle?: "pop-up" | "container";
+  formMethods?: UseFormReturn<InputData, any, undefined>
+  formValues?: InputData
+}
+
+const ChatBot = ({chatbotStyle="pop-up", formMethods:methods, formValues}:ChatbotProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { sender: "AI", text: "Hi, how can I help you today?", timestamp: Date.now() },
   ]);
   const [chatBotOpen, setChatBotOpen] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(false);
   const [voiceConnecting, setVoiceConnecting] = useState(false);
   const [transcripts] = useState<Map<string, ChatMessage>>(
     new Map()
   );
+  const pathname = usePathname();
 
   const [connectionDetails, updateConnectionDetails] = useState<
     ConnectionDetails | undefined
   >(undefined);
   const [agentState, setAgentState] = useState<AgentState>("disconnected");
 
-  const methods = useForm<InputData>({ resolver: zodResolver(schema) });
-  const formValues = methods.watch();
+  const defaultMethods = useForm<InputData>({ resolver: zodResolver(schema) });
+
+  if(!methods){
+    methods=defaultMethods
+    formValues = methods.watch()
+  }
 
   const chatContainerRef = useRef<HTMLDivElement | null>(null); // Create a reference to the chat container
   useEffect(() => {
@@ -117,10 +131,12 @@ const ChatBot = () => {
             body: {
               query: message,
               conversation_id: conversationId?conversationId:null,
+              user_id: userId
             },
           }
         );
         console.log("Chat response:", response);
+        setUserId(response.user_id)
         setConversationId(response.conversation_id);
         setMessages((prev) => [
           ...prev,
@@ -165,6 +181,10 @@ const ChatBot = () => {
     console.log("Updated agentState in parent:", agentState);
   }, [agentState]);
 
+  if(pathname==="/chatbot-demo"&&chatbotStyle==="pop-up"){
+    return <></>
+  }
+
   return (
     <LiveKitRoom
       token={connectionDetails?.participantToken}
@@ -177,11 +197,12 @@ const ChatBot = () => {
         updateConnectionDetails(undefined);
         onCloseButtonClicked();
       }}
-      className="grid grid-rows-[2fr_1fr] items-center"
+      className={`${chatbotStyle=="container"?"block flex-1":"grid grid-rows-[2fr_1fr]"} items-center w-full`}
       data-lk-theme="default"
     >
-      <div className="text-black">
+      <div className={`text-black ${chatbotStyle=="container"?"h-full":""}`}>
         {/* Button */}
+        {chatbotStyle==="pop-up"&&
         <button
           className="fixed bottom-4 right-4 inline-flex items-center justify-center text-sm font-medium disabled:pointer-events-none disabled:opacity-50 border rounded-full w-16 h-16 bg-black hover:bg-gray-700 m-0 cursor-pointer border-gray-200 bg-none p-0 normal-case leading-5 hover:text-gray-900"
           type="button"
@@ -204,11 +225,11 @@ const ChatBot = () => {
           >
             <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
           </svg>
-        </button>
+        </button>}
 
         {/* Chat Container */}
-        {chatBotOpen && (
-          <div className="fixed flex flex-col bottom-[calc(4rem+1.5rem)] right-0 mr-4 bg-white p-6 rounded-lg border border-[#e5e7eb] w-[440px] h-[calc(80vh-64px)] shadow-slate-200 shadow-md">
+        {(chatBotOpen || chatbotStyle=="container") && (
+    <div className={`${chatbotStyle=="pop-up"?"fixed bottom-[calc(4rem+1.5rem)] right-0 mr-4 w-[440px] h-[calc(80vh-64px)] rounded-lg border border-[#e5e7eb] shadow-slate-200 shadow-md":"w-full h-full"} flex flex-col bg-white p-6`}>
             {/* Heading */}
             <div className="flex flex-col space-y-1.5 pb-2">
               <div className="flex justify-between items-center">
