@@ -20,33 +20,47 @@ export default function Sidebar({ onPromptClick }: SidebarProps) {
   const sections: Section[] = [
     {
       id: 'db-tool',
-      title: 'Database Tool Calls',
-      description: 'Query and modify order data.',
+      title: 'Order Lookup & Database Queries',
+      description: 'Retrieve order status, purchased products, and shipping details. You can query up to 3 orders at once.',
       prompts: [
-        'Show my recent orders',
-        'Add a test order for $200',
-        'Delete order #3',
-        'Summarize my order history'
+        'Check the status of order {order_number}',
+        'What items did I buy in order {order_number}?',
+        'Where is order {order_number} being shipped?',
+        'Show the details for orders {order_number}, {order_number}, and {order_number}',
+        'Check the status of these orders: {order_number}, {order_number}',
+        'Summarize everything in order {order_number}',
+        'What products are in orders {order_number} and {order_number}?',
+        'Which address is order {order_number} being delivered to?'
       ]
     },
     {
       id: 'rag',
-      title: 'RAG Knowledge Retrieval',
-      description: 'Retrieve information from the knowledge base.',
+      title: 'Product & Store Knowledge',
+      description: 'Ask questions about products, sizing, shipping, and store policies.',
       prompts: [
-        'Explain the refund policy',
-        'Summarize company guidelines',
-        'What are the shipping rules?',
-        'Compare standard vs express delivery'
+        'What is Drippy Dino Tees and what kind of products do they sell?',
+        'Tell me about the Cloud Syntax Tee, including material, fit, and available colors.',
+        'Compare the Cloud Syntax Tee and Samurai Error 404 Tee.',
+        'What sizes are available for the Dino Minimal Logo Tee and how should I size down for regular fit?',
+        'How long does shipping take in Singapore and what are the costs for express or international shipping?',
+        'What is your return and exchange policy, including time limits and conditions?',
+        'Do your prints crack after washing and how should I care for the shirts?',
+        'When is the next product drop and where can I find announcements?'
       ]
     },
     {
       id: 'auth',
-      title: 'Authorization & Sensitive Data',
-      description: 'Test access control for protected user information.',
+      title: 'Order Access & Authorization',
+      description: 'Access protected order information. You must provide a valid {order_number} and be logged in. Data will not be returned if your session is expired or invalid.',
       prompts: [
-        'What is my full name?',
-        'What is my saved address?'
+        'Show details for order {order_number}.',
+        'What is the status of order {order_number}?',
+        'List the items and quantities in order {order_number}.',
+        'How much did order {order_number} cost including shipping?',
+        'Show the shipping address for order {order_number}.',
+        'What payment method was used for order {order_number}?',
+        'What happens if I try to fetch order {order_number} while logged out?',
+        'Can I access order {order_number} if I am not the owner?'
       ]
     }
   ];

@@ -38,7 +38,7 @@ export default function RootLayout({
           <ToastProvider>
             <div className="text-black">
               <Navbar />
-              <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex overflow-y-scroll">
+              <div className="w-screen h-[calc(100vh-64px)] bg-background z-[1] flex overflow-y-auto">
                 {children}
               </div>
               <ChatBot chatbotStyle="pop-up"/>

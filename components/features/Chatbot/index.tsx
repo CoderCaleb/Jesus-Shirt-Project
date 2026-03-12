@@ -69,7 +69,7 @@ type ChatbotProps = {
   formValues?: InputData
 }
 
-const ChatBot = ({chatbotStyle="pop-up", formMethods:methods, formValues}:ChatbotProps) => {
+const ChatBot = ({ chatbotStyle = "pop-up", formMethods: methods, formValues }: ChatbotProps) => {
   const [messages, setMessages] = useState<ChatMessage[]>([
     { sender: "AI", text: "Hi, how can I help you today?", timestamp: Date.now() },
   ]);
@@ -90,8 +90,8 @@ const ChatBot = ({chatbotStyle="pop-up", formMethods:methods, formValues}:Chatbo
 
   const defaultMethods = useForm<InputData>({ resolver: zodResolver(schema) });
 
-  if(!methods){
-    methods=defaultMethods
+  if (!methods) {
+    methods = defaultMethods
     formValues = methods.watch()
   }
 
@@ -105,6 +105,7 @@ const ChatBot = ({chatbotStyle="pop-up", formMethods:methods, formValues}:Chatbo
       const response = await fetchHelper<ConnectionDetails>(
         `${process.env.NEXT_PUBLIC_CLIENT_API_URL}/get_connection_details`
       );
+      console.log(response)
       updateConnectionDetails(response);
       setConversationId(null);
       setMessages([]);
@@ -130,7 +131,7 @@ const ChatBot = ({chatbotStyle="pop-up", formMethods:methods, formValues}:Chatbo
             method: "POST",
             body: {
               query: message,
-              conversation_id: conversationId?conversationId:null,
+              conversation_id: conversationId ? conversationId : null,
               user_id: userId
             },
           }
@@ -181,7 +182,7 @@ const ChatBot = ({chatbotStyle="pop-up", formMethods:methods, formValues}:Chatbo
     console.log("Updated agentState in parent:", agentState);
   }, [agentState]);
 
-  if(pathname==="/chatbot-demo"&&chatbotStyle==="pop-up"){
+  if (pathname === "/chatbot-demo" && chatbotStyle === "pop-up") {
     return <></>
   }
 
@@ -197,39 +198,39 @@ const ChatBot = ({chatbotStyle="pop-up", formMethods:methods, formValues}:Chatbo
         updateConnectionDetails(undefined);
         onCloseButtonClicked();
       }}
-      className={`${chatbotStyle=="container"?"block flex-1":"grid grid-rows-[2fr_1fr]"} items-center w-full`}
+      className={`${chatbotStyle == "container" ? "block flex-1" : "grid grid-rows-[2fr_1fr]"} items-center w-full min-h-0`}
       data-lk-theme="default"
     >
-      <div className={`text-black ${chatbotStyle=="container"?"h-full":""}`}>
+      <div className={`text-black ${chatbotStyle == "container" ? "h-full" : ""}`}>
         {/* Button */}
-        {chatbotStyle==="pop-up"&&
-        <button
-          className="fixed bottom-4 right-4 inline-flex items-center justify-center text-sm font-medium disabled:pointer-events-none disabled:opacity-50 border rounded-full w-16 h-16 bg-black hover:bg-gray-700 m-0 cursor-pointer border-gray-200 bg-none p-0 normal-case leading-5 hover:text-gray-900"
-          type="button"
-          aria-haspopup="dialog"
-          aria-expanded="false"
-          data-state="closed"
-          onClick={handleOpenChatBot}
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            width="30"
-            height="40"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            className="text-white block border-gray-200 align-middle"
+        {chatbotStyle === "pop-up" &&
+          <button
+            className="fixed bottom-4 right-4 inline-flex items-center justify-center text-sm font-medium disabled:pointer-events-none disabled:opacity-50 border rounded-full w-16 h-16 bg-black hover:bg-gray-700 m-0 cursor-pointer border-gray-200 bg-none p-0 normal-case leading-5 hover:text-gray-900"
+            type="button"
+            aria-haspopup="dialog"
+            aria-expanded="false"
+            data-state="closed"
+            onClick={handleOpenChatBot}
           >
-            <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
-          </svg>
-        </button>}
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="30"
+              height="40"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="text-white block border-gray-200 align-middle"
+            >
+              <path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z" />
+            </svg>
+          </button>}
 
         {/* Chat Container */}
-        {(chatBotOpen || chatbotStyle=="container") && (
-    <div className={`${chatbotStyle=="pop-up"?"fixed bottom-[calc(4rem+1.5rem)] right-0 mr-4 w-[440px] h-[calc(80vh-64px)] rounded-lg border border-[#e5e7eb] shadow-slate-200 shadow-md":"w-full h-full"} flex flex-col bg-white p-6`}>
+        {(chatBotOpen || chatbotStyle == "container") && (
+          <div className={`${chatbotStyle == "pop-up" ? "fixed bottom-[calc(4rem+1.5rem)] right-0 mr-4 w-[440px] h-[calc(80vh-64px)] rounded-lg border border-[#e5e7eb] shadow-slate-200 shadow-md" : "w-full h-full"} flex flex-col bg-white p-6`}>
             {/* Heading */}
             <div className="flex flex-col space-y-1.5 pb-2">
               <div className="flex justify-between items-center">
@@ -255,49 +256,49 @@ const ChatBot = ({chatbotStyle="pop-up", formMethods:methods, formValues}:Chatbo
             </div>
 
             {/* Chat Messages */}
-            <div className="flex-1 overflow-y-auto pr-4" ref={chatContainerRef}>
+            <div className="flex-1 overflow-y-auto pr-4 min-h-0 pb-6" ref={chatContainerRef}>
               {messages.map((msg, index) => (
                 <div key={index}>
                   {msg.sender !== "SYSTEM" ? (
-                    index===0||messages[index - 1].sender !== msg.sender?<div className="flex gap-3 mt-8 text-gray-600 text-sm h-min">
-                      
-                        <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
-                          <div className="rounded-full bg-gray-100 border p-1 w-full h-full">
-                            {msg.sender === "AI" && (
-                              <svg
-                                stroke="none"
-                                fill="black"
-                                strokeWidth="1.5"
-                                viewBox="0 0 24 24"
-                                aria-hidden="true"
-                                height="20"
-                                width="20"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  strokeLinecap="round"
-                                  strokeLinejoin="round"
-                                  d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
-                                />
-                              </svg>
-                            )}
-                            {msg.sender === "USER" && (
-                              <FaUser className="w-[20px] h-[20px] p-1" />
-                            )}
-                          </div>
+                    index === 0 || messages[index - 1].sender !== msg.sender ? <div className="flex gap-3 mt-8 text-gray-600 text-sm h-min">
+
+                      <span className="relative flex shrink-0 overflow-hidden rounded-full w-8 h-8">
+                        <div className="rounded-full bg-gray-100 border p-1 w-full h-full">
+                          {msg.sender === "AI" && (
+                            <svg
+                              stroke="none"
+                              fill="black"
+                              strokeWidth="1.5"
+                              viewBox="0 0 24 24"
+                              aria-hidden="true"
+                              height="20"
+                              width="20"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z"
+                              />
+                            </svg>
+                          )}
+                          {msg.sender === "USER" && (
+                            <FaUser className="w-[20px] h-[20px] p-1" />
+                          )}
+                        </div>
+                      </span>
+
+                      <div className="">
+                        <span className="block font-bold text-gray-700">
+                          {msg.sender}
                         </span>
-                      
-                        <p className="">
-                          <span className="block font-bold text-gray-700">
-                            {msg.sender}
-                          </span>
-                            <React.Fragment key={index}>
-                              <Markdown>{msg.text}</Markdown>
-                            </React.Fragment>
-                        </p>
-                      
-                    </div>:<p className="leading-relaxed text-gray-600 text-sm ml-11">{msg.text}</p>
-                  
+                        <React.Fragment key={index}>
+                          <Markdown>{msg.text}</Markdown>
+                        </React.Fragment>
+                      </div>
+
+                    </div> : <p className="leading-relaxed text-gray-600 text-sm ml-11">{msg.text}</p>
+
                   ) : (
                     <p className="text-sm text-red-500 font-medium my-4">
                       {msg.text}
@@ -400,8 +401,8 @@ function SimpleVoiceAssistant({
   return (
     <div className="flex w-full h-full items-center justify-center text-center">
       {state === "initializing" ||
-      state === "connecting" ||
-      state === "disconnected" ? (
+        state === "connecting" ||
+        state === "disconnected" ? (
         "Connecting... Please reload the page if agent is not connected after a minute"
       ) : (
         <ControlBar setAgentState={onStateChange} />

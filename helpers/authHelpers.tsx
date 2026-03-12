@@ -17,38 +17,51 @@ function attachOrderHeaders(
   orderToken?: string,
   orderNumber?: string,
   state?: string,
+  role?: string,
 ) {
   let { url, requestInit } = input;
-  console.log("Attach headers", orderToken, orderNumber, state);
-  if (orderToken && orderNumber && state) {
+  console.log("Attach headers", orderToken, orderNumber, state, role);
+  const headers : Record<string, any> = {...requestInit.headers}
+  
+  if (orderToken) headers["Order-Token"] = orderToken;
+  if (orderNumber) headers["orderNumber"] = orderNumber;
+  if (state) headers["state"] = state;
+  if (role) headers["role"] = role; 
+  if(headers){
+    console.log("headers",headers)
+  }
+  
     requestInit = {
       ...requestInit,
-      headers: {
-        ...requestInit.headers,
-        "Order-Token": orderToken,
-        orderNumber: orderNumber,
-        state: state,
-      },
+      headers
     };
-  }
+  
   return { url, requestInit };
 }
 
 export async function sendMagicLink(
+  role: string,
   email: string,
   orderToken?: string,
   orderNumber?: string,
   state?: string,
 ) {
   try {
+    console.log("role",role)
+    if(!role){
+      throw new Error("No role provided")
+    }
     const response = await createCode({
       email,
       options: {
         preAPIHook: async (input) => {
-          return attachOrderHeaders(input, orderToken, orderNumber, state);
+          return attachOrderHeaders(input, orderToken, orderNumber, state, role);
         },
       },
     });
+
+    console.log("create code response",response)
+  
 
     if (response.status === "SIGN_IN_UP_NOT_ALLOWED") {
       throw new Error(response.reason);
@@ -77,6 +90,7 @@ type MagicLinkResponse = {
 };
 
 export const handleMagicLinkClicked = async (
+  role: string,
   setStatus: React.Dispatch<
     React.SetStateAction<"loading" | "error" | "success" | "idle">
   >,
@@ -91,7 +105,7 @@ export const handleMagicLinkClicked = async (
     const response: MagicLinkResponse = await consumeCode({
       options: {
         preAPIHook: async (input) => {
-          return attachOrderHeaders(input, orderToken, orderNumber, state);
+          return attachOrderHeaders(input, orderToken, orderNumber, state, role);
         },
       },
     });

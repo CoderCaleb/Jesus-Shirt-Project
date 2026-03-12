@@ -64,6 +64,7 @@ export async function fetchHelper<T>(
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
+      console.log(errorData.error,errorData.message)
       const { status } = response;
 
       // Handle specific status codes
@@ -87,7 +88,7 @@ export async function fetchHelper<T>(
         }
       }
 
-      throw new ApiError(response.status, response.statusText, errorData);
+      throw new ApiError(response.status, response.statusText, errorData.error ?? errorData.message);
     }
 
     const data = await response.json();

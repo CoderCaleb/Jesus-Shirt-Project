@@ -23,10 +23,13 @@ const VerifyPage = () => {
   const orderToken = searchParams.get("order_token") ?? undefined;
   const orderNumber = searchParams.get("order_id") ?? undefined;
   const state = searchParams.get("state") ?? undefined;
+  const role = searchParams.get("role") ?? "customer";
+
 
   useEffect(() => {
     if (!requiresConfirmation) {
       handleMagicLinkClicked(
+        role,
         setStatus,
         setErrorMessage,
         orderToken,

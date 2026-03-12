@@ -11,6 +11,7 @@ import {
   sendMagicLink,
 } from "@/helpers/authHelpers";
 import Loader from "@/components/ui/Loader";
+import { useSearchParams } from "next/navigation";
 
 interface SignUpClientProps {
   state: string | undefined;
@@ -38,6 +39,8 @@ export default function SignUpClient({
   const [sendMagicLinkLoading, setSendMagicLinkLoading] = useState(false);
   const [sendMagicLinkError, setSendMagicLinkError] = useState({ error: "" });
   const [authStep, setAuthStep] = useState<null | number>(null);
+  const searchParams = useSearchParams();
+  const role = searchParams.get("role") ?? "customer";
 
   useEffect(() => {
     const updateInitialMagicLinkBeenSentState = async () => {
@@ -49,7 +52,7 @@ export default function SignUpClient({
   const onSubmit = async (data: FormData) => {
     setSendMagicLinkLoading(true);
     try {
-      await sendMagicLink(data.email, orderToken, orderId, state);
+      await sendMagicLink(role, data.email, orderToken, orderId, state);
       setAuthStep(2);
       methods.reset();
     } catch (error:unknown) {

@@ -33,7 +33,7 @@ function ChatBotDemo() {
       formMethods={methods}
       formValues={formValues}
     />
-    <OrdersAccordian/>
+    <OrdersAccordian ordersClickable={false} ordersCopyable/>
     </div>
   </div>
   )

@@ -21,7 +21,12 @@ async function fetchOrders(): Promise<OrdersResponse> {
   });
 }
 
-export default async function OrdersContent() {
+type OrdersContentType = {
+  ordersClickable?: boolean;
+  ordersCopyable?: boolean;
+}
+
+export default async function OrdersContent({ordersClickable=false, ordersCopyable=false}:OrdersContentType) {
   const { accessTokenPayload, hasToken, error } = await getSSRSessionHelper();
 
   if (error) {
@@ -59,7 +64,7 @@ export default async function OrdersContent() {
         </div>
         <div className="bg-slate-300 w-full h-lineBreakHeight" />
         {ordersResponse.orders.map((order) => (
-          <OrderRow key={order.order_number} order={order} />
+          <OrderRow key={order.order_number} order={order} ordersClickable={ordersClickable} ordersCopyable={ordersCopyable}/>
         ))}
       </div>
     );
